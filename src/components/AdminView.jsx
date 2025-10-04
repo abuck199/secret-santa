@@ -204,7 +204,7 @@ const AdminView = ({
 
             <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
               <button 
-                onClick={shuffleAssignments} 
+                onClick={sendAssignmentEmails} 
                 disabled={loading}
                 className="flex-1 bg-gradient-to-r from-beige to-beige-dark text-white px-6 py-3 rounded-lg hover:from-beige-dark hover:to-beige-dark font-bold disabled:opacity-50"
               >
