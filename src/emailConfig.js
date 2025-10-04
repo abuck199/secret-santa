@@ -1,6 +1,6 @@
 export const emailConfig = {
-  publicKey: 'YYb-eV65AkDlBwDFI',
-  serviceId: 'service_t3r7jfw',
-  templateIdWelcome: 'template_yn9dxgk',
-  templateIdAssignment: 'template_g260y0n'
+  publicKey: process.env.REACT_APP_EMAILJS_PUBLIC_KEY,
+  serviceId: process.env.REACT_APP_EMAILJS_SERVICE_ID,
+  templateIdWelcome: process.env.REACT_APP_EMAILJS_TEMPLATE_WELCOME,
+  templateIdAssignment: process.env.REACT_APP_EMAILJS_TEMPLATE_ASSIGNMENT
 };
