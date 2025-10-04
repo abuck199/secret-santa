@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from './supabaseClient';
+import { supabase, supabaseAnon } from './supabaseClient';
 import bcrypt from 'bcryptjs';
 import emailjs from '@emailjs/browser';
 import { emailConfig } from './emailConfig';
@@ -18,6 +18,7 @@ const SecretSantaApp = () => {
   useEffect(() => {
     emailjs.init(emailConfig.publicKey);
   }, []);
+  
   // États principaux
   const [currentUser, setCurrentUser] = useState(null);
   const [view, setView] = useState('login');
@@ -39,13 +40,9 @@ const SecretSantaApp = () => {
   // Filtres
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [draggedItem, setDraggedItem] = useState(null);
 
   // === EFFETS ===
   useEffect(() => {
-    loadAllData();
-    
-    // Charger l'utilisateur depuis sessionStorage au démarrage
     const savedUser = sessionStorage.getItem('currentUser');
     if (savedUser) {
       try {
@@ -58,6 +55,13 @@ const SecretSantaApp = () => {
       }
     }
   }, []);
+
+  // Charger les données seulement quand currentUser change
+  useEffect(() => {
+    if (currentUser) {
+      loadAllData();
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     const titles = {
@@ -102,7 +106,7 @@ const SecretSantaApp = () => {
   };
 
   const loadUsers = async () => {
-    const { data } = await supabase.from('users').select('*').order('username');
+    const { data } = await supabase.from('users').select('id, username, email, is_admin, created_at').order('username');
     setUsers(data || []);
   };
 
@@ -147,7 +151,8 @@ const SecretSantaApp = () => {
       return;
     }
     
-    const { data } = await supabase
+    // Utiliser supabaseAnon pour le login (lecture publique du username/email)
+    const { data } = await supabaseAnon
       .from('users')
       .select('*')
       .eq('username', trimmedUsername)
@@ -177,7 +182,6 @@ const SecretSantaApp = () => {
   };
 
   const handleLogout = () => {
-    // Supprimer de sessionStorage
     sessionStorage.removeItem('currentUser');
     setCurrentUser(null);
     setView('login');
@@ -204,7 +208,6 @@ const SecretSantaApp = () => {
       return;
     }
     
-    // Validation email obligatoire
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       setError('Courriel invalide');
       return;
@@ -212,11 +215,11 @@ const SecretSantaApp = () => {
     
     setLoading(true);
     
-    // Envoyer l'email avec les identifiants AVANT de hasher le mot de passe
+    // Envoyer l'email avec les identifiants AVANT de hasher
     try {
       await emailjs.send(
         emailConfig.serviceId,
-        emailConfig.templateIdWelcome,  // Template de bienvenue
+        emailConfig.templateIdWelcome,
         {
           to_email: trimmedEmail,
           to: trimmedEmail,
@@ -228,10 +231,8 @@ const SecretSantaApp = () => {
           site_url: window.location.origin
         }
       );
-      console.log(`Email de bienvenue envoyé à ${trimmedUsername}`);
     } catch (error) {
       console.error('Erreur envoi email de bienvenue:', error);
-      // Continue quand même la création même si l'email échoue
     }
     
     const hashedPassword = await bcrypt.hash(password.trim(), 10);
@@ -259,7 +260,6 @@ const SecretSantaApp = () => {
     if (!user) return;
     
     const items = wishLists[userId] || [];
-    // Vérifier si des articles de cet utilisateur sont réservés
     const hasReserved = items.some(i => i.reservedBy !== null);
     
     const msg = `Supprimer ${user.username}?\n\nCela supprimera:\n` +
@@ -305,7 +305,6 @@ const SecretSantaApp = () => {
   const toggleItemClaimed = async (itemId, currentStatus) => {
     setLoading(true);
     
-    // Si on réserve, on met l'ID de l'utilisateur actuel, sinon null
     const reservedBy = !currentStatus ? currentUser.id : null;
     
     await supabase
@@ -322,25 +321,20 @@ const SecretSantaApp = () => {
   };
 
   // === DRAG & DROP ===
-  const handleDragStart = (item) => setDraggedItem(item);
-  const handleDragOver = (e) => e.preventDefault();
-
-  const handleDrop = async (targetItem) => {
-    if (!draggedItem || draggedItem.id === targetItem.id) return;
-    
-    const items = [...(wishLists[currentUser.id] || [])];
-    const dragIdx = items.findIndex(i => i.id === draggedItem.id);
-    const targetIdx = items.findIndex(i => i.id === targetItem.id);
-    
-    items.splice(dragIdx, 1);
-    items.splice(targetIdx, 0, draggedItem);
-    
-    await Promise.all(items.map((item, idx) => 
-      supabase.from('wishlist_items').update({ display_order: idx }).eq('id', item.id)
-    ));
-    
-    await loadWishLists();
-    setDraggedItem(null);
+  const updateWishlistOrder = async (userId, newItems) => {
+    try {
+      await Promise.all(newItems.map((item, idx) => 
+        supabase
+          .from('wishlist_items')
+          .update({ display_order: idx })
+          .eq('id', item.id)
+      ));
+      
+      await loadWishLists();
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'ordre:', error);
+      setError('Erreur lors de la réorganisation');
+    }
   };
 
   // === ATTRIBUTIONS ===
@@ -357,17 +351,14 @@ const SecretSantaApp = () => {
       let emailsFailed = 0;
       const emailPromises = [];
       
-      // Parcourir toutes les attributions existantes
       for (const [giverId, receiverId] of Object.entries(assignments)) {
         const giver = users.find(u => u.id === giverId);
         const receiver = users.find(u => u.id === receiverId);
         
         if (giver?.email && receiver) {
-          console.log(`Préparation email pour ${giver.username} → ${giver.email}`);
-          
           const emailPromise = emailjs.send(
             emailConfig.serviceId,
-            emailConfig.templateIdAssignment,  // Template d'attribution
+            emailConfig.templateIdAssignment,
             {
               to_email: giver.email,
               to: giver.email,
@@ -378,15 +369,8 @@ const SecretSantaApp = () => {
               site_url: window.location.origin
             }
           )
-          .then(() => {
-            emailsSent++;
-            console.log(`Email envoyé à ${giver.username} (${giver.email})`);
-          })
-          .catch((error) => {
-            emailsFailed++;
-            console.error(`❌ Erreur envoi email à ${giver.username} (${giver.email}):`, error);
-            console.error('Détails:', error.text || error.message || error);
-          });
+          .then(() => emailsSent++)
+          .catch(() => emailsFailed++);
           
           emailPromises.push(emailPromise);
         }
@@ -394,21 +378,14 @@ const SecretSantaApp = () => {
       
       await Promise.all(emailPromises);
       
-      let message = 'Emails renvoyés !';
-      if (emailsSent > 0) {
-        message = `${emailsSent} email(s) renvoyé(s)`;
-        if (emailsFailed > 0) {
-          message += `, ${emailsFailed} échec(s)`;
-        }
-      } else if (emailPromises.length === 0) {
-        message = 'Aucun email envoyé (aucun utilisateur avec email)';
-      } else {
-        message = `Échec: ${emailsFailed} erreur(s)`;
-      }
+      let message = emailsSent > 0 
+        ? `${emailsSent} email(s) renvoyé(s)` 
+        : 'Aucun email envoyé';
+      
+      if (emailsFailed > 0) message += `, ${emailsFailed} échec(s)`;
       
       setSuccess(message);
     } catch (error) {
-      console.error('Erreur lors de l\'envoi des emails:', error);
       setError('Erreur lors de l\'envoi des emails');
     } finally {
       setLoading(false);
@@ -435,61 +412,39 @@ const SecretSantaApp = () => {
       // Envoyer les emails
       let emailsSent = 0;
       let emailsFailed = 0;
-      const emailPromises = [];
       
       for (const assignment of newAssignments) {
         const giver = users.find(u => u.id === assignment.giver_id);
         const receiver = users.find(u => u.id === assignment.receiver_id);
         
         if (giver?.email && receiver) {
-          console.log(`Préparation email pour ${giver.username} → ${giver.email}`);
-          
-          const emailPromise = emailjs.send(
-            emailConfig.serviceId,
-            emailConfig.templateId,
-            {
-              to_email: giver.email,  // Pour compatibilité
-              to: giver.email,         // Requis par EmailJS
-              from_name: 'Secret Santa',
-              to_name: giver.username,
-              receiver_name: receiver.username,
-              event_name: event.name,
-              site_url: window.location.origin
-            }
-          )
-          .then(() => {
+          try {
+            await emailjs.send(
+              emailConfig.serviceId,
+              emailConfig.templateId,
+              {
+                to_email: giver.email,
+                to: giver.email,
+                from_name: 'Secret Santa',
+                to_name: giver.username,
+                receiver_name: receiver.username,
+                event_name: event.name,
+                site_url: window.location.origin
+              }
+            );
             emailsSent++;
-            console.log(`Email envoyé à ${giver.username} (${giver.email})`);
-          })
-          .catch((error) => {
+          } catch {
             emailsFailed++;
-            console.error(`❌ Erreur envoi email à ${giver.username} (${giver.email}):`, error);
-            console.error('Détails:', error.text || error.message || error);
-          });
-          
-          emailPromises.push(emailPromise);
+          }
         }
       }
       
-      // Attendre que tous les emails soient envoyés
-      await Promise.all(emailPromises);
-      
-      // Message de succès basé sur les résultats
       let message = 'Attributions créées !';
-      if (emailsSent > 0) {
-        message += ` ${emailsSent} email(s) envoyé(s)`;
-        if (emailsFailed > 0) {
-          message += `, ${emailsFailed} échec(s)`;
-        }
-      } else if (emailPromises.length === 0) {
-        message += ' (Aucun utilisateur avec email)';
-      } else {
-        message += ` (${emailsFailed} échec(s))`;
-      }
+      if (emailsSent > 0) message += ` ${emailsSent} email(s) envoyé(s)`;
+      if (emailsFailed > 0) message += `, ${emailsFailed} échec(s)`;
       
       setSuccess(message);
     } catch (error) {
-      console.error('Erreur lors du mélange:', error);
       setError('Erreur lors de la création des attributions');
     } finally {
       setLoading(false);
@@ -513,7 +468,6 @@ const SecretSantaApp = () => {
     const reservations = [];
     Object.entries(wishLists).forEach(([userId, items]) => {
       items.forEach(item => {
-        // Vérifier que c'est MOI qui ai réservé l'article
         if (item.reservedBy === currentUser?.id && userId !== currentUser?.id) {
           const user = users.find(u => u.id === userId);
           if (user) reservations.push({ ...item, userName: user.username, userId });
@@ -526,7 +480,6 @@ const SecretSantaApp = () => {
   const getStatistics = useCallback(() => {
     const allItems = Object.values(wishLists).flat();
     const totalItems = allItems.length;
-    // Compter les articles avec reserved_by (pas juste claimed)
     const reservedItems = allItems.filter(i => i.reservedBy !== null).length;
     const usersWithLists = Object.keys(wishLists).length;
     
@@ -599,9 +552,7 @@ const SecretSantaApp = () => {
           itemForm={itemForm}
           setItemForm={setItemForm}
           addWishlistItem={addWishlistItem}
-          handleDragStart={handleDragStart}
-          handleDragOver={handleDragOver}
-          handleDrop={handleDrop}
+          updateWishlistOrder={updateWishlistOrder}
           setView={setView}
           loading={loading}
         />
