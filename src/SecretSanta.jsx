@@ -26,6 +26,7 @@ const SecretSantaApp = () => {
   const [wishLists, setWishLists] = useState({});
   const [assignments, setAssignments] = useState({});
   const [event, setEvent] = useState({ id: null, name: 'Noël en Famille 2025' });
+  const [initialLoading, setInitialLoading] = useState(true);
   
   // Formulaires
   const [loginForm, setLoginForm] = useState({ username: '', password: '', showPassword: false });
@@ -43,18 +44,71 @@ const SecretSantaApp = () => {
 
   // === EFFETS ===
   useEffect(() => {
-    const savedUser = sessionStorage.getItem('currentUser');
-    if (savedUser) {
+    const checkUserSession = async () => {
+      const savedUser = sessionStorage.getItem('currentUser');
+      const savedView = sessionStorage.getItem('currentView');
+      
+      if (!savedUser) {
+        setInitialLoading(false); // ← Pas d'utilisateur, arrêter le loading
+        return;
+      }
+      
       try {
         const parsedUser = JSON.parse(savedUser);
-        setCurrentUser(parsedUser);
-        setView('dashboard');
+        
+        // Vérifier que l'utilisateur existe toujours dans la DB
+        const { data, error } = await supabaseAnon
+          .from('users')
+          .select('id, username, email, is_admin')
+          .eq('id', parsedUser.id)
+          .single();
+        
+        if (error || !data) {
+          console.log('Utilisateur supprimé, déconnexion...');
+          sessionStorage.removeItem('currentUser');
+          sessionStorage.removeItem('currentView');
+          setError('Votre compte a été supprimé');
+          setInitialLoading(false); // ← Arrêter le loading
+          return;
+        }
+        
+        setCurrentUser(data);
+        
+        // Restaurer la vue sauvegardée
+        if (savedView) {
+          setView(savedView);
+        } else {
+          setView('dashboard');
+        }
       } catch (error) {
         console.error('Erreur lors du chargement de la session:', error);
         sessionStorage.removeItem('currentUser');
+        sessionStorage.removeItem('currentView');
+      } finally {
+        setInitialLoading(false); // ← Toujours arrêter le loading à la fin
       }
-    }
+    };
+    
+    checkUserSession();
   }, []);
+
+  // Sauvegarder la vue chaque fois qu'elle change
+  useEffect(() => {
+    if (currentUser && view !== 'login') {
+      sessionStorage.setItem('currentView', view);
+    }
+  }, [view, currentUser]);
+
+  useEffect(() => {
+  if (!currentUser) return;
+  
+  // Recharger les données toutes les 10 secondes
+  const interval = setInterval(() => {
+    loadWishLists();
+  }, 5000); // 5 secondes
+  
+  return () => clearInterval(interval);
+}, [currentUser]);
 
   // Charger les données seulement quand currentUser change
   useEffect(() => {
@@ -73,8 +127,9 @@ const SecretSantaApp = () => {
       assignment: 'Mon Attribution',
       admin: 'Administration'
     };
-    document.title = `${titles[view] || 'Cadeau Mystère'} - Cadeau Mystère`;
-  }, [view]);
+    const appName = event.name || 'Cadeau Mystère';
+    document.title = `${titles[view] || appName} - ${appName}`;
+  }, [view, event.name]);
 
   useEffect(() => {
     if (error) {
@@ -89,6 +144,35 @@ const SecretSantaApp = () => {
       return () => clearTimeout(timer);
     }
   }, [success]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    // Vérifier toutes les 30 secondes si le compte existe toujours
+    const checkAccountExists = async () => {
+      try {
+        const { data, error } = await supabaseAnon
+          .from('users')
+          .select('id')
+          .eq('id', currentUser.id)
+          .single();
+        
+        if (error || !data) {
+          // Compte supprimé, forcer la déconnexion
+          sessionStorage.removeItem('currentUser');
+          setCurrentUser(null);
+          setView('login');
+          setError('Votre compte a été supprimé par un administrateur');
+        }
+      } catch (error) {
+        console.error('Erreur vérification compte:', error);
+      }
+    };
+    
+    const interval = setInterval(checkAccountExists, 5000); // 5 secondes
+    
+    return () => clearInterval(interval);
+  }, [currentUser]);
 
   // === CHARGEMENT DONNÉES ===
   const loadAllData = async () => {
@@ -106,8 +190,8 @@ const SecretSantaApp = () => {
   };
 
   const loadUsers = async () => {
-    const { data } = await supabase.from('users').select('id, username, email, is_admin, created_at').order('username');
-    setUsers(data || []);
+  const { data } = await supabase.from('users_safe').select('*').order('username');
+  setUsers(data || []);
   };
 
   const loadWishLists = async () => {
@@ -183,6 +267,7 @@ const SecretSantaApp = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem('currentUser');
+    sessionStorage.removeItem('currentView'); // ← Nettoyer la vue
     setCurrentUser(null);
     setView('login');
   };
@@ -256,29 +341,91 @@ const SecretSantaApp = () => {
   };
 
   const deleteUser = async (userId) => {
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
+  const user = users.find(u => u.id === userId);
+  if (!user) return;
+  
+  const items = wishLists[userId] || [];
+  const hasReserved = items.some(i => i.reservedBy !== null);
+  
+  const reservedByUser = Object.values(wishLists)
+    .flat()
+    .filter(item => item.reservedBy === userId && item.userId !== userId);
+  
+  const msg = `⚠️ ATTENTION : Cette action est IRRÉVERSIBLE !\n\n` +
+              `Supprimer ${user.username}?\n\n` +
+              `Cela va:\n` +
+              `- Supprimer sa liste (${items.length} article${items.length > 1 ? 's' : ''})\n` +
+              (hasReserved ? '- Annuler les réservations sur ses articles\n' : '') +
+              (reservedByUser.length > 0 ? `- Annuler ses ${reservedByUser.length} réservation(s) chez les autres\n` : '') +
+              '- Supprimer son attribution\n\n' +
+              'Tapez "SUPPRIMER" en majuscules pour confirmer';
+  
+  const confirmation = window.prompt(msg);
+  
+  if (confirmation !== 'SUPPRIMER') {
+    setError('Suppression annulée');
+    return;
+  }
+  
+  setLoading(true);
+  
+  try {
+    // 1. D'abord, annuler toutes les réservations de cet utilisateur
+    await supabase
+      .from('wishlist_items')
+      .update({ claimed: false, reserved_by: null })
+      .eq('reserved_by', userId);
     
-    const items = wishLists[userId] || [];
-    const hasReserved = items.some(i => i.reservedBy !== null);
+    // 2. Ensuite, supprimer l'utilisateur (cascade supprimera sa liste et ses attributions)
+    const { error: deleteError } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', userId);
     
-    const msg = `Supprimer ${user.username}?\n\nCela supprimera:\n` +
-                `- Sa liste (${items.length} article${items.length > 1 ? 's' : ''})\n` +
-                (hasReserved ? '- Les réservations sur ses articles\n' : '') +
-                '- Son attribution';
+    if (deleteError) throw deleteError;
     
-    if (!window.confirm(msg)) return;
+    // 3. Recharger toutes les données
+    await Promise.all([
+      loadUsers(),
+      loadWishLists(),
+      loadAssignments()
+    ]);
     
-    setLoading(true);
-    await supabase.from('users').delete().eq('id', userId);
-    await loadAllData();
-    setSuccess(`${user.username} supprimé`);
+    setSuccess(`${user.username} supprimé avec succès`);
+  } catch (error) {
+    setError('Erreur lors de la suppression');
+    console.error('Erreur suppression:', error);
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   // === GESTION WISHLIST ===
   const addWishlistItem = async () => {
     if (!itemForm.item.trim()) return;
+    
+    if (itemForm.link && itemForm.link.trim()) {
+      const link = itemForm.link.trim();
+      
+      // Bloquer javascript: et data: URLs
+      if (link.toLowerCase().startsWith('javascript:') || 
+          link.toLowerCase().startsWith('data:')) {
+        setError('Lien invalide');
+        return;
+      }
+      
+      // Optionnel : forcer https
+      if (!link.startsWith('http://') && !link.startsWith('https://')) {
+        setError('Le lien doit commencer par http:// ou https://');
+        return;
+      }
+    }
+    
+    // Limiter la longueur
+    if (itemForm.item.length > 200) {
+      setError('Le nom de l\'article est trop long (max 200 caractères)');
+      return;
+  }
     
     const msg = `Ajouter "${itemForm.item}"?\n\n⚠️ Impossible de supprimer après ajout.`;
     if (!window.confirm(msg)) return;
@@ -305,20 +452,48 @@ const SecretSantaApp = () => {
   const toggleItemClaimed = async (itemId, currentStatus) => {
     setLoading(true);
     
-    const reservedBy = !currentStatus ? currentUser.id : null;
-    
-    await supabase
-      .from('wishlist_items')
-      .update({ 
-        claimed: !currentStatus,
-        reserved_by: reservedBy
-      })
-      .eq('id', itemId);
+    try {
+      if (!currentStatus) {
+        // Avant de réserver, vérifier que personne d'autre ne l'a réservé
+        const { data: checkData } = await supabase
+          .from('wishlist_items')
+          .select('claimed, reserved_by')
+          .eq('id', itemId)
+          .single();
+        
+        if (checkData.claimed && checkData.reserved_by !== currentUser.id) {
+          setError('Désolé, cet article vient d\'être réservé par quelqu\'un d\'autre');
+          setLoading(false);
+          await loadWishLists(); // Recharger pour voir l'état actuel
+          return;
+        }
+      }
       
-    await loadWishLists();
-    setSuccess(!currentStatus ? 'Article réservé' : 'Réservation annulée');
-    setLoading(false);
-  };
+      const reservedBy = !currentStatus ? currentUser.id : null;
+      
+      const { error } = await supabase
+        .from('wishlist_items')
+        .update({ 
+          claimed: !currentStatus,
+          reserved_by: reservedBy
+        })
+        .eq('id', itemId);
+      
+      if (error) {
+        setError('Erreur lors de la réservation');
+        setLoading(false);
+        return;
+      }
+        
+      await loadWishLists();
+      setSuccess(!currentStatus ? 'Article réservé' : 'Réservation annulée');
+    } catch (err) {
+      setError('Erreur lors de la réservation');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+};
 
   // === DRAG & DROP ===
   const updateWishlistOrder = async (userId, newItems) => {
@@ -508,6 +683,17 @@ const SecretSantaApp = () => {
     
     return filtered.sort((a, b) => a.username.localeCompare(b.username));
   }, [users, wishLists, searchQuery, filterStatus]);
+
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-beige-light via-cream to-beige flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-stone-800 mb-4"></div>
+          <p className="text-stone-600 text-lg">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   // === RENDU ===
   if (!currentUser) {
