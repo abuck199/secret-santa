@@ -25,7 +25,7 @@ const SecretSantaApp = () => {
   const [users, setUsers] = useState([]);
   const [wishLists, setWishLists] = useState({});
   const [assignments, setAssignments] = useState({});
-  const [event, setEvent] = useState({ id: null, name: 'Noël en Famille 2025' });
+  const [event, setEvent] = useState({ id: null, name: 'Noël 2025' });
   const [initialLoading, setInitialLoading] = useState(true);
   
   // Formulaires
