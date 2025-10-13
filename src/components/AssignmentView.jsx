@@ -30,11 +30,12 @@ const AssignmentView = ({
           {(wishLists[assignments[currentUser.id]] || []).map(item => (
             <WishlistItem 
               key={item.id} 
-              item={item} 
-              onToggle={toggleItemClaimed}
-              userId={assignments[currentUser.id]} 
-              loading={loading}
+              item={item}
+              showToggle={true} // ← Ajouté
+              toggleItemClaimed={toggleItemClaimed} // ← Corrigé (était onToggle)
               currentUser={currentUser}
+              hideClaimedBadge={false} // ← Ajouté
+              onUpdate={null} // ← Ajouté (pas de modification ici)
             />
           ))}
         </div>

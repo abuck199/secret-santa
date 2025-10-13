@@ -19,8 +19,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import WishlistItem from './WishlistItem';
 
-// Composant wrapper pour chaque item draggable
-const SortableWishlistItem = ({ item, currentUser }) => {
+const SortableWishlistItem = ({ item, currentUser, updateWishlistItem }) => {
   const {
     attributes,
     listeners,
@@ -38,7 +37,6 @@ const SortableWishlistItem = ({ item, currentUser }) => {
 
   return (
     <div ref={setNodeRef} style={style} className="flex items-start gap-2">
-      {/* Handle de drag - fonctionne sur mobile et desktop */}
       <div
         {...attributes}
         {...listeners}
@@ -48,13 +46,13 @@ const SortableWishlistItem = ({ item, currentUser }) => {
         <GripVertical className="w-5 h-5 text-stone-400" />
       </div>
       
-      {/* Le contenu de votre item */}
       <div className="flex-1 min-w-0">
         <WishlistItem 
           item={item} 
           showToggle={false} 
           currentUser={currentUser} 
-          hideClaimedBadge={true} 
+          hideClaimedBadge={true}
+          onUpdate={updateWishlistItem} // ← Passer la fonction de mise à jour
         />
       </div>
     </div>
@@ -67,22 +65,22 @@ const WishlistView = ({
   itemForm, 
   setItemForm, 
   addWishlistItem, 
+  updateWishlistItem, // ← Recevoir la fonction
   updateWishlistOrder,
   setView, 
   loading 
 }) => {
   const items = wishLists[currentUser.id] || [];
 
-  // Senseurs pour supporter souris, tactile et clavier
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 8px de mouvement avant de commencer le drag
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250, // 250ms de délai sur mobile pour éviter conflits avec scroll
+        delay: 250,
         tolerance: 5,
       },
     }),
@@ -91,7 +89,6 @@ const WishlistView = ({
     })
   );
 
-  // Quand un item est déplacé
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
@@ -99,10 +96,8 @@ const WishlistView = ({
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
 
-      // Réorganiser les items
       const newItems = arrayMove(items, oldIndex, newIndex);
       
-      // Appeler la fonction parent pour mettre à jour dans Supabase
       if (updateWishlistOrder) {
         updateWishlistOrder(currentUser.id, newItems);
       }
@@ -120,11 +115,11 @@ const WishlistView = ({
       <div className="bg-white rounded-xl shadow-2xl p-6 border-t-4 border-primary">
         <h2 className="text-2xl font-bold text-stone-800 mb-6">Ma liste de souhaits</h2>
 
-        {/* Formulaire */}
+        {/* Formulaire d'ajout */}
         <div className="mb-6 p-4 bg-gradient-to-br from-cream to-beige border-2 border-beige-dark rounded-xl">
           <h3 className="font-bold text-stone-800 mb-3">Ajouter un article</h3>
           <p className="text-xs text-primary-dark mb-3 font-semibold">
-            ⚠️ Impossible de supprimer après ajout
+            💡 Vous pouvez modifier vos articles après les avoir ajoutés
           </p>
           <div className="space-y-3">
             <input 
@@ -153,17 +148,17 @@ const WishlistView = ({
           </div>
         </div>
 
-        {/* Instructions avec icône mobile/desktop */}
+        {/* Instructions */}
         {items.length > 0 && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              <span className="hidden md:inline">💡 Utilisez l'icône ☰ pour glisser-déposer et réorganiser par priorité</span>
-              <span className="md:hidden">💡 Maintenez l'icône ☰ appuyée pour déplacer les articles</span>
+              <span className="hidden md:inline">💡 Utilisez l'icône ☰ pour réorganiser • Cliquez sur ✏️ pour modifier</span>
+              <span className="md:hidden">💡 Maintenez ☰ pour déplacer • ✏️ pour modifier</span>
             </p>
           </div>
         )}
 
-        {/* Liste draggable avec dnd-kit */}
+        {/* Liste des articles */}
         {items.length > 0 ? (
           <DndContext
             sensors={sensors}
@@ -180,6 +175,7 @@ const WishlistView = ({
                     key={item.id} 
                     item={item} 
                     currentUser={currentUser}
+                    updateWishlistItem={updateWishlistItem} // ← Passer ici
                   />
                 ))}
               </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LogOut, Menu, X, Home, List, Gift } from 'lucide-react';
+import { LogOut, Menu, X, Home, List, Gift, Lock } from 'lucide-react';
 
 const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -51,7 +51,8 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Accueil', icon: Home },
     { id: 'all-lists', label: 'Listes', icon: List },
-    { id: 'my-reservations', label: 'Réservations', icon: Gift }
+    { id: 'my-reservations', label: 'Réservations', icon: Gift },
+    { id: 'change-password', label: 'Mot de passe', icon: Lock }
   ];
 
   return (

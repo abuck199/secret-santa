@@ -204,14 +204,14 @@ const AdminView = ({
 
             <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
               <button 
-                onClick={sendAssignmentEmails} 
+                onClick={shuffleAssignments}  // ← CORRECTION : Remélanger appelle shuffleAssignments
                 disabled={loading}
                 className="flex-1 bg-gradient-to-r from-beige to-beige-dark text-white px-6 py-3 rounded-lg hover:from-beige-dark hover:to-beige-dark font-bold disabled:opacity-50"
               >
                 {loading ? 'Mélange...' : 'Remélanger'}
               </button>
               <button 
-                onClick={sendAssignmentEmails} 
+                onClick={sendAssignmentEmails}  // ← CORRECT : Renvoyer emails appelle sendAssignmentEmails
                 disabled={loading}
                 className="flex-1 bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-3 rounded-lg hover:from-primary-dark hover:to-primary-dark font-bold disabled:opacity-50"
               >

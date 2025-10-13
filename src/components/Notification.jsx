@@ -1,15 +1,42 @@
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 
-const Notification = ({ type, message }) => (
-  <div className={`fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in ${
-    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-  } text-white`}>
-    <div className="flex items-center space-x-2">
-      {type === 'success' ? <Check className="w-5 h-5" /> : <X className="w-5 h-5" />}
-      <span>{message}</span>
-    </div>
-  </div>
-);
+const Notification = () => {
+  return (
+    <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 3000,
+        style: {
+          background: '#fff',
+          color: '#292524',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+          borderRadius: '12px',
+          padding: '16px',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+        success: {
+          iconTheme: {
+            primary: '#10b981',
+            secondary: '#fff',
+          },
+          style: {
+            border: '2px solid #10b981',
+          },
+        },
+        error: {
+          iconTheme: {
+            primary: '#ef4444',
+            secondary: '#fff',
+          },
+          style: {
+            border: '2px solid #ef4444',
+          },
+        },
+      }}
+    />
+  );
+};
 
 export default Notification;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gift, List, Users, Shuffle } from 'lucide-react';
+import { Gift, List, Users, Shuffle, Lock } from 'lucide-react';
 
 const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, setView }) => (
   <div className="max-w-7xl mx-auto px-4 py-8">
@@ -59,6 +59,20 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
           Gérer ma liste
         </button>
       </div>
+    </div>
+
+    {/* Changement de mot de passe */}
+    <div className="mt-6 bg-white rounded-xl shadow-xl p-6 border-t-4 border-stone-400">
+      <h2 className="text-2xl font-bold text-stone-800 mb-4 flex items-center">
+        <Lock className="w-6 h-6 mr-2 text-stone-600" />Sécurité
+      </h2>
+      <button 
+        onClick={() => setView('change-password')} 
+        className="bg-gradient-to-r from-stone-600 to-stone-700 text-white px-6 py-3 rounded-lg hover:from-stone-700 hover:to-stone-800 transition shadow-lg font-semibold flex items-center gap-2"
+      >
+        <Lock className="w-5 h-5" />
+        Changer mon mot de passe
+      </button>
     </div>
 
     {/* Admin Panel */}

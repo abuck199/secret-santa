@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, supabaseAnon } from './supabaseClient';
 import bcrypt from 'bcryptjs';
 import emailjs from '@emailjs/browser';
+import Snowfall from 'react-snowfall';
 import { emailConfig } from './emailConfig';
 import LoginPage from './components/LoginPage';
 import NavBar from './components/NavBar';
@@ -11,7 +12,9 @@ import AllListsView from './components/AllListsView';
 import MyReservationsView from './components/MyReservationsView';
 import AssignmentView from './components/AssignmentView';
 import AdminView from './components/AdminView';
+import toast from 'react-hot-toast';
 import Notification from './components/Notification';
+import ChangePasswordView from './components/ChangePasswordView';
 
 const SecretSantaApp = () => {
   // Initialiser EmailJS
@@ -34,8 +37,6 @@ const SecretSantaApp = () => {
   const [itemForm, setItemForm] = useState({ item: '', link: '' });
   
   // UI
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   
   // Filtres
@@ -67,7 +68,7 @@ const SecretSantaApp = () => {
           console.log('Utilisateur supprimé, déconnexion...');
           sessionStorage.removeItem('currentUser');
           sessionStorage.removeItem('currentView');
-          setError('Votre compte a été supprimé');
+          toast.error('Votre compte a été supprimé');
           setInitialLoading(false); // ← Arrêter le loading
           return;
         }
@@ -132,20 +133,6 @@ const SecretSantaApp = () => {
   }, [view, event.name]);
 
   useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => setError(''), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => setSuccess(''), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [success]);
-
-  useEffect(() => {
     if (!currentUser) return;
     
     // Vérifier toutes les 30 secondes si le compte existe toujours
@@ -162,7 +149,7 @@ const SecretSantaApp = () => {
           sessionStorage.removeItem('currentUser');
           setCurrentUser(null);
           setView('login');
-          setError('Votre compte a été supprimé par un administrateur');
+          toast.error('Votre compte a été supprimé par un administrateur');
         }
       } catch (error) {
         console.error('Erreur vérification compte:', error);
@@ -180,7 +167,7 @@ const SecretSantaApp = () => {
       await Promise.all([loadEvent(), loadUsers(), loadWishLists(), loadAssignments()]);
     } catch (err) {
       console.error('Erreur chargement:', err);
-      setError('Erreur de chargement');
+      toast.error('Erreur de chargement');
     }
   };
 
@@ -206,7 +193,8 @@ const SecretSantaApp = () => {
         link: item.link || '',
         claimed: item.claimed,
         reservedBy: item.reserved_by || null,
-        displayOrder: item.display_order || 0
+        displayOrder: item.display_order || 0,
+        userId: item.user_id
       });
       return acc;
     }, {});
@@ -224,18 +212,18 @@ const SecretSantaApp = () => {
 
   // === AUTHENTIFICATION ===
   const handleLogin = async () => {
-    setError('');
-    setLoading(true);
-    
-    const trimmedUsername = loginForm.username.toLowerCase().trim();
-    
-    if (!trimmedUsername || !loginForm.password) {
-      setError('Veuillez remplir tous les champs');
-      setLoading(false);
-      return;
-    }
-    
-    // Utiliser supabaseAnon pour le login (lecture publique du username/email)
+  toast.error(''); // Réinitialiser (optionnel)
+  setLoading(true);
+  
+  const trimmedUsername = loginForm.username.toLowerCase().trim();
+  
+  if (!trimmedUsername || !loginForm.password) {
+    toast.error('Veuillez remplir tous les champs'); // ← Utilisez toast
+    setLoading(false);
+    return;
+  }
+  
+  try {
     const { data } = await supabaseAnon
       .from('users')
       .select('*')
@@ -244,7 +232,7 @@ const SecretSantaApp = () => {
     
     if (!data) {
       setLoading(false);
-      setError('Nom d\'utilisateur ou mot de passe invalide');
+      toast.error('Nom d\'utilisateur ou mot de passe invalide'); // ← toast
       return;
     }
     
@@ -253,17 +241,21 @@ const SecretSantaApp = () => {
     setLoading(false);
     
     if (!passwordMatch) {
-      setError('Nom d\'utilisateur ou mot de passe invalide');
+      toast.error('Nom d\'utilisateur ou mot de passe invalide'); // ← toast
       return;
     }
     
-    // Sauvegarder dans sessionStorage
     sessionStorage.setItem('currentUser', JSON.stringify(data));
     
     setCurrentUser(data);
     setView('dashboard');
     setLoginForm({ username: '', password: '', showPassword: false });
-  };
+  } catch (err) {
+    toast.error('Erreur de connexion'); // ← toast
+    console.error('Erreur login:', err);
+    setLoading(false);
+  }
+};
 
   const handleLogout = () => {
     sessionStorage.removeItem('currentUser');
@@ -279,22 +271,22 @@ const SecretSantaApp = () => {
     const trimmedEmail = email?.trim() || '';
     
     if (!trimmedUsername || !password.trim() || !trimmedEmail) {
-      setError('Tous les champs sont requis (nom d\'utilisateur, email et mot de passe)');
+      toast.error('Tous les champs sont requis (nom d\'utilisateur, email et mot de passe)');
       return;
     }
     
     if (trimmedUsername.length < 3) {
-      setError('Le nom d\'utilisateur doit avoir au moins 3 caractères');
+      toast.error('Le nom d\'utilisateur doit avoir au moins 3 caractères');
       return;
     }
     
     if (password.length < 4) {
-      setError('Le mot de passe doit avoir au moins 4 caractères');
+      toast.error('Le mot de passe doit avoir au moins 4 caractères');
       return;
     }
     
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      setError('Courriel invalide');
+      toast.error('Courriel invalide');
       return;
     }
     
@@ -331,13 +323,13 @@ const SecretSantaApp = () => {
     setLoading(false);
     
     if (error) {
-      setError(error.code === '23505' ? 'Ce nom d\'utilisateur existe déjà' : 'Erreur lors de la création');
+      toast.error(error.code === '23505' ? 'Ce nom d\'utilisateur existe déjà' : 'Erreur lors de la création');
       return;
     }
     
     await loadUsers();
     setUserForm({ username: '', password: '', email: '', showForm: false });
-    setSuccess(`${trimmedUsername} a été ajouté et un email de bienvenue a été envoyé`);
+    toast.success(`${trimmedUsername} a été ajouté et un email de bienvenue a été envoyé`);
   };
 
   const deleteUser = async (userId) => {
@@ -363,7 +355,7 @@ const SecretSantaApp = () => {
   const confirmation = window.prompt(msg);
   
   if (confirmation !== 'SUPPRIMER') {
-    setError('Suppression annulée');
+    toast.error('Suppression annulée');
     return;
   }
   
@@ -391,9 +383,9 @@ const SecretSantaApp = () => {
       loadAssignments()
     ]);
     
-    setSuccess(`${user.username} supprimé avec succès`);
+    toast.success(`${user.username} supprimé avec succès`);
   } catch (error) {
-    setError('Erreur lors de la suppression');
+    toast.error('Erreur lors de la suppression');
     console.error('Erreur suppression:', error);
   } finally {
     setLoading(false);
@@ -410,20 +402,20 @@ const SecretSantaApp = () => {
       // Bloquer javascript: et data: URLs
       if (link.toLowerCase().startsWith('javascript:') || 
           link.toLowerCase().startsWith('data:')) {
-        setError('Lien invalide');
+        toast.error('Lien invalide');
         return;
       }
       
       // Optionnel : forcer https
       if (!link.startsWith('http://') && !link.startsWith('https://')) {
-        setError('Le lien doit commencer par http:// ou https://');
+        toast.error('Le lien doit commencer par http:// ou https://');
         return;
       }
     }
     
     // Limiter la longueur
     if (itemForm.item.length > 200) {
-      setError('Le nom de l\'article est trop long (max 200 caractères)');
+      toast.error('Le nom de l\'article est trop long (max 200 caractères)');
       return;
   }
     
@@ -445,7 +437,7 @@ const SecretSantaApp = () => {
     
     await loadWishLists();
     setItemForm({ item: '', link: '' });
-    setSuccess('Article ajouté');
+    toast.success('Article ajouté');
     setLoading(false);
   };
 
@@ -462,7 +454,7 @@ const SecretSantaApp = () => {
           .single();
         
         if (checkData.claimed && checkData.reserved_by !== currentUser.id) {
-          setError('Désolé, cet article vient d\'être réservé par quelqu\'un d\'autre');
+          toast.error('Désolé, cet article vient d\'être réservé par quelqu\'un d\'autre');
           setLoading(false);
           await loadWishLists(); // Recharger pour voir l'état actuel
           return;
@@ -480,15 +472,15 @@ const SecretSantaApp = () => {
         .eq('id', itemId);
       
       if (error) {
-        setError('Erreur lors de la réservation');
+        toast.error('Erreur lors de la réservation');
         setLoading(false);
         return;
       }
         
       await loadWishLists();
-      setSuccess(!currentStatus ? 'Article réservé' : 'Réservation annulée');
+      toast.success(!currentStatus ? 'Article réservé' : 'Réservation annulée');
     } catch (err) {
-      setError('Erreur lors de la réservation');
+      toast.error('Erreur lors de la réservation');
       console.error(err);
     } finally {
       setLoading(false);
@@ -508,14 +500,71 @@ const SecretSantaApp = () => {
       await loadWishLists();
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'ordre:', error);
-      setError('Erreur lors de la réorganisation');
+      toast.error('Erreur lors de la réorganisation');
+    }
+  };
+
+
+  // === GESTION WISHLIST - Mise à jour d'un article ===
+  const updateWishlistItem = async (itemId, newName, newLink) => {
+    if (!newName.trim()) {
+      toast.error('Le nom de l\'article est requis');
+      return;
+    }
+
+    // Validation de la longueur
+    if (newName.length > 200) {
+      toast.error('Le nom de l\'article est trop long (max 200 caractères)');
+      return;
+    }
+
+    // Validation du lien si présent
+    if (newLink) {
+      if (newLink.toLowerCase().startsWith('javascript:') || 
+          newLink.toLowerCase().startsWith('data:')) {
+        toast.error('Lien invalide détecté');
+        return;
+      }
+      
+      if (!newLink.startsWith('http://') && !newLink.startsWith('https://')) {
+        toast.error('Le lien doit commencer par http:// ou https://');
+        return;
+      }
+      
+      if (newLink.length > 500) {
+        toast.error('Le lien est trop long (max 500 caractères)');
+        return;
+      }
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('wishlist_items')
+        .update({ 
+          item: newName,
+          link: newLink || null
+        })
+        .eq('id', itemId)
+        .eq('user_id', currentUser.id); // Sécurité : seulement ses propres items
+
+      if (error) throw error;
+
+      await loadWishLists();
+      toast.success('Article mis à jour');
+    } catch (error) {
+      toast.error('Erreur lors de la mise à jour');
+      console.error('Erreur update item:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   // === ATTRIBUTIONS ===
   const sendAssignmentEmails = async () => {
     if (Object.keys(assignments).length === 0) {
-      setError('Aucune attribution à envoyer. Créez d\'abord les attributions.');
+      toast.error('Aucune attribution à envoyer. Créez d\'abord les attributions.');
       return;
     }
 
@@ -559,78 +608,108 @@ const SecretSantaApp = () => {
       
       if (emailsFailed > 0) message += `, ${emailsFailed} échec(s)`;
       
-      setSuccess(message);
+      toast.success(message);
     } catch (error) {
-      setError('Erreur lors de l\'envoi des emails');
+      toast.error('Erreur lors de l\'envoi des emails');
     } finally {
       setLoading(false);
     }
   };
 
   const shuffleAssignments = async () => {
-    setLoading(true);
+  // Validation : minimum 3 participants
+  if (users.length < 3) {
+    toast.error('Il faut au moins 3 participants pour créer des attributions');
+    return;
+  }
+  
+  if (loading) return; // Protection double clic
+  setLoading(true);
+  
+  try {
+    // Vérifier qu'il n'y a pas d'attributions récentes (protection spam)
+    const { data: existingAssignments } = await supabase
+      .from('assignments')
+      .select('created_at')
+      .order('created_at', { ascending: false })
+      .limit(1);
     
-    try {
-      await supabase.from('assignments').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (existingAssignments?.length > 0) {
+      const lastCreated = new Date(existingAssignments[0].created_at);
+      const now = new Date();
+      const diffSeconds = (now - lastCreated) / 1000;
       
-      const ids = users.map(u => u.id);
-      const shuffled = [...ids].sort(() => Math.random() - 0.5);
+      if (diffSeconds < 10) {
+        toast.error('Attendez quelques secondes avant de recréer les attributions');
+        setLoading(false);
+        return;
+      }
+    }
+    
+    // Supprimer les anciennes attributions
+    await supabase.from('assignments').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    
+    // Créer les nouvelles attributions
+    const ids = users.map(u => u.id);
+    const shuffled = [...ids].sort(() => Math.random() - 0.5);
+    
+    const newAssignments = shuffled.map((giver, i) => ({
+      giver_id: giver,
+      receiver_id: shuffled[(i + 1) % shuffled.length]
+    }));
+    
+    await supabase.from('assignments').insert(newAssignments);
+    await loadAssignments();
+    
+    // Envoyer les emails
+    let emailsSent = 0;
+    let emailsFailed = 0;
+    
+    for (const assignment of newAssignments) {
+      const giver = users.find(u => u.id === assignment.giver_id);
+      const receiver = users.find(u => u.id === assignment.receiver_id);
       
-      const newAssignments = shuffled.map((giver, i) => ({
-        giver_id: giver,
-        receiver_id: shuffled[(i + 1) % shuffled.length]
-      }));
-      
-      await supabase.from('assignments').insert(newAssignments);
-      await loadAssignments();
-      
-      // Envoyer les emails
-      let emailsSent = 0;
-      let emailsFailed = 0;
-      
-      for (const assignment of newAssignments) {
-        const giver = users.find(u => u.id === assignment.giver_id);
-        const receiver = users.find(u => u.id === assignment.receiver_id);
-        
-        if (giver?.email && receiver) {
-          try {
-            await emailjs.send(
-              emailConfig.serviceId,
-              emailConfig.templateId,
-              {
-                to_email: giver.email,
-                to: giver.email,
-                from_name: 'Secret Santa',
-                to_name: giver.username,
-                receiver_name: receiver.username,
-                event_name: event.name,
-                site_url: window.location.origin
-              }
-            );
-            emailsSent++;
-          } catch {
-            emailsFailed++;
-          }
+      if (giver?.email && receiver) {
+        try {
+          await emailjs.send(
+            emailConfig.serviceId,
+            emailConfig.templateIdAssignment, // ← Assurez-vous que c'est le bon template
+            {
+              to_email: giver.email,
+              to: giver.email,
+              from_name: 'Secret Santa',
+              to_name: giver.username,
+              receiver_name: receiver.username,
+              event_name: event.name,
+              site_url: window.location.origin
+            }
+          );
+          emailsSent++;
+        } catch (error) {
+          console.error(`Erreur email pour ${giver.username}:`, error);
+          emailsFailed++;
         }
       }
-      
-      let message = 'Attributions créées !';
-      if (emailsSent > 0) message += ` ${emailsSent} email(s) envoyé(s)`;
-      if (emailsFailed > 0) message += `, ${emailsFailed} échec(s)`;
-      
-      setSuccess(message);
-    } catch (error) {
-      setError('Erreur lors de la création des attributions');
-    } finally {
-      setLoading(false);
     }
-  };
+    
+    let message = 'Attributions créées ! 🎁';
+    if (emailsSent > 0) message += ` ${emailsSent} email(s) envoyé(s)`;
+    if (emailsFailed > 0) message += `, ${emailsFailed} échec(s)`;
+    
+    toast.success(message);
+  } catch (error) {
+    toast.error('Erreur lors de la création des attributions');
+    console.error('Erreur création attributions:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const updateEvent = async () => {
     if (!event.id) return;
     setLoading(true);
     await supabase.from('events').update({ name: event.name }).eq('id', event.id);
-    setSuccess('Mis à jour');
+    toast.success('Mis à jour');
     setLoading(false);
   };
 
@@ -702,7 +781,6 @@ const SecretSantaApp = () => {
         loginForm={loginForm}
         setLoginForm={setLoginForm}
         handleLogin={handleLogin}
-        error={error}
         loading={loading}
       />
     );
@@ -718,8 +796,20 @@ const SecretSantaApp = () => {
         handleLogout={handleLogout}
       />
       
-      {success && <Notification type="success" message={success} />}
-      {error && <Notification type="error" message={error} />}
+    {currentUser && (
+      <Snowfall
+        color="#fff"
+        snowflakeCount={50}
+        style={{
+          position: 'fixed',
+          width: '100vw',
+          height: '100vh',
+          zIndex: 1
+        }}
+      />
+    )}
+
+      <Notification />
 
       {view === 'dashboard' && (
         <DashboardView
@@ -738,6 +828,7 @@ const SecretSantaApp = () => {
           itemForm={itemForm}
           setItemForm={setItemForm}
           addWishlistItem={addWishlistItem}
+          updateWishlistItem={updateWishlistItem}
           updateWishlistOrder={updateWishlistOrder}
           setView={setView}
           loading={loading}
@@ -750,6 +841,7 @@ const SecretSantaApp = () => {
           wishLists={wishLists}
           currentUser={currentUser}
           toggleItemClaimed={toggleItemClaimed}
+          updateWishlistItem={updateWishlistItem}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           filterStatus={filterStatus}
@@ -777,6 +869,15 @@ const SecretSantaApp = () => {
           toggleItemClaimed={toggleItemClaimed}
           setView={setView}
           loading={loading}
+        />
+      )}
+
+      {view === 'change-password' && (
+        <ChangePasswordView
+          currentUser={currentUser}
+          supabase={supabase}
+          bcrypt={bcrypt}
+          setView={setView}
         />
       )}
 
