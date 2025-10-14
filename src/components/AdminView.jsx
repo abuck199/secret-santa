@@ -230,7 +230,7 @@ const AdminView = ({
           <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl">
             <Shuffle className="w-6 h-6 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold text-dark-100">Attributions Secret Santa</h2>
+          <h2 className="text-2xl font-bold text-dark-100">{event?.name}</h2>
         </div>
         
         {Object.keys(assignments).length === 0 ? (

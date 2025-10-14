@@ -15,6 +15,7 @@ import AdminView from './components/AdminView';
 import toast from 'react-hot-toast';
 import Notification from './components/Notification';
 import ChangePasswordView from './components/ChangePasswordView';
+import WelcomeAnimation from './components/WelcomeAnimation';
 
 const SecretSantaApp = () => {
   // Initialiser EmailJS
@@ -25,6 +26,7 @@ const SecretSantaApp = () => {
   // États principaux
   const [currentUser, setCurrentUser] = useState(null);
   const [view, setView] = useState('login');
+  const [showWelcome, setShowWelcome] = useState(false); // ← AJOUTER CETTE LIGNE
   const [users, setUsers] = useState([]);
   const [wishLists, setWishLists] = useState({});
   const [assignments, setAssignments] = useState({});
@@ -212,56 +214,51 @@ const SecretSantaApp = () => {
 
   // === AUTHENTIFICATION ===
   const handleLogin = async () => {
-    setLoading(true);
+  setLoading(true);
+  
+  const trimmedUsername = loginForm.username.toLowerCase().trim();
+  
+  if (!trimmedUsername || !loginForm.password) {
+    toast.error('Veuillez remplir tous les champs');
+    setLoading(false);
+    return;
+  }
+  
+  try {
+    const { data } = await supabaseAnon
+      .from('users')
+      .select('*')
+      .eq('username', trimmedUsername)
+      .single();
     
-    const trimmedUsername = loginForm.username.toLowerCase().trim();
-    
-    if (!trimmedUsername || !loginForm.password) {
-      toast.error('Veuillez remplir tous les champs');
+    if (!data) {
       setLoading(false);
+      toast.error('Nom d\'utilisateur ou mot de passe invalide');
       return;
     }
     
-    try {
-      const { data } = await supabaseAnon
-        .from('users')
-        .select('*')
-        .eq('username', trimmedUsername)
-        .single();
-      
-      if (!data) {
-        setLoading(false);
-        toast.error('Nom d\'utilisateur ou mot de passe invalide');
-        return;
-      }
-      
-      const passwordMatch = await bcrypt.compare(loginForm.password, data.password);
-      
-      setLoading(false);
-      
-      if (!passwordMatch) {
-        toast.error('Nom d\'utilisateur ou mot de passe invalide');
-        return;
-      }
-      
-      // ✅ Ajouter un petit délai avant le message de succès
-      sessionStorage.setItem('currentUser', JSON.stringify(data));
-      
-      setCurrentUser(data);
-      setView('dashboard');
-      setLoginForm({ username: '', password: '', showPassword: false });
-      
-      // Message de succès après un court délai
-      setTimeout(() => {
-        toast.success(`Bienvenue ${data.username}! 🎄`);
-      }, 100);
-      
-    } catch (err) {
-      toast.error('Erreur de connexion');
-      console.error('Erreur login:', err);
-      setLoading(false);
+    const passwordMatch = await bcrypt.compare(loginForm.password, data.password);
+    
+    setLoading(false);
+    
+    if (!passwordMatch) {
+      toast.error('Nom d\'utilisateur ou mot de passe invalide');
+      return;
     }
-  };
+    
+    sessionStorage.setItem('currentUser', JSON.stringify(data));
+    
+    // ✨ MODIFICATION ICI : Afficher l'animation au lieu de setView directement
+    setCurrentUser(data);
+    setShowWelcome(true); // ← CHANGÉ
+    setLoginForm({ username: '', password: '', showPassword: false });
+    
+  } catch (err) {
+    toast.error('Erreur de connexion');
+    console.error('Erreur login:', err);
+    setLoading(false);
+  }
+};
 
   const handleLogout = () => {
     sessionStorage.removeItem('currentUser');
@@ -790,21 +787,22 @@ const SecretSantaApp = () => {
             setLoginForm={setLoginForm}
             handleLogin={handleLogin}
             loading={loading}
+            event={event}
           />
         </>
       );
   }
 
   return (
-  <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 relative">
-      <NavBar 
-        currentUser={currentUser}
-        event={event}
-        view={view}
-        setView={setView}
-        handleLogout={handleLogout}
-      />
-      
+  <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 relative pb-24 md:pb-0">
+    <NavBar 
+      currentUser={currentUser}
+      event={event}
+      view={view}
+      setView={setView}
+      handleLogout={handleLogout}
+    />
+    
     {currentUser && (
       <Snowfall
         color="#fff"
@@ -814,104 +812,117 @@ const SecretSantaApp = () => {
           width: '100vw',
           height: '100vh',
           zIndex: 1,
-          opacity: 0.2
+          opacity: 0.15
         }}
       />
     )}
 
-      <Notification />
+    <Notification />
 
-      {view === 'dashboard' && (
-        <DashboardView
-          currentUser={currentUser}
-          assignments={assignments}
-          wishLists={wishLists}
-          getAssignedUser={getAssignedUser}
-          setView={setView}
-        />
-      )}
+    {/* ✨ AJOUTER CETTE SECTION COMPLÈTE */}
+    {showWelcome && (
+      <WelcomeAnimation 
+        username={currentUser.username}
+        onComplete={() => {
+          setShowWelcome(false);
+          setView('dashboard');
+        }}
+      />
+    )}
 
-      {view === 'wishlist' && (
-        <WishlistView
-          currentUser={currentUser}
-          wishLists={wishLists}
-          itemForm={itemForm}
-          setItemForm={setItemForm}
-          addWishlistItem={addWishlistItem}
-          updateWishlistItem={updateWishlistItem}
-          updateWishlistOrder={updateWishlistOrder}
-          setView={setView}
-          loading={loading}
-        />
-      )}
+    {/* ✨ AJOUTER !showWelcome à chaque vue ci-dessous */}
+    {view === 'dashboard' && !showWelcome && (
+      <DashboardView
+        currentUser={currentUser}
+        assignments={assignments}
+        wishLists={wishLists}
+        getAssignedUser={getAssignedUser}
+        setView={setView}
+      />
+    )}
 
-      {view === 'all-lists' && (
-        <AllListsView
-          users={users}
-          wishLists={wishLists}
-          currentUser={currentUser}
-          toggleItemClaimed={toggleItemClaimed}
-          updateWishlistItem={updateWishlistItem}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          filterStatus={filterStatus}
-          setFilterStatus={setFilterStatus}
-          getFilteredUsers={getFilteredUsers}
-          loading={loading}
-        />
-      )}
+    {view === 'wishlist' && !showWelcome && (
+      <WishlistView
+        currentUser={currentUser}
+        wishLists={wishLists}
+        itemForm={itemForm}
+        setItemForm={setItemForm}
+        addWishlistItem={addWishlistItem}
+        updateWishlistItem={updateWishlistItem}
+        updateWishlistOrder={updateWishlistOrder}
+        setView={setView}
+        loading={loading}
+      />
+    )}
 
-      {view === 'my-reservations' && (
-        <MyReservationsView
-          getMyReservations={getMyReservations}
-          toggleItemClaimed={toggleItemClaimed}
-          setView={setView}
-          loading={loading}
-        />
-      )}
+    {view === 'all-lists' && !showWelcome && (
+      <AllListsView
+        users={users}
+        wishLists={wishLists}
+        currentUser={currentUser}
+        toggleItemClaimed={toggleItemClaimed}
+        updateWishlistItem={updateWishlistItem}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filterStatus={filterStatus}
+        setFilterStatus={setFilterStatus}
+        getFilteredUsers={getFilteredUsers}
+        loading={loading}
+      />
+    )}
 
-      {view === 'assignment' && assignments[currentUser.id] && (
-        <AssignmentView
-          currentUser={currentUser}
-          assignments={assignments}
-          wishLists={wishLists}
-          getAssignedUser={getAssignedUser}
-          toggleItemClaimed={toggleItemClaimed}
-          setView={setView}
-          loading={loading}
-        />
-      )}
+    {view === 'my-reservations' && !showWelcome && (
+      <MyReservationsView
+        getMyReservations={getMyReservations}
+        toggleItemClaimed={toggleItemClaimed}
+        setView={setView}
+        loading={loading}
+      />
+    )}
 
-      {view === 'change-password' && (
-        <ChangePasswordView
-          currentUser={currentUser}
-          supabase={supabase}
-          bcrypt={bcrypt}
-          setView={setView}
-        />
-      )}
+    {view === 'assignment' && assignments[currentUser.id] && !showWelcome && (
+      <AssignmentView
+        currentUser={currentUser}
+        assignments={assignments}
+        wishLists={wishLists}
+        getAssignedUser={getAssignedUser}
+        toggleItemClaimed={toggleItemClaimed}
+        setView={setView}
+        event={event}
+        loading={loading}
+      />
+    )}
 
-      {view === 'admin' && currentUser.is_admin && (
-        <AdminView
-          users={users}
-          wishLists={wishLists}
-          assignments={assignments}
-          event={event}
-          setEvent={setEvent}
-          userForm={userForm}
-          setUserForm={setUserForm}
-          getStatistics={getStatistics}
-          updateEvent={updateEvent}
-          addUser={addUser}
-          deleteUser={deleteUser}
-          getAssignedUser={getAssignedUser}
-          shuffleAssignments={shuffleAssignments}
-          sendAssignmentEmails={sendAssignmentEmails}
-          setView={setView}
-          loading={loading}
-        />
-      )}
-    </div>
+    {view === 'change-password' && !showWelcome && (
+      <ChangePasswordView
+        currentUser={currentUser}
+        supabase={supabase}
+        bcrypt={bcrypt}
+        setView={setView}
+      />
+    )}
+
+    {view === 'admin' && currentUser.is_admin && !showWelcome && (
+      <AdminView
+        users={users}
+        wishLists={wishLists}
+        assignments={assignments}
+        event={event}
+        setEvent={setEvent}
+        userForm={userForm}
+        setUserForm={setUserForm}
+        getStatistics={getStatistics}
+        updateEvent={updateEvent}
+        addUser={addUser}
+        deleteUser={deleteUser}
+        getAssignedUser={getAssignedUser}
+        shuffleAssignments={shuffleAssignments}
+        sendAssignmentEmails={sendAssignmentEmails}
+        setView={setView}
+        loading={loading}
+      />
+    )}
+  </div>
   );
 };
 

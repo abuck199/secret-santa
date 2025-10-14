@@ -130,7 +130,7 @@ const WishlistItem = ({
 
         <div className="flex items-center gap-2 ml-2">
           {/* Bouton de modification */}
-          {currentUser && item.userId === currentUser.id && !item.claimed && onUpdate && (
+          {currentUser && item.userId === currentUser.id && onUpdate && (
             <button
               onClick={() => setIsEditing(true)}
               className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white p-2 rounded-lg transition-all shadow-lg hover:scale-110"

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Eye, EyeOff, Sparkles } from 'lucide-react';
 
-const LoginPage = ({ loginForm, setLoginForm, handleLogin, loading }) => (
+const LoginPage = ({ loginForm, setLoginForm, handleLogin, loading, event }) => (
   <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 flex items-center justify-center px-4 relative overflow-hidden">
     {/* Particules décoratives */}
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -22,7 +22,7 @@ const LoginPage = ({ loginForm, setLoginForm, handleLogin, loading }) => (
           <span className="text-4xl">🎄</span>
         </div>
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2">
-          Secret Santa
+          {event?.name}
           <Sparkles className="w-6 h-6 text-gold animate-pulse" />
         </h1>
         <p className="text-dark-400 text-sm">Connectez-vous pour accéder à la magie des fêtes</p>

@@ -8,7 +8,7 @@ const Navigation = ({ currentUser, activeTab, setActiveTab, handleLogout }) => (
       <div className="nav-header">
         <Gift className="nav-icon" size={32} />
         <div>
-          <h1 className="nav-title">Secret Santa</h1>
+          <h1 className="nav-title">Noël 2025</h1>
           <p className="nav-subtitle">Organisateur de cadeaux</p>
         </div>
       </div>

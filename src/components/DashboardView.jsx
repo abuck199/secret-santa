@@ -10,7 +10,7 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
         Bienvenue {currentUser.username}!
         <Sparkles className="w-8 h-8 text-gold animate-pulse" />
       </h1>
-      <p className="text-dark-400">Découvrez la magie de Noël avec votre Secret Santa</p>
+      <p className="text-dark-400">Votre plateforme d'échange de cadeaux intelligente</p>
     </div>
 
     <div className="grid md:grid-cols-2 gap-6">
@@ -69,7 +69,7 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
         </div>
 
         {(wishLists[currentUser.id] || []).length > 0 ? (
-          <div className="space-y-2 mb-4 max-h-56 overflow-y-auto custom-scrollbar">
+          <div className="space-y-2 mb-4 max-h-56 overflow-y-auto scrollbar-hide">
             {(wishLists[currentUser.id] || []).map((item, index) => (
               <div 
                 key={item.id} 
