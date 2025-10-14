@@ -1,11 +1,68 @@
 import React, { useState } from 'react';
-import { Search, ChevronDown, ChevronUp, Sparkles, Gift, List, Heart, Lock, Users, HelpCircle, ArrowLeft } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, Sparkles, Gift, List, Heart, Lock, Users, HelpCircle, ArrowLeft, CheckCircle, AlertCircle, Info } from 'lucide-react';
 
 const FAQView = ({ event, setView }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [openItems, setOpenItems] = useState([0]); // Premier item ouvert par défaut
+  const [openItems, setOpenItems] = useState([0]);
 
-  // Données FAQ organisées par catégories
+  // Composant pour les sections de réponse
+  const Section = ({ title, children, icon: Icon, color = "emerald" }) => (
+    <div className={`mb-4 p-4 bg-gradient-to-br from-${color}-900/10 to-${color}-800/10 backdrop-blur-sm border border-${color}-500/20 rounded-xl`}>
+      <div className="flex items-center gap-2 mb-3">
+        {Icon && <Icon className={`w-5 h-5 text-${color}-500`} />}
+        <h4 className="font-bold text-dark-100">{title}</h4>
+      </div>
+      <div className="space-y-2 text-dark-300 leading-relaxed">
+        {children}
+      </div>
+    </div>
+  );
+
+  const Step = ({ number, children }) => (
+    <div className="flex items-start gap-3 mb-2">
+      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white text-sm font-bold">
+        {number}
+      </div>
+      <p className="flex-1 pt-0.5">{children}</p>
+    </div>
+  );
+
+  const Tip = ({ children }) => (
+    <div className="flex items-start gap-2 p-3 bg-gradient-to-r from-gold/10 to-gold/5 border border-gold/30 rounded-lg mt-3">
+      <Sparkles className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
+      <p className="text-sm text-gold">{children}</p>
+    </div>
+  );
+
+  const Warning = ({ children }) => (
+    <div className="flex items-start gap-2 p-3 bg-gradient-to-r from-red-900/20 to-red-800/20 border border-red-500/30 rounded-lg mt-3">
+      <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+      <p className="text-sm text-red-400">{children}</p>
+    </div>
+  );
+
+  const Success = ({ children }) => (
+    <div className="flex items-start gap-2 p-3 bg-gradient-to-r from-emerald-900/20 to-emerald-800/20 border border-emerald-500/30 rounded-lg mt-3">
+      <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+      <p className="text-sm text-emerald-400">{children}</p>
+    </div>
+  );
+
+  const InfoBox = ({ children }) => (
+    <div className="flex items-start gap-2 p-3 bg-gradient-to-r from-blue-900/20 to-blue-800/20 border border-blue-500/30 rounded-lg mt-3">
+      <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+      <p className="text-sm text-blue-400">{children}</p>
+    </div>
+  );
+
+  const Bullet = ({ children }) => (
+    <div className="flex items-start gap-2 ml-4">
+      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+      <p>{children}</p>
+    </div>
+  );
+
+  // Données FAQ avec le nouveau format
   const faqCategories = [
     {
       id: 'getting-started',
@@ -17,11 +74,49 @@ const FAQView = ({ event, setView }) => {
       questions: [
         {
           question: 'Comment fonctionne cette application?',
-          answer: `${event?.name || 'Cette application'} vous permet d'organiser un échange de cadeaux facilement!\n\n**Les étapes:**\n\n1️⃣ Créez votre liste de souhaits avec vos envies\n2️⃣ Consultez les listes des autres participants\n3️⃣ Réservez des articles pour éviter les doublons\n4️⃣ Découvrez votre attribution (à qui offrir un cadeau)\n5️⃣ Échangez vos cadeaux le jour J!\n\n**C'est simple, organisé et amusant!** 🎄`
+          answer: (
+            <>
+              <p className="mb-4">{event?.name || 'Cette application'} vous permet d'organiser un échange de cadeaux facilement!</p>
+              
+              <Section title="Les étapes" icon={Gift} color="primary">
+                <Step number="1">Créez votre liste de souhaits avec vos envies</Step>
+                <Step number="2">Consultez les listes des autres participants</Step>
+                <Step number="3">Réservez des articles pour éviter les doublons</Step>
+                <Step number="4">Découvrez votre attribution (à qui offrir un cadeau)</Step>
+                <Step number="5">Échangez vos cadeaux le jour J!</Step>
+              </Section>
+
+              <Success>C'est simple, organisé et amusant! 🎄</Success>
+            </>
+          )
         },
         {
           question: 'Première utilisation : par où commencer?',
-          answer: `Bienvenue! Voici les 3 premières étapes:\n\n**1. Créez votre liste** 📝\n• Cliquez sur "Ma Liste" dans le menu\n• Ajoutez vos idées de cadeaux\n• Ajoutez des liens si vous le souhaitez\n\n**2. Explorez les autres listes** 👀\n• Allez dans "Toutes les Listes"\n• Parcourez ce que les autres veulent\n• Réservez ce qui vous intéresse\n\n**3. Découvrez votre attribution** ❤️\n• Cliquez sur "Mon Attribution"\n• Voyez à qui vous devez offrir\n• Consultez sa liste de souhaits\n\n**C'est tout!** Vous êtes prêt! 🎁`
+          answer: (
+            <>
+              <p className="mb-4">Bienvenue! Voici les 3 premières étapes:</p>
+              
+              <Section title="1. Créez votre liste" icon={List} color="emerald">
+                <Bullet>Cliquez sur "Ma Liste" dans le menu</Bullet>
+                <Bullet>Ajoutez vos idées de cadeaux</Bullet>
+                <Bullet>Ajoutez des liens si vous le souhaitez</Bullet>
+              </Section>
+
+              <Section title="2. Explorez les autres listes" icon={Users} color="blue">
+                <Bullet>Allez dans "Toutes les Listes"</Bullet>
+                <Bullet>Parcourez ce que les autres veulent</Bullet>
+                <Bullet>Réservez ce qui vous intéresse</Bullet>
+              </Section>
+
+              <Section title="3. Découvrez votre attribution" icon={Heart} color="primary">
+                <Bullet>Cliquez sur "Mon Attribution"</Bullet>
+                <Bullet>Voyez à qui vous devez offrir</Bullet>
+                <Bullet>Consultez sa liste de souhaits</Bullet>
+              </Section>
+
+              <Success>C'est tout! Vous êtes prêt! 🎁</Success>
+            </>
+          )
         }
       ]
     },
@@ -35,19 +130,85 @@ const FAQView = ({ event, setView }) => {
       questions: [
         {
           question: 'Comment créer ma liste de souhaits?',
-          answer: `**Pour créer votre liste:**\n\n1️⃣ Cliquez sur "Ma Liste" 📋 dans le menu\n2️⃣ Cliquez sur le bouton "Ajouter un article" ➕\n3️⃣ Entrez le nom de l'article que vous souhaitez\n4️⃣ (Optionnel) Ajoutez un lien vers le produit 🔗\n5️⃣ Cliquez sur "Ajouter à ma liste" ✅\n\n**Conseils:**\n• Soyez précis dans vos descriptions\n• Ajoutez des liens pour aider la personne à trouver\n• Variez les prix si possible\n• Mettez à jour régulièrement!`
+          answer: (
+            <>
+              <Section title="Pour créer votre liste" icon={List} color="emerald">
+                <Step number="1">Cliquez sur "Ma Liste" 📋 dans le menu</Step>
+                <Step number="2">Cliquez sur le bouton "Ajouter un article" ➕</Step>
+                <Step number="3">Entrez le nom de l'article que vous souhaitez</Step>
+                <Step number="4">(Optionnel) Ajoutez un lien vers le produit 🔗</Step>
+                <Step number="5">Cliquez sur "Ajouter à ma liste" ✅</Step>
+              </Section>
+
+              <Tip>
+                <strong>Conseils:</strong> Soyez précis dans vos descriptions • Ajoutez des liens pour aider • Variez les prix si possible • Mettez à jour régulièrement!
+              </Tip>
+            </>
+          )
         },
         {
           question: 'Puis-je modifier un article de ma liste?',
-          answer: `**Oui! Vous pouvez modifier vos articles à tout moment:**\n\n1️⃣ Allez dans "Ma Liste" 📋\n2️⃣ Cliquez sur l'icône ✏️ (crayon) sur l'article\n3️⃣ Modifiez le nom ou le lien\n4️⃣ Cliquez sur "Sauvegarder" 💾\n\n**Important:**\n✅ Vous pouvez modifier même si quelqu'un a réservé l'article\n✅ La personne verra la version mise à jour\n✅ Pratique pour corriger des erreurs ou ajouter des détails!`
+          answer: (
+            <>
+              <p className="mb-4">Oui! Vous pouvez modifier vos articles à tout moment:</p>
+              
+              <Section title="Comment modifier" icon={List} color="blue">
+                <Step number="1">Allez dans "Ma Liste" 📋</Step>
+                <Step number="2">Cliquez sur l'icône ✏️ (crayon) sur l'article</Step>
+                <Step number="3">Modifiez le nom ou le lien</Step>
+                <Step number="4">Cliquez sur "Sauvegarder" 💾</Step>
+              </Section>
+
+              <InfoBox>
+                Vous pouvez modifier même si quelqu'un a réservé l'article. La personne verra la version mise à jour. Pratique pour corriger des erreurs ou ajouter des détails!
+              </InfoBox>
+            </>
+          )
         },
         {
           question: 'Puis-je supprimer un article de ma liste?',
-          answer: `**Non, vous ne pouvez pas supprimer un article une fois ajouté.**\n\n**Pourquoi?**\n🚫 Pour éviter les problèmes si quelqu'un l'a déjà réservé\n🚫 Pour maintenir la cohérence des réservations\n\n**Solution:**\n✅ Vous pouvez **modifier** l'article pour le remplacer\n✅ Changez le nom pour un autre souhait\n✅ Mettez à jour le lien si nécessaire\n\n💡 Astuce: Réfléchissez bien avant d'ajouter un article!`
+          answer: (
+            <>
+              <Warning>
+                Non, vous ne pouvez pas supprimer un article une fois ajouté.
+              </Warning>
+
+              <Section title="Pourquoi?" icon={AlertCircle} color="red">
+                <Bullet>Pour éviter les problèmes si quelqu'un l'a déjà réservé</Bullet>
+                <Bullet>Pour maintenir la cohérence des réservations</Bullet>
+              </Section>
+
+              <Section title="Solution" icon={CheckCircle} color="emerald">
+                <Bullet>Vous pouvez modifier l'article pour le remplacer</Bullet>
+                <Bullet>Changez le nom pour un autre souhait</Bullet>
+                <Bullet>Mettez à jour le lien si nécessaire</Bullet>
+              </Section>
+
+              <Tip>Astuce: Réfléchissez bien avant d'ajouter un article!</Tip>
+            </>
+          )
         },
         {
           question: 'Comment réorganiser ma liste?',
-          answer: `**Vous pouvez changer l'ordre de vos articles par glisser-déposer:**\n\n**Sur ordinateur:**\n🖱️ Cliquez sur l'icône ☰ (trois lignes) à gauche\n🖱️ Maintenez et glissez l'article\n🖱️ Relâchez à la position souhaitée\n\n**Sur mobile:**\n📱 Maintenez votre doigt sur l'icône ☰\n📱 Glissez l'article vers le haut ou le bas\n📱 Relâchez quand c'est bon\n\n💡 Mettez vos articles préférés en haut!`
+          answer: (
+            <>
+              <p className="mb-4">Vous pouvez changer l'ordre de vos articles par glisser-déposer:</p>
+              
+              <Section title="Sur ordinateur" icon={null} color="blue">
+                <Bullet>Cliquez sur l'icône ☰ (trois lignes) à gauche</Bullet>
+                <Bullet>Maintenez et glissez l'article</Bullet>
+                <Bullet>Relâchez à la position souhaitée</Bullet>
+              </Section>
+
+              <Section title="Sur mobile" icon={null} color="blue">
+                <Bullet>Maintenez votre doigt sur l'icône ☰</Bullet>
+                <Bullet>Glissez l'article vers le haut ou le bas</Bullet>
+                <Bullet>Relâchez quand c'est bon</Bullet>
+              </Section>
+
+              <Tip>Mettez vos articles préférés en haut!</Tip>
+            </>
+          )
         }
       ]
     },
@@ -61,19 +222,99 @@ const FAQView = ({ event, setView }) => {
       questions: [
         {
           question: 'Comment réserver un article?',
-          answer: `**Pour réserver un article d'une autre personne:**\n\n1️⃣ Allez dans "Toutes les Listes" 📝\n2️⃣ Parcourez les listes des participants\n3️⃣ Trouvez un article qui vous intéresse\n4️⃣ Cliquez sur "Réserver" 🎁\n5️⃣ L'article est maintenant marqué comme réservé!\n\n**Important:**\n⚠️ Vous ne pouvez PAS réserver vos propres articles\n✅ Les autres ne voient pas QUI a réservé\n✅ Vous pouvez annuler une réservation si besoin\n\n💡 Réservez pour éviter que 2 personnes offrent la même chose!`
+          answer: (
+            <>
+              <Section title="Pour réserver un article" icon={Gift} color="gold">
+                <Step number="1">Allez dans "Toutes les Listes" 📝</Step>
+                <Step number="2">Parcourez les listes des participants</Step>
+                <Step number="3">Trouvez un article qui vous intéresse</Step>
+                <Step number="4">Cliquez sur "Réserver" 🎁</Step>
+                <Step number="5">L'article est maintenant marqué comme réservé!</Step>
+              </Section>
+
+              <Warning>
+                Vous ne pouvez PAS réserver vos propres articles
+              </Warning>
+
+              <InfoBox>
+                Les autres ne voient pas QUI a réservé • Vous pouvez annuler une réservation si besoin
+              </InfoBox>
+
+              <Tip>Réservez pour éviter que 2 personnes offrent la même chose!</Tip>
+            </>
+          )
         },
         {
           question: 'Comment voir mes réservations?',
-          answer: `**Pour consulter tous les articles que vous avez réservés:**\n\n1️⃣ Cliquez sur "Mes Réservations" 🎁 dans le menu\n2️⃣ Vous verrez tous vos articles réservés\n3️⃣ Organisés par personne\n4️⃣ Avec les liens vers les produits\n\n**Actions possibles:**\n✅ Voir le lien du produit\n✅ Annuler une réservation si besoin\n✅ Voir le compteur total\n\n💡 Pratique pour ne rien oublier lors des achats!`
+          answer: (
+            <>
+              <Section title="Consulter vos réservations" icon={Gift} color="gold">
+                <Step number="1">Cliquez sur "Mes Réservations" 🎁 dans le menu</Step>
+                <Step number="2">Vous verrez tous vos articles réservés</Step>
+                <Step number="3">Organisés par personne</Step>
+                <Step number="4">Avec les liens vers les produits</Step>
+              </Section>
+
+              <Section title="Actions possibles" icon={CheckCircle} color="emerald">
+                <Bullet>Voir le lien du produit</Bullet>
+                <Bullet>Annuler une réservation si besoin</Bullet>
+                <Bullet>Voir le compteur total</Bullet>
+              </Section>
+
+              <Tip>Pratique pour ne rien oublier lors des achats!</Tip>
+            </>
+          )
         },
         {
           question: 'Puis-je annuler une réservation?',
-          answer: `**Oui! Vous pouvez annuler une réservation à tout moment:**\n\n1️⃣ Allez dans "Mes Réservations" 🎁\n2️⃣ Trouvez l'article à annuler\n3️⃣ Cliquez sur "Annuler" ❌\n4️⃣ L'article redevient disponible pour les autres\n\n**Ou directement depuis les listes:**\n1️⃣ Allez dans "Toutes les Listes" 📝\n2️⃣ Les articles que vous avez réservés ont un bouton "Annuler"\n3️⃣ Cliquez dessus pour libérer l'article\n\n✅ Aucun problème pour changer d'avis!`
+          answer: (
+            <>
+              <p className="mb-4">Oui! Vous pouvez annuler une réservation à tout moment:</p>
+              
+              <Section title="Méthode 1: Depuis Mes Réservations" icon={Gift} color="gold">
+                <Step number="1">Allez dans "Mes Réservations" 🎁</Step>
+                <Step number="2">Trouvez l'article à annuler</Step>
+                <Step number="3">Cliquez sur "Annuler" ❌</Step>
+                <Step number="4">L'article redevient disponible pour les autres</Step>
+              </Section>
+
+              <Section title="Méthode 2: Depuis les listes" icon={List} color="blue">
+                <Step number="1">Allez dans "Toutes les Listes" 📝</Step>
+                <Step number="2">Les articles que vous avez réservés ont un bouton "Annuler"</Step>
+                <Step number="3">Cliquez dessus pour libérer l'article</Step>
+              </Section>
+
+              <Success>Aucun problème pour changer d'avis!</Success>
+            </>
+          )
         },
         {
           question: 'Les autres voient-ils qui a réservé?',
-          answer: `**Non! Les réservations sont anonymes:**\n\n🔒 **Vous voyez:**\n✅ Vos propres réservations\n✅ Quels articles de votre liste sont réservés\n❌ Mais PAS qui les a réservés\n\n👥 **Les autres voient:**\n✅ Si un article est "Réservé" ou "Disponible"\n❌ Mais PAS qui l'a réservé\n\n🎁 **L'admin voit:**\n✅ Toutes les statistiques\n❌ Mais pas les détails de qui réserve quoi\n\n💡 C'est pour garder la surprise!`
+          answer: (
+            <>
+              <Warning>
+                Non! Les réservations sont anonymes:
+              </Warning>
+
+              <Section title="Vous voyez" icon={Lock} color="emerald">
+                <Bullet>Vos propres réservations</Bullet>
+                <Bullet>Quels articles de votre liste sont réservés</Bullet>
+                <Bullet>Mais PAS qui les a réservés</Bullet>
+              </Section>
+
+              <Section title="Les autres voient" icon={Users} color="blue">
+                <Bullet>Si un article est "Réservé" ou "Disponible"</Bullet>
+                <Bullet>Mais PAS qui l'a réservé</Bullet>
+              </Section>
+
+              <Section title="L'admin voit" icon={Users} color="purple">
+                <Bullet>Toutes les statistiques</Bullet>
+                <Bullet>Mais pas les détails de qui réserve quoi</Bullet>
+              </Section>
+
+              <Tip>C'est pour garder la surprise!</Tip>
+            </>
+          )
         }
       ]
     },
@@ -87,15 +328,75 @@ const FAQView = ({ event, setView }) => {
       questions: [
         {
           question: 'Comment voir mon attribution?',
-          answer: `**Pour découvrir à qui vous devez offrir un cadeau:**\n\n1️⃣ Cliquez sur "Mon Attribution" ❤️ dans le menu\n2️⃣ Vous verrez le nom de la personne\n3️⃣ Vous pouvez consulter sa liste de souhaits\n4️⃣ Vous pouvez réserver des articles directement!\n\n**Important:**\n🤫 C'est SECRET! Ne dites à personne qui est votre attribution\n🎁 Vous ne pouvez offrir qu'à UNE personne\n❤️ Quelqu'un d'autre vous offre un cadeau (mais vous ne savez pas qui!)\n\n💡 C'est ça la magie du Secret Santa!`
+          answer: (
+            <>
+              <Section title="Découvrir votre attribution" icon={Heart} color="primary">
+                <Step number="1">Cliquez sur "Mon Attribution" ❤️ dans le menu</Step>
+                <Step number="2">Vous verrez le nom de la personne</Step>
+                <Step number="3">Vous pouvez consulter sa liste de souhaits</Step>
+                <Step number="4">Vous pouvez réserver des articles directement!</Step>
+              </Section>
+
+              <Warning>
+                C'est SECRET! Ne dites à personne qui est votre attribution
+              </Warning>
+
+              <InfoBox>
+                Vous ne pouvez offrir qu'à UNE personne • Quelqu'un d'autre vous offre un cadeau (mais vous ne savez pas qui!)
+              </InfoBox>
+            </>
+          )
         },
         {
           question: 'Quand vais-je connaître mon attribution?',
-          answer: `**Vous connaîtrez votre attribution quand l'admin créera les attributions:**\n\n📧 **Vous recevrez un email** avec:\n✅ Le nom de votre attribution\n✅ Un lien vers l'application\n\n🔔 **Dans l'app:**\n✅ L'onglet "Mon Attribution" deviendra actif\n✅ Vous pourrez voir la liste de la personne\n\n⏱️ **Timing:**\n• L'admin choisit quand créer les attributions\n• Généralement quelques jours/semaines avant l'événement\n\n💡 Patience! L'admin vous préviendra! 😊`
+          answer: (
+            <>
+              <p className="mb-4">Vous connaîtrez votre attribution quand l'admin créera les attributions:</p>
+              
+              <Section title="Vous recevrez un email" icon={Gift} color="primary">
+                <Bullet>Le nom de votre attribution</Bullet>
+                <Bullet>Un lien vers l'application</Bullet>
+              </Section>
+
+              <Section title="Dans l'app" icon={Heart} color="primary">
+                <Bullet>L'onglet "Mon Attribution" deviendra actif</Bullet>
+                <Bullet>Vous pourrez voir la liste de la personne</Bullet>
+              </Section>
+
+              <Section title="Timing" icon={null} color="blue">
+                <Bullet>L'admin choisit quand créer les attributions</Bullet>
+                <Bullet>Généralement quelques jours/semaines avant l'événement</Bullet>
+              </Section>
+
+              <Tip>Patience! L'admin vous préviendra! 😊</Tip>
+            </>
+          )
         },
         {
-          question: 'C\'est quoi le principe du Secret Santa?',
-          answer: `**Le Secret Santa (ou Père Noël Secret) c'est simple:**\n\n🎲 **Attribution aléatoire:**\n• Chaque personne tire au sort un nom\n• Vous offrez UN cadeau à cette personne\n• Quelqu'un d'autre vous offre un cadeau\n• Personne ne sait qui offre à qui (sauf l'admin!)\n\n🎁 **Avantages:**\n✅ Un seul cadeau à acheter (économique!)\n✅ Tout le monde reçoit un cadeau\n✅ Suspense et surprise garantis\n✅ Parfait pour les grands groupes\n\n🤫 **Règle d'or:**\n• GARDEZ LE SECRET!\n• Ne dites à personne qui est votre attribution\n• Le mystère fait partie du jeu!\n\n🎄 C'est la magie des fêtes!`
+          question: "C'est quoi le principe?",
+          answer: (
+            <>              
+              <Section title="Attribution aléatoire" icon={Gift} color="primary">
+                <Bullet>Chaque personne tire au sort un nom</Bullet>
+                <Bullet>Vous offrez UN cadeau à cette personne</Bullet>
+                <Bullet>Quelqu'un d'autre vous offre un cadeau</Bullet>
+                <Bullet>Personne ne sait qui offre à qui (sauf l'admin!)</Bullet>
+              </Section>
+
+              <Section title="Avantages" icon={CheckCircle} color="emerald">
+                <Bullet>Un seul cadeau à acheter (économique!)</Bullet>
+                <Bullet>Tout le monde reçoit un cadeau</Bullet>
+                <Bullet>Suspense et surprise garantis</Bullet>
+                <Bullet>Parfait pour les grands groupes</Bullet>
+              </Section>
+
+              <Warning>
+                Règle d'or: GARDEZ LE SECRET! • Ne dites à personne qui est votre attribution • Le mystère fait partie du jeu!
+              </Warning>
+
+              <Success>C'est la magie des fêtes! 🎄</Success>
+            </>
+          )
         }
       ]
     },
@@ -109,15 +410,84 @@ const FAQView = ({ event, setView }) => {
       questions: [
         {
           question: 'Comment changer mon mot de passe?',
-          answer: `**Pour modifier votre mot de passe:**\n\n**Sur ordinateur:**\n1️⃣ Cliquez sur votre avatar en haut à droite 👤\n2️⃣ Sélectionnez "Changer mot de passe" 🔒\n\n**Sur mobile:**\n1️⃣ Ouvrez le menu "Menu" ☰ en bas\n2️⃣ Sélectionnez "Changer mot de passe" 🔒\n\n**Ensuite:**\n3️⃣ Entrez votre mot de passe actuel\n4️⃣ Entrez le nouveau (2 fois)\n5️⃣ Validez! ✅\n\n**Exigences:**\n• Minimum 4 caractères\n• Doit être différent de l'ancien\n\n🔒 Gardez-le en sécurité!`
+          answer: (
+            <>
+              <Section title="Sur ordinateur" icon={null} color="blue">
+                <Step number="1">Cliquez sur votre avatar en haut à droite 👤</Step>
+                <Step number="2">Sélectionnez "Changer mot de passe" 🔒</Step>
+              </Section>
+
+              <Section title="Sur mobile" icon={null} color="blue">
+                <Step number="1">Ouvrez le menu "Menu" ☰ en bas</Step>
+                <Step number="2">Sélectionnez "Changer mot de passe" 🔒</Step>
+              </Section>
+
+              <Section title="Ensuite" icon={Lock} color="blue">
+                <Step number="3">Entrez votre mot de passe actuel</Step>
+                <Step number="4">Entrez le nouveau (2 fois)</Step>
+                <Step number="5">Validez! ✅</Step>
+              </Section>
+
+              <InfoBox>
+                Exigences: Minimum 4 caractères • Doit être différent de l'ancien
+              </InfoBox>
+
+              <Warning>Gardez-le en sécurité! 🔒</Warning>
+            </>
+          )
         },
         {
           question: 'Vais-je recevoir des notifications?',
-          answer: `**Oui! Vous recevrez des emails pour:**\n\n📧 **Création de compte:**\n✅ Vos identifiants de connexion\n✅ Bienvenue sur la plateforme\n\n❤️ **Attribution créée:**\n✅ Le nom de votre attribution\n✅ Lien direct vers l'application\n\n🔄 **Nouvelles attributions:**\n✅ Si l'admin recrée les attributions\n✅ Votre nouvelle attribution\n\n**Important:**\n⚠️ Pas de notifications pour les réservations\n💡 Consultez régulièrement l'app pour voir les nouveautés!\n\n📱 Gardez un œil sur votre boîte mail!`
+          answer: (
+            <>
+              <p className="mb-4">Oui! Vous recevrez des emails pour:</p>
+              
+              <Section title="Création de compte" icon={Gift} color="emerald">
+                <Bullet>Vos identifiants de connexion</Bullet>
+                <Bullet>Bienvenue sur la plateforme</Bullet>
+              </Section>
+
+              <Section title="Attribution créée" icon={Heart} color="primary">
+                <Bullet>Le nom de votre attribution</Bullet>
+                <Bullet>Lien direct vers l'application</Bullet>
+              </Section>
+
+              <Section title="Nouvelles attributions" icon={Gift} color="gold">
+                <Bullet>Si l'admin recrée les attributions</Bullet>
+                <Bullet>Votre nouvelle attribution</Bullet>
+              </Section>
+
+              <Warning>
+                Pas de notifications pour les réservations
+              </Warning>
+
+              <Tip>Consultez régulièrement l'app pour voir les nouveautés! 📱 Gardez un œil sur votre boîte mail!</Tip>
+            </>
+          )
         },
         {
           question: 'Puis-je supprimer mon compte?',
-          answer: `**Non, vous ne pouvez pas supprimer votre propre compte.**\n\n**Pourquoi?**\n🔒 Pour maintenir l'intégrité de l'échange\n🎁 Pour éviter de casser les attributions\n👥 Pour la cohérence du groupe\n\n**Si vous voulez vraiment partir:**\n📧 Contactez l'administrateur\n👤 Seul l'admin peut supprimer des comptes\n⚠️ Cela affectera les attributions\n\n💡 Mieux vaut rester et participer! 🎄`
+          answer: (
+            <>
+              <Warning>
+                Non, vous ne pouvez pas supprimer votre propre compte.
+              </Warning>
+
+              <Section title="Pourquoi?" icon={AlertCircle} color="red">
+                <Bullet>Pour maintenir l'intégrité de l'échange</Bullet>
+                <Bullet>Pour éviter de casser les attributions</Bullet>
+                <Bullet>Pour la cohérence du groupe</Bullet>
+              </Section>
+
+              <Section title="Si vous voulez vraiment partir" icon={Users} color="blue">
+                <Bullet>Contactez l'administrateur</Bullet>
+                <Bullet>Seul l'admin peut supprimer des comptes</Bullet>
+                <Bullet>Cela affectera les attributions</Bullet>
+              </Section>
+
+              <Tip>Mieux vaut rester et participer! 🎄</Tip>
+            </>
+          )
         }
       ]
     },
@@ -130,12 +500,53 @@ const FAQView = ({ event, setView }) => {
       borderColor: 'border-purple-500/30',
       questions: [
         {
-          question: 'Qui est l\'administrateur?',
-          answer: `**L'administrateur gère ${event?.name || 'l\'événement'}:**\n\n⚙️ **Ses responsabilités:**\n• Créer les attributions (qui offre à qui)\n• Ajouter/supprimer des participants\n• Envoyer les emails d'attribution\n• Consulter les statistiques globales\n• Gérer les paramètres de l'événement\n\n🔒 **Ce qu'il NE voit PAS:**\n❌ Vos mots de passe\n❌ Qui réserve quoi en détail\n\n💬 **Besoin d'aide?**\n• Contactez votre administrateur\n• Il/elle peut vous aider avec tout problème\n\n👑 L'admin a un badge spécial dans l'app!`
+          question: "Qui est l'administrateur?",
+          answer: (
+            <>
+              <p className="mb-4">L'administrateur gère {event?.name || "l'événement"}:</p>
+              
+              <Section title="Ses responsabilités" icon={Users} color="purple">
+                <Bullet>Créer les attributions (qui offre à qui)</Bullet>
+                <Bullet>Ajouter/supprimer des participants</Bullet>
+                <Bullet>Envoyer les emails d'attribution</Bullet>
+                <Bullet>Consulter les statistiques globales</Bullet>
+                <Bullet>Gérer les paramètres de l'événement</Bullet>
+              </Section>
+
+              <Section title="Ce qu'il NE voit PAS" icon={Lock} color="red">
+                <Bullet>Vos mots de passe</Bullet>
+                <Bullet>Qui réserve quoi en détail</Bullet>
+              </Section>
+
+              <InfoBox>
+                Besoin d'aide? Contactez votre administrateur. Il/elle peut vous aider avec tout problème.
+              </InfoBox>
+
+              <Tip>L'admin a un badge spécial dans l'app! 👑</Tip>
+            </>
+          )
         },
         {
           question: 'Comment devenir administrateur?',
-          answer: `**Vous ne pouvez pas devenir administrateur vous-même.**\n\n**L'admin est désigné lors de la création:**\n👤 C'est la personne qui a créé l'événement\n🔐 Seul l'admin peut gérer l'événement\n\n**Si vous voulez être admin:**\n💬 Demandez à l'admin actuel\n⚠️ Il/elle peut créer un nouvel événement pour vous\n\n💡 En général, il n'y a qu'un seul admin par événement!`
+          answer: (
+            <>
+              <Warning>
+                Vous ne pouvez pas devenir administrateur vous-même.
+              </Warning>
+
+              <Section title="L'admin est désigné lors de la création" icon={Users} color="purple">
+                <Bullet>C'est la personne qui a créé l'événement</Bullet>
+                <Bullet>Seul l'admin peut gérer l'événement</Bullet>
+              </Section>
+
+              <Section title="Si vous voulez être admin" icon={Gift} color="blue">
+                <Bullet>Demandez à l'admin actuel</Bullet>
+                <Bullet>Il/elle peut créer un nouvel événement pour vous</Bullet>
+              </Section>
+
+              <Tip>En général, il n'y a qu'un seul admin par événement!</Tip>
+            </>
+          )
         }
       ]
     }
@@ -145,12 +556,10 @@ const FAQView = ({ event, setView }) => {
   const filteredCategories = faqCategories.map(category => ({
     ...category,
     questions: category.questions.filter(q =>
-      q.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      q.answer.toLowerCase().includes(searchQuery.toLowerCase())
+      q.question.toLowerCase().includes(searchQuery.toLowerCase())
     )
   })).filter(category => category.questions.length > 0);
 
-  // Toggle l'ouverture d'une question
   const toggleItem = (categoryIndex, questionIndex) => {
     const itemId = `${categoryIndex}-${questionIndex}`;
     setOpenItems(prev =>
@@ -160,7 +569,6 @@ const FAQView = ({ event, setView }) => {
     );
   };
 
-  // Vérifier si un item est ouvert
   const isOpen = (categoryIndex, questionIndex) => {
     return openItems.includes(`${categoryIndex}-${questionIndex}`);
   };
@@ -179,7 +587,7 @@ const FAQView = ({ event, setView }) => {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-3 mb-4">
-        <HelpCircle className="w-10 h-10 text-primary animate-float" />
+          <HelpCircle className="w-10 h-10 text-primary animate-float" />
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent">
             Foire Aux Questions
           </h1>
@@ -212,7 +620,7 @@ const FAQView = ({ event, setView }) => {
               style={{ animationDelay: `${categoryIndex * 0.1}s` }}
             >
               {/* Category Header */}
-              <div className={`flex items-center gap-3 mb-4 pb-4 border-b border-white/10`}>
+              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/10">
                 <div className={`p-2 bg-gradient-to-br ${category.bgColor} rounded-xl border ${category.borderColor}`}>
                   <Icon className={`w-6 h-6 ${category.color}`} />
                 </div>
@@ -249,7 +657,7 @@ const FAQView = ({ event, setView }) => {
                       {/* Answer */}
                       {itemIsOpen && (
                         <div className="px-4 pb-4 pt-2 border-t border-white/10 animate-slide-down">
-                          <div className="text-dark-300 whitespace-pre-line leading-relaxed">
+                          <div className="text-dark-300 leading-relaxed">
                             {item.answer}
                           </div>
                         </div>
@@ -279,7 +687,7 @@ const FAQView = ({ event, setView }) => {
           <div>
             <h3 className="font-bold text-dark-100 mb-2">Vous n'avez pas trouvé votre réponse?</h3>
             <p className="text-dark-400 text-sm">
-              Contactez l'administrateur de {event?.name || 'l\'événement'} pour obtenir de l'aide personnalisée! 😊
+              Contactez l'administrateur de {event?.name || "l'événement"} pour obtenir de l'aide personnalisée! 😊
             </p>
           </div>
         </div>
@@ -288,4 +696,4 @@ const FAQView = ({ event, setView }) => {
   );
 };
 
-export default FAQView;
+export default FAQView
