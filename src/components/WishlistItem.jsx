@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Check, Edit2, X, Save } from 'lucide-react';
+import { ExternalLink, Check, Edit2, X, Save, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const WishlistItem = ({ 
@@ -28,55 +28,53 @@ const WishlistItem = ({
   };
 
   const handleReserve = () => {
-    // Confetti seulement quand on réserve (pas quand on annule)
     if (!item.claimed) {
       confetti({
         particleCount: 50,
         spread: 60,
         origin: { y: 0.7 },
-        colors: ['#9b8578', '#D5BDAF', '#F5EBE0']
+        colors: ['#dc2626', '#fbbf24', '#10b981']
       });
     }
     
-    // Appeler la fonction de réservation
     if (toggleItemClaimed) {
       toggleItemClaimed(item.id, item.claimed);
     }
   };
 
-  // Vérifier si c'est l'utilisateur actuel qui a réservé
   const isReservedByCurrentUser = item.claimed && item.reservedBy === currentUser?.id;
-  // Vérifier si c'est réservé par quelqu'un d'autre
   const isReservedByOther = item.claimed && item.reservedBy !== currentUser?.id;
 
   // Mode édition
   if (isEditing) {
     return (
-      <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border-2 border-blue-300">
+      <div className="bg-gradient-to-br from-blue-900/30 to-blue-800/30 backdrop-blur-sm p-4 rounded-xl border-2 border-blue-500/50 shadow-lg animate-scale-in">
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-stone-700 mb-1">
+            <label className="block text-xs font-semibold text-blue-300 mb-2 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
               Nom de l'article
             </label>
             <input
               type="text"
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
-              className="w-full px-3 py-2 border-2 border-stone-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-full px-3 py-2 bg-dark-900/50 border-2 border-blue-500/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500/50 outline-none text-dark-100 placeholder-dark-500"
               placeholder="Nom de l'article"
               autoFocus
             />
           </div>
           
           <div>
-            <label className="block text-xs font-semibold text-stone-700 mb-1">
+            <label className="block text-xs font-semibold text-blue-300 mb-2 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
               Lien (optionnel)
             </label>
             <input
               type="url"
               value={editedLink}
               onChange={(e) => setEditedLink(e.target.value)}
-              className="w-full px-3 py-2 border-2 border-stone-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-full px-3 py-2 bg-dark-900/50 border-2 border-blue-500/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500/50 outline-none text-dark-100 placeholder-dark-500"
               placeholder="https://..."
             />
           </div>
@@ -84,14 +82,14 @@ const WishlistItem = ({
           <div className="flex gap-2">
             <button
               onClick={handleSave}
-              className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+              className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-glow-green"
             >
               <Save className="w-4 h-4" />
               Sauvegarder
             </button>
             <button
               onClick={handleCancel}
-              className="flex-1 bg-stone-300 hover:bg-stone-400 text-stone-700 px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+              className="flex-1 bg-dark-700/50 hover:bg-dark-600/50 backdrop-blur-sm text-dark-200 px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all border border-white/10"
             >
               <X className="w-4 h-4" />
               Annuler
@@ -104,13 +102,13 @@ const WishlistItem = ({
 
   // Mode affichage normal
   return (
-    <div className="bg-gradient-to-r from-cream to-beige p-4 rounded-lg border-2 border-beige-dark">
+    <div className="bg-gradient-to-r from-dark-800/60 to-dark-900/60 backdrop-blur-sm p-4 rounded-xl border border-white/10 hover:border-emerald-500/50 transition-all duration-300 group hover:shadow-lg">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h4 className="font-bold text-stone-800">{item.item}</h4>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="font-bold text-dark-100 group-hover:text-emerald-400 transition-colors">{item.item}</h4>
             {!hideClaimedBadge && item.claimed && (
-              <span className="bg-green-200 text-green-900 text-xs px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+              <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1 shadow-lg">
                 <Check className="w-3 h-3" />
                 Réservé
               </span>
@@ -122,20 +120,20 @@ const WishlistItem = ({
               href={item.link} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline flex items-center gap-1 mt-1"
+              className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1 mt-2 font-medium transition-colors group/link"
             >
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform" />
               Voir le produit
             </a>
           )}
         </div>
 
         <div className="flex items-center gap-2 ml-2">
-          {/* Bouton de modification (seulement pour le propriétaire et si pas réservé) */}
-          {currentUser && item.userId === currentUser.id && !item.claimed && (
+          {/* Bouton de modification */}
+          {currentUser && item.userId === currentUser.id && !item.claimed && onUpdate && (
             <button
               onClick={() => setIsEditing(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition"
+              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white p-2 rounded-lg transition-all shadow-lg hover:scale-110"
               title="Modifier"
             >
               <Edit2 className="w-4 h-4" />
@@ -145,31 +143,29 @@ const WishlistItem = ({
           {/* Bouton de réservation */}
           {showToggle && toggleItemClaimed && (
             <>
-              {/* Si pas réservé, afficher bouton "Réserver" */}
               {!item.claimed && (
                 <button
                   onClick={handleReserve}
-                  className="px-3 py-2 rounded-lg font-semibold transition bg-primary text-white hover:bg-primary-dark"
+                  className="px-3 py-2 rounded-lg font-semibold transition-all bg-gradient-to-r from-primary via-primary-600 to-primary-dark text-white hover:from-primary-dark hover:to-primary shadow-lg hover:shadow-glow-red flex items-center gap-1.5 group/btn"
                 >
+                  <Sparkles className="w-3.5 h-3.5 group-hover/btn:rotate-12 transition-transform" />
                   Réserver
                 </button>
               )}
               
-              {/* Si réservé par l'utilisateur actuel, afficher bouton "Annuler" */}
               {isReservedByCurrentUser && (
                 <button
                   onClick={handleReserve}
-                  className="px-3 py-2 rounded-lg font-semibold transition bg-stone-300 text-stone-700 hover:bg-stone-400"
+                  className="px-3 py-2 rounded-lg font-semibold transition-all bg-dark-700/50 hover:bg-dark-600/50 backdrop-blur-sm text-dark-200 border border-white/10 hover:border-white/20"
                 >
                   Annuler
                 </button>
               )}
               
-              {/* Si réservé par quelqu'un d'autre, afficher texte "Réservé" désactivé */}
               {isReservedByOther && (
                 <button
                   disabled
-                  className="px-3 py-2 rounded-lg font-semibold bg-stone-200 text-stone-500 cursor-not-allowed"
+                  className="px-3 py-2 rounded-lg font-semibold bg-dark-800/30 text-dark-600 cursor-not-allowed border border-white/5"
                 >
                   Réservé
                 </button>

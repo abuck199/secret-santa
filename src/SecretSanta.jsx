@@ -212,50 +212,56 @@ const SecretSantaApp = () => {
 
   // === AUTHENTIFICATION ===
   const handleLogin = async () => {
-  toast.error(''); // Réinitialiser (optionnel)
-  setLoading(true);
-  
-  const trimmedUsername = loginForm.username.toLowerCase().trim();
-  
-  if (!trimmedUsername || !loginForm.password) {
-    toast.error('Veuillez remplir tous les champs'); // ← Utilisez toast
-    setLoading(false);
-    return;
-  }
-  
-  try {
-    const { data } = await supabaseAnon
-      .from('users')
-      .select('*')
-      .eq('username', trimmedUsername)
-      .single();
+    setLoading(true);
     
-    if (!data) {
+    const trimmedUsername = loginForm.username.toLowerCase().trim();
+    
+    if (!trimmedUsername || !loginForm.password) {
+      toast.error('Veuillez remplir tous les champs');
       setLoading(false);
-      toast.error('Nom d\'utilisateur ou mot de passe invalide'); // ← toast
       return;
     }
     
-    const passwordMatch = await bcrypt.compare(loginForm.password, data.password);
-    
-    setLoading(false);
-    
-    if (!passwordMatch) {
-      toast.error('Nom d\'utilisateur ou mot de passe invalide'); // ← toast
-      return;
+    try {
+      const { data } = await supabaseAnon
+        .from('users')
+        .select('*')
+        .eq('username', trimmedUsername)
+        .single();
+      
+      if (!data) {
+        setLoading(false);
+        toast.error('Nom d\'utilisateur ou mot de passe invalide');
+        return;
+      }
+      
+      const passwordMatch = await bcrypt.compare(loginForm.password, data.password);
+      
+      setLoading(false);
+      
+      if (!passwordMatch) {
+        toast.error('Nom d\'utilisateur ou mot de passe invalide');
+        return;
+      }
+      
+      // ✅ Ajouter un petit délai avant le message de succès
+      sessionStorage.setItem('currentUser', JSON.stringify(data));
+      
+      setCurrentUser(data);
+      setView('dashboard');
+      setLoginForm({ username: '', password: '', showPassword: false });
+      
+      // Message de succès après un court délai
+      setTimeout(() => {
+        toast.success(`Bienvenue ${data.username}! 🎄`);
+      }, 100);
+      
+    } catch (err) {
+      toast.error('Erreur de connexion');
+      console.error('Erreur login:', err);
+      setLoading(false);
     }
-    
-    sessionStorage.setItem('currentUser', JSON.stringify(data));
-    
-    setCurrentUser(data);
-    setView('dashboard');
-    setLoginForm({ username: '', password: '', showPassword: false });
-  } catch (err) {
-    toast.error('Erreur de connexion'); // ← toast
-    console.error('Erreur login:', err);
-    setLoading(false);
-  }
-};
+  };
 
   const handleLogout = () => {
     sessionStorage.removeItem('currentUser');
@@ -775,19 +781,22 @@ const SecretSantaApp = () => {
   }
 
   // === RENDU ===
-  if (!currentUser) {
-    return (
-      <LoginPage
-        loginForm={loginForm}
-        setLoginForm={setLoginForm}
-        handleLogin={handleLogin}
-        loading={loading}
-      />
-    );
+    if (!currentUser) {
+      return (
+        <>
+          <Notification />  {/* ← AJOUTER ICI */}
+          <LoginPage
+            loginForm={loginForm}
+            setLoginForm={setLoginForm}
+            handleLogin={handleLogin}
+            loading={loading}
+          />
+        </>
+      );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-beige-light via-cream to-beige">
+  <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 relative">
       <NavBar 
         currentUser={currentUser}
         event={event}
@@ -804,7 +813,8 @@ const SecretSantaApp = () => {
           position: 'fixed',
           width: '100vw',
           height: '100vh',
-          zIndex: 1
+          zIndex: 1,
+          opacity: 0.2
         }}
       />
     )}
