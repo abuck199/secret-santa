@@ -5,21 +5,21 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
   <div className="max-w-7xl mx-auto px-4 py-8 animate-fade-in">
     {/* Welcome Header */}
     <div className="mb-8 text-center">
-      <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-3">
-        <Sparkles className="w-8 h-8 text-gold animate-pulse" />
+      <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2">
+        <Sparkles className="w-6 h-6 text-gold animate-pulse" />
         Bienvenue {currentUser.username}!
-        <Sparkles className="w-8 h-8 text-gold animate-pulse" />
+        <Sparkles className="w-6 h-6 text-gold animate-pulse" />
       </h1>
       <p className="text-dark-400">Votre plateforme d'échange de cadeaux intelligente</p>
     </div>
 
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="grid md:grid-cols-2 gap-4">
       {/* Attribution Card */}
-      <div className="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-glow-red animate-slide-up">
+      <div className="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-4 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-glow-red animate-slide-up">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-dark-100 flex items-center gap-2">
             <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
-              <Gift className="w-6 h-6 text-primary" />
+              <Gift className="w-5 h-5 mr-2 text-primary" />
             </div>
             Votre attribution
           </h2>

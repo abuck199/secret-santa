@@ -59,9 +59,9 @@ const WelcomeAnimation = ({ username, onComplete }) => {
             step >= 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
           }`}
         >
-          <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-primary via-gold to-emerald-500 rounded-full shadow-2xl shadow-primary/50 animate-float">
-            <span className="text-7xl">🎄</span>
-          </div>
+        <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-primary via-gold to-emerald-500 rounded-full shadow-2xl shadow-primary/50 animate-float">
+            <span className="text-6xl">🎄</span>
+        </div>
         </div>
 
         {/* Message de bienvenue */}
@@ -70,10 +70,10 @@ const WelcomeAnimation = ({ username, onComplete }) => {
             step >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent flex items-center justify-center gap-3 flex-wrap">
-            <Sparkles className="w-10 h-10 text-gold animate-pulse" />
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent flex items-center justify-center gap-3 flex-wrap">
+            <Sparkles className="w-8 h-8 text-gold animate-pulse" />
             Joyeux temps des fêtes!
-            <Sparkles className="w-10 h-10 text-gold animate-pulse" />
+            <Sparkles className="w-8 h-8 text-gold animate-pulse" />
           </h1>
           <p className="text-2xl md:text-3xl text-dark-200 font-medium">
             Bienvenue <span className="text-primary font-bold">{username}</span>! 🎁

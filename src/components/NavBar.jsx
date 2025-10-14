@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LogOut, Home, List, Gift, Lock, Sparkles, Settings, Heart, Clipboard, Menu, X } from 'lucide-react';
+import { LogOut, Home, List, Gift, Lock, Sparkles, Settings, Heart, Clipboard, Menu, X, HelpCircle } from 'lucide-react';
 
 const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,6 +19,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
     { id: 'assignment', label: 'Mon Attribution', icon: Heart, color: 'text-primary' },
     { id: 'all-lists', label: 'Toutes les Listes', icon: List, color: 'text-blue-500' },
     { id: 'my-reservations', label: 'Mes Réservations', icon: Gift, color: 'text-gold' },
+    { id: 'faq', label: 'Aide', icon: HelpCircle, color: 'text-purple-500' },
   ];
 
   // Fermeture au clic extérieur
@@ -64,14 +65,14 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
     <>
       {/* ========== DESKTOP NAVBAR ========== */}
       <nav className="hidden md:block sticky top-0 z-50 bg-dark-900/80 backdrop-blur-xl shadow-2xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo cliquable */}
             <button 
               onClick={() => setView('dashboard')}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
             >
-              <span className="text-3xl animate-float group-hover:scale-110 transition-transform">🎄</span>
+              <span className="text-2xl animate-float group-hover:scale-110 transition-transform">🎄</span>
               <div>
                 <span className="text-xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent flex items-center gap-2">
                   {event.name}
@@ -88,7 +89,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                   <button 
                     key={item.id}
                     onClick={() => setView(item.id)}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 font-medium group ${
+                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 font-medium group ${
                       view === item.id 
                         ? 'bg-white/10 text-white shadow-lg' 
                         : 'text-dark-300 hover:text-white hover:bg-white/5'
@@ -111,7 +112,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-all group"
               >
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white font-bold text-base shadow-lg group-hover:scale-105 transition-transform">
+                <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white font-bold text-base shadow-lg group-hover:scale-105 transition-transform">
                   {currentUser.username.substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex flex-col items-start">
@@ -313,6 +314,17 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                   >
                     <Gift className="w-5 h-5" />
                     <span className="font-medium">Mes réservations</span>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('faq')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      view === 'faq' 
+                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30' 
+                        : 'text-dark-300 hover:bg-white/5'
+                    }`}
+                  >
+                    <HelpCircle className="w-5 h-5" />
+                    <span className="font-medium">Aide & FAQ</span>
                   </button>
                 </div>
               </div>

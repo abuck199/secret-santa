@@ -33,7 +33,7 @@ const AllListsView = ({
     </div>
 
     {/* Grid des listes */}
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="grid md:grid-cols-2 gap-4">
       {users.map((user, index) => {
         const userWishlist = wishLists[user.id] || [];
         const reservedCount = userWishlist.filter(i => i.claimed).length;

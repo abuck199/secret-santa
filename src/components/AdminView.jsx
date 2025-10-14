@@ -51,9 +51,9 @@ const AdminView = ({
         </div>
         
         <div className="grid md:grid-cols-3 gap-4 mb-6">
-          <div className="p-5 bg-gradient-to-br from-blue-900/20 to-blue-800/20 backdrop-blur-sm rounded-xl border border-blue-500/30 hover:border-blue-500/50 transition-all">
-            <p className="text-sm text-blue-400 mb-2 font-medium">Total d'articles</p>
-            <p className="text-4xl font-bold text-blue-300">{stats.totalItems}</p>
+          <div className="p-4 bg-gradient-to-br from-blue-900/20 to-blue-800/20 backdrop-blur-sm rounded-lg border border-blue-500/30 hover:border-blue-500/50 transition-all">
+            <p className="text-xs text-blue-400 mb-2 font-medium">Total</p>
+            <p className="text-3xl font-bold text-blue-300">{stats.totalItems}</p>
           </div>
           <div className="p-5 bg-gradient-to-br from-emerald-900/20 to-emerald-800/20 backdrop-blur-sm rounded-xl border border-emerald-500/30 hover:border-emerald-500/50 transition-all">
             <p className="text-sm text-emerald-400 mb-2 font-medium">Réservés</p>

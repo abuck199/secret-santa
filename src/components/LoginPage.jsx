@@ -15,15 +15,14 @@ const LoginPage = ({ loginForm, setLoginForm, handleLogin, loading, event }) => 
     {/* Glow effect background */}
     <div className="absolute inset-0 bg-gradient-radial from-primary/10 via-transparent to-transparent opacity-30"></div>
 
-    <div className="bg-dark-800/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/10 relative z-10 animate-scale-in">
-      {/* Header avec icône festive */}
+    <div className="bg-dark-800/80 backdrop-blur-xl rounded-xl shadow-2xl p-6 w-full max-w-md border border-white/10 relative z-10 animate-scale-in">      {/* Header avec icône festive */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary via-emerald-600 to-gold rounded-full mb-4 shadow-glow-red animate-float">
-          <span className="text-4xl">🎄</span>
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary via-emerald-600 to-gold rounded-full mb-3 shadow-glow-red animate-float">
+          <span className="text-3xl">🎄</span>
         </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2">
           {event?.name}
-          <Sparkles className="w-6 h-6 text-gold animate-pulse" />
+          <Sparkles className="w-5 h-5 text-gold animate-pulse" />
         </h1>
         <p className="text-dark-400 text-sm">Connectez-vous pour accéder à la magie des fêtes</p>
       </div>

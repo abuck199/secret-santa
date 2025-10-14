@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import Notification from './components/Notification';
 import ChangePasswordView from './components/ChangePasswordView';
 import WelcomeAnimation from './components/WelcomeAnimation';
+import FAQView from './components/FAQView';
 
 const SecretSantaApp = () => {
   // Initialiser EmailJS
@@ -162,6 +163,10 @@ const SecretSantaApp = () => {
     
     return () => clearInterval(interval);
   }, [currentUser]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [view]);
 
   // === CHARGEMENT DONNÉES ===
   const loadAllData = async () => {
@@ -920,6 +925,13 @@ const SecretSantaApp = () => {
         sendAssignmentEmails={sendAssignmentEmails}
         setView={setView}
         loading={loading}
+      />
+    )}
+
+    {view === 'faq' && !showWelcome && (
+      <FAQView
+        event={event}
+        setView={setView}
       />
     )}
   </div>
