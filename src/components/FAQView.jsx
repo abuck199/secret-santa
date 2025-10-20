@@ -5,18 +5,55 @@ const FAQView = ({ event, setView }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [openItems, setOpenItems] = useState([0]);
 
+  // Mapping des couleurs pour Tailwind (classes complètes)
+  const colorMap = {
+    emerald: {
+      bg: 'from-emerald-900/10 to-emerald-800/10',
+      border: 'border-emerald-500/20',
+      icon: 'text-emerald-500'
+    },
+    blue: {
+      bg: 'from-blue-900/10 to-blue-800/10',
+      border: 'border-blue-500/20',
+      icon: 'text-blue-500'
+    },
+    primary: {
+      bg: 'from-primary/10 to-primary-dark/10',
+      border: 'border-primary/20',
+      icon: 'text-primary'
+    },
+    gold: {
+      bg: 'from-gold/10 to-gold-dark/10',
+      border: 'border-gold/20',
+      icon: 'text-gold'
+    },
+    red: {
+      bg: 'from-red-900/10 to-red-800/10',
+      border: 'border-red-500/20',
+      icon: 'text-red-500'
+    },
+    purple: {
+      bg: 'from-purple-900/10 to-purple-800/10',
+      border: 'border-purple-500/20',
+      icon: 'text-purple-500'
+    }
+  };
+
   // Composant pour les sections de réponse
-  const Section = ({ title, children, icon: Icon, color = "emerald" }) => (
-    <div className={`mb-4 p-4 bg-gradient-to-br from-${color}-900/10 to-${color}-800/10 backdrop-blur-sm border border-${color}-500/20 rounded-xl`}>
-      <div className="flex items-center gap-2 mb-3">
-        {Icon && <Icon className={`w-5 h-5 text-${color}-500`} />}
-        <h4 className="font-bold text-dark-100">{title}</h4>
+  const Section = ({ title, children, icon: Icon, color = "emerald" }) => {
+    const colors = colorMap[color] || colorMap.emerald;
+    return (
+      <div className={`mb-4 p-4 bg-gradient-to-br ${colors.bg} backdrop-blur-sm border ${colors.border} rounded-xl`}>
+        <div className="flex items-center gap-2 mb-3">
+          {Icon && <Icon className={`w-5 h-5 ${colors.icon}`} />}
+          <h4 className="font-bold text-dark-100">{title}</h4>
+        </div>
+        <div className="space-y-2 text-dark-300 leading-relaxed">
+          {children}
+        </div>
       </div>
-      <div className="space-y-2 text-dark-300 leading-relaxed">
-        {children}
-      </div>
-    </div>
-  );
+    );
+  };
 
   const Step = ({ number, children }) => (
     <div className="flex items-start gap-3 mb-2">
@@ -344,6 +381,8 @@ const FAQView = ({ event, setView }) => {
               <InfoBox>
                 Vous ne pouvez offrir qu'à UNE personne • Quelqu'un d'autre vous offre un cadeau (mais vous ne savez pas qui!)
               </InfoBox>
+
+              <Tip>C'est ça la magie du Secret Santa!</Tip>
             </>
           )
         },
@@ -373,9 +412,11 @@ const FAQView = ({ event, setView }) => {
           )
         },
         {
-          question: "C'est quoi le principe?",
+          question: "C'est quoi le principe du Secret Santa?",
           answer: (
-            <>              
+            <>
+              <p className="mb-4">Le Secret Santa (ou Père Noël Secret) c'est simple:</p>
+              
               <Section title="Attribution aléatoire" icon={Gift} color="primary">
                 <Bullet>Chaque personne tire au sort un nom</Bullet>
                 <Bullet>Vous offrez UN cadeau à cette personne</Bullet>

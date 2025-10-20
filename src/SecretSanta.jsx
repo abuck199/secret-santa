@@ -26,6 +26,8 @@ const SecretSantaApp = () => {
   
   // États principaux
   const [currentUser, setCurrentUser] = useState(null);
+  const [reservingItems, setReservingItems] = useState(new Set());
+  const [isEditing, setIsEditing] = useState(false);
   const [view, setView] = useState('login');
   const [showWelcome, setShowWelcome] = useState(false); // ← AJOUTER CETTE LIGNE
   const [users, setUsers] = useState([]);
@@ -104,15 +106,15 @@ const SecretSantaApp = () => {
   }, [view, currentUser]);
 
   useEffect(() => {
-  if (!currentUser) return;
-  
-  // Recharger les données toutes les 10 secondes
-  const interval = setInterval(() => {
-    loadWishLists();
-  }, 5000); // 5 secondes
-  
-  return () => clearInterval(interval);
-}, [currentUser]);
+    if (!currentUser || isEditing) return; // ← Skip le refresh si édition en cours
+    
+    // Recharger les données toutes les 5 secondes
+    const interval = setInterval(() => {
+      loadWishLists();
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [currentUser, isEditing]);
 
   // Charger les données seulement quand currentUser change
   useEffect(() => {
@@ -402,107 +404,179 @@ const SecretSantaApp = () => {
 
   // === GESTION WISHLIST ===
   const addWishlistItem = async () => {
-    if (!itemForm.item.trim()) return;
+  
+  if (!itemForm.item.trim()) return;
+  
+  // ← NOUVEAU: Vérifier le nombre d'items existants
+  const userItems = wishLists[currentUser.id] || [];
+  const MAX_ITEMS = 50;
+  
+  if (userItems.length >= MAX_ITEMS) {
+    toast.error(`Vous avez atteint la limite de ${MAX_ITEMS} articles par liste`);
+    return;
+  }
+  
+  if (itemForm.link && itemForm.link.trim()) {
+    const link = itemForm.link.trim();
     
-    if (itemForm.link && itemForm.link.trim()) {
-      const link = itemForm.link.trim();
-      
-      // Bloquer javascript: et data: URLs
-      if (link.toLowerCase().startsWith('javascript:') || 
-          link.toLowerCase().startsWith('data:')) {
-        toast.error('Lien invalide');
-        return;
-      }
-      
-      // Optionnel : forcer https
-      if (!link.startsWith('http://') && !link.startsWith('https://')) {
-        toast.error('Le lien doit commencer par http:// ou https://');
-        return;
-      }
+    // Bloquer javascript: et data: URLs
+    if (link.toLowerCase().startsWith('javascript:') || 
+        link.toLowerCase().startsWith('data:')) {
+      toast.error('Lien invalide');
+      return;
     }
     
-    // Limiter la longueur
-    if (itemForm.item.length > 200) {
-      toast.error('Le nom de l\'article est trop long (max 200 caractères)');
+    // Optionnel : forcer https
+    if (!link.startsWith('http://') && !link.startsWith('https://')) {
+      toast.error('Le lien doit commencer par http:// ou https://');
       return;
+    }
   }
-    
-    const msg = `Ajouter "${itemForm.item}"?\n\n⚠️ Impossible de supprimer après ajout.`;
-    if (!window.confirm(msg)) return;
-    
-    setLoading(true);
-    
-    const userItems = wishLists[currentUser.id] || [];
-    const maxOrder = userItems.length > 0 ? Math.max(...userItems.map(i => i.displayOrder)) : 0;
-    
-    await supabase.from('wishlist_items').insert([{
-      user_id: currentUser.id,
-      item: itemForm.item,
-      link: itemForm.link,
-      claimed: false,
-      display_order: maxOrder + 1
-    }]);
-    
-    await loadWishLists();
-    setItemForm({ item: '', link: '' });
-    toast.success('Article ajouté');
+  
+  // Limiter la longueur
+  if (itemForm.item.length > 200) {
+    toast.error('Le nom de l\'article est trop long (max 200 caractères)');
+    return;
+  }
+  
+  const msg = `Ajouter "${itemForm.item}"?\n\n⚠️ Impossible de supprimer après ajout.`;
+  if (!window.confirm(msg)) return;
+  
+  setLoading(true);
+  
+  const maxOrder = userItems.length > 0 ? Math.max(...userItems.map(i => i.displayOrder)) : 0;
+  
+  const { error } = await supabase.from('wishlist_items').insert([{
+    user_id: currentUser.id,
+    item: itemForm.item,
+    link: itemForm.link,
+    claimed: false,
+    display_order: maxOrder + 1
+  }]);
+  
+  if (error) {
+    toast.error('Erreur lors de l\'ajout de l\'article');
+    console.error('Erreur ajout item:', error);
     setLoading(false);
-  };
+    return;
+  }
+  
+  await loadWishLists();
+  setItemForm({ item: '', link: '' });
+  toast.success('Article ajouté');
+  setLoading(false);
+};
 
-  const toggleItemClaimed = async (itemId, currentStatus) => {
-    setLoading(true);
-    
-    try {
-      if (!currentStatus) {
-        // Avant de réserver, vérifier que personne d'autre ne l'a réservé
-        const { data: checkData } = await supabase
-          .from('wishlist_items')
-          .select('claimed, reserved_by')
-          .eq('id', itemId)
-          .single();
-        
-        if (checkData.claimed && checkData.reserved_by !== currentUser.id) {
-          toast.error('Désolé, cet article vient d\'être réservé par quelqu\'un d\'autre');
-          setLoading(false);
-          await loadWishLists(); // Recharger pour voir l'état actuel
-          return;
-        }
-      }
-      
-      const reservedBy = !currentStatus ? currentUser.id : null;
-      
-      const { error } = await supabase
+// Dans SecretSanta.jsx - Remplacer la fonction toggleItemClaimed (ligne ~287)
+
+const toggleItemClaimed = async (itemId, currentStatus) => {
+  if (reservingItems.has(itemId)) {
+    toast.error('Réservation en cours, veuillez patienter...');
+    return;
+  }
+  
+  // ← NOUVEAU: Marquer l'item comme "en cours de réservation"
+  setReservingItems(prev => new Set(prev).add(itemId));
+  setLoading(true);
+  
+  try {
+    if (!currentStatus) {
+      // RÉSERVATION - Update atomique avec condition
+      const { data, error } = await supabase
         .from('wishlist_items')
         .update({ 
-          claimed: !currentStatus,
-          reserved_by: reservedBy
+          claimed: true,
+          reserved_by: currentUser.id
         })
-        .eq('id', itemId);
+        .eq('id', itemId)
+        .eq('claimed', false)  // Condition atomique
+        .select();
       
-      if (error) {
-        toast.error('Erreur lors de la réservation');
+      if (error || !data || data.length === 0) {
+        toast.error('Désolé, cet article vient d\'être réservé par quelqu\'un d\'autre');
         setLoading(false);
+        // ← NOUVEAU: Retirer l'item du Set
+        setReservingItems(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(itemId);
+          return newSet;
+        });
+        await loadWishLists();
         return;
       }
-        
-      await loadWishLists();
-      toast.success(!currentStatus ? 'Article réservé' : 'Réservation annulée');
-    } catch (err) {
-      toast.error('Erreur lors de la réservation');
-      console.error(err);
-    } finally {
-      setLoading(false);
+      
+      toast.success('Article réservé');
+    } else {
+      // ANNULATION - Vérifier que c'est bien l'utilisateur qui a réservé
+      const { data, error } = await supabase
+        .from('wishlist_items')
+        .update({ 
+          claimed: false,
+          reserved_by: null
+        })
+        .eq('id', itemId)
+        .eq('reserved_by', currentUser.id)
+        .select();
+      
+      if (error || !data || data.length === 0) {
+        toast.error('Impossible d\'annuler cette réservation');
+        setLoading(false);
+        // ← NOUVEAU: Retirer l'item du Set
+        setReservingItems(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(itemId);
+          return newSet;
+        });
+        await loadWishLists();
+        return;
+      }
+      
+      toast.success('Réservation annulée');
     }
+    
+    await loadWishLists();
+  } catch (err) {
+    toast.error('Erreur lors de la réservation');
+    console.error(err);
+    await loadWishLists();
+  } finally {
+    setLoading(false);
+    // ← NOUVEAU: Toujours retirer l'item du Set à la fin
+    setReservingItems(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(itemId);
+      return newSet;
+    });
+  }
 };
 
   // === DRAG & DROP ===
   const updateWishlistOrder = async (userId, newItems) => {
+    // ← NOUVEAU: Vérifier que c'est bien la liste de l'utilisateur actuel
+    if (userId !== currentUser.id) {
+      console.error('Tentative de modification de la liste d\'un autre utilisateur');
+      toast.error('Vous ne pouvez réorganiser que votre propre liste');
+      return;
+    }
+    
+    // ← NOUVEAU: Vérifier que tous les items appartiennent bien à cet utilisateur
+    const userItemIds = (wishLists[userId] || []).map(item => item.id);
+    const allItemsBelongToUser = newItems.every(item => userItemIds.includes(item.id));
+    
+    if (!allItemsBelongToUser) {
+      console.error('Tentative de réorganiser des items qui ne lui appartiennent pas');
+      toast.error('Erreur lors de la réorganisation');
+      return;
+    }
+    
     try {
+      // Update avec double vérification: id ET user_id
       await Promise.all(newItems.map((item, idx) => 
         supabase
           .from('wishlist_items')
           .update({ display_order: idx })
           .eq('id', item.id)
+          .eq('user_id', userId)  // ← NOUVEAU: Vérification supplémentaire
       ));
       
       await loadWishLists();
@@ -857,6 +931,7 @@ const SecretSantaApp = () => {
         updateWishlistOrder={updateWishlistOrder}
         setView={setView}
         loading={loading}
+        setIsEditing={setIsEditing}
       />
     )}
 
@@ -873,6 +948,7 @@ const SecretSantaApp = () => {
         setFilterStatus={setFilterStatus}
         getFilteredUsers={getFilteredUsers}
         loading={loading}
+        setIsEditing={setIsEditing}
       />
     )}
 
