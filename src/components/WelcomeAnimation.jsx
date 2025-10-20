@@ -6,7 +6,6 @@ const WelcomeAnimation = ({ username, onComplete }) => {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    // Confetti au début
     confetti({
       particleCount: 100,
       spread: 70,
@@ -14,11 +13,9 @@ const WelcomeAnimation = ({ username, onComplete }) => {
       colors: ['#dc2626', '#fbbf24', '#10b981']
     });
 
-    // Animation des étapes
     const timer1 = setTimeout(() => setStep(1), 500);
     const timer2 = setTimeout(() => setStep(2), 1500);
     const timer3 = setTimeout(() => {
-      // Grand confetti final
       confetti({
         particleCount: 150,
         spread: 100,
@@ -54,21 +51,19 @@ const WelcomeAnimation = ({ username, onComplete }) => {
       {/* Contenu principal */}
       <div className="relative text-center px-4 max-w-2xl">
         {/* Icône festive */}
-        <div 
-          className={`mb-8 transition-all duration-700 ${
-            step >= 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
-          }`}
+        <div
+          className={`mb-8 transition-all duration-700 ${step >= 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+            }`}
         >
-        <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-primary via-gold to-emerald-500 rounded-full shadow-2xl shadow-primary/50 animate-float">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-primary via-gold to-emerald-500 rounded-full shadow-2xl shadow-primary/50 animate-float">
             <span className="text-6xl">🎄</span>
-        </div>
+          </div>
         </div>
 
         {/* Message de bienvenue */}
-        <div 
-          className={`mb-8 transition-all duration-700 delay-300 ${
-            step >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
+        <div
+          className={`mb-8 transition-all duration-700 delay-300 ${step >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
         >
           <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent flex items-center justify-center gap-3 flex-wrap">
             <Sparkles className="w-8 h-8 text-gold animate-pulse" />
@@ -81,10 +76,9 @@ const WelcomeAnimation = ({ username, onComplete }) => {
         </div>
 
         {/* Message secondaire */}
-        <div 
-          className={`transition-all duration-700 delay-500 ${
-            step >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
+        <div
+          className={`transition-all duration-900 delay-500 ${step >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
         >
           <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-emerald-900/30 to-emerald-800/30 backdrop-blur-sm rounded-full border border-emerald-500/30">
             <Gift className="w-6 h-6 text-emerald-500 animate-float" />

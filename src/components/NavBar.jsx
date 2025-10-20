@@ -68,7 +68,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo cliquable */}
-            <button 
+            <button
               onClick={() => setView('dashboard')}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
             >
@@ -80,20 +80,19 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                 </span>
               </div>
             </button>
-            
+
             {/* Navigation centrale - TOUS les menus principaux */}
             <div className="flex gap-2 items-center">
               {desktopMenuItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <button 
+                  <button
                     key={item.id}
                     onClick={() => setView(item.id)}
-                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 font-medium group ${
-                      view === item.id 
-                        ? 'bg-white/10 text-white shadow-lg' 
-                        : 'text-dark-300 hover:text-white hover:bg-white/5'
-                    }`}
+                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 font-medium group ${view === item.id
+                      ? 'bg-white/10 text-white shadow-lg'
+                      : 'text-dark-300 hover:text-white hover:bg-white/5'
+                      }`}
                     aria-current={view === item.id ? 'page' : undefined}
                   >
                     <Icon className={`w-5 h-5 ${view === item.id ? item.color : ''} group-hover:scale-110 transition-transform`} />
@@ -133,7 +132,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                       <p className="text-xs text-dark-500 mt-1">{currentUser.email}</p>
                     )}
                   </div>
-                  
+
                   <button
                     onClick={() => { setView('change-password'); setShowProfileMenu(false); }}
                     className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-colors text-dark-300 hover:text-white"
@@ -172,7 +171,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
       <nav className="md:hidden sticky top-0 z-50 bg-dark-900/95 backdrop-blur-xl shadow-2xl border-b border-white/10">
         <div className="px-4 py-3 flex items-center justify-between">
           {/* Logo cliquable */}
-          <button 
+          <button
             onClick={() => setView('dashboard')}
             className="flex items-center gap-2"
           >
@@ -193,24 +192,21 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
             {/* Bouton Accueil */}
             <button
               onClick={() => handleNavClick('dashboard')}
-              className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all duration-200 ${
-                view === 'dashboard' 
-                  ? 'bg-white/10 scale-105' 
-                  : 'hover:bg-white/5'
-              }`}
+              className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all duration-200 ${view === 'dashboard'
+                ? 'bg-white/10 scale-105'
+                : 'hover:bg-white/5'
+                }`}
             >
-              <Home 
-                className={`w-7 h-7 transition-all ${
-                  view === 'dashboard' 
-                    ? 'text-primary scale-110' 
-                    : 'text-dark-400'
-                }`} 
+              <Home
+                className={`w-7 h-7 transition-all ${view === 'dashboard'
+                  ? 'text-primary scale-110'
+                  : 'text-dark-400'
+                  }`}
               />
-              <span className={`text-sm font-medium transition-colors ${
-                view === 'dashboard' 
-                  ? 'text-white' 
-                  : 'text-dark-500'
-              }`}>
+              <span className={`text-sm font-medium transition-colors ${view === 'dashboard'
+                ? 'text-white'
+                : 'text-dark-500'
+                }`}>
                 Accueil
               </span>
             </button>
@@ -230,11 +226,11 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
       {/* Mobile Full Menu (Swipe up style) - TOUS les menus */}
       {isMenuOpen && (
         <>
-          <div 
+          <div
             className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 animate-fade-in"
             onClick={() => setIsMenuOpen(false)}
           />
-          <div 
+          <div
             ref={menuRef}
             className="md:hidden fixed bottom-0 left-0 right-0 bg-dark-900/95 backdrop-blur-xl rounded-t-2xl shadow-2xl border-t border-white/10 z-50 animate-slide-up max-h-[80vh] overflow-y-auto pb-safe"
           >
@@ -244,7 +240,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                 <Menu className="w-5 h-5 text-dark-400" />
                 <h3 className="text-lg font-bold text-dark-100">Menu</h3>
               </div>
-              <button 
+              <button
                 onClick={() => setIsMenuOpen(false)}
                 className="p-2 hover:bg-white/5 rounded-lg transition-colors"
               >
@@ -270,11 +266,10 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                 <div className="space-y-1">
                   <button
                     onClick={() => handleNavClick('wishlist')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      view === 'wishlist' 
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' 
-                        : 'text-dark-300 hover:bg-white/5'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'wishlist'
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                      : 'text-dark-300 hover:bg-white/5'
+                      }`}
                   >
                     <Clipboard className="w-5 h-5" />
                     <span className="font-medium">Ma liste de souhaits</span>
@@ -282,11 +277,10 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
 
                   <button
                     onClick={() => handleNavClick('assignment')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      view === 'assignment' 
-                        ? 'bg-primary/10 text-primary border border-primary/30' 
-                        : 'text-dark-300 hover:bg-white/5'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'assignment'
+                      ? 'bg-primary/10 text-primary border border-primary/30'
+                      : 'text-dark-300 hover:bg-white/5'
+                      }`}
                   >
                     <Heart className="w-5 h-5" />
                     <span className="font-medium">Mon attribution</span>
@@ -294,11 +288,10 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
 
                   <button
                     onClick={() => handleNavClick('all-lists')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      view === 'all-lists' 
-                        ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' 
-                        : 'text-dark-300 hover:bg-white/5'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'all-lists'
+                      ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30'
+                      : 'text-dark-300 hover:bg-white/5'
+                      }`}
                   >
                     <List className="w-5 h-5" />
                     <span className="font-medium">Toutes les listes</span>
@@ -306,22 +299,20 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
 
                   <button
                     onClick={() => handleNavClick('my-reservations')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      view === 'my-reservations' 
-                        ? 'bg-gold/10 text-gold border border-gold/30' 
-                        : 'text-dark-300 hover:bg-white/5'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'my-reservations'
+                      ? 'bg-gold/10 text-gold border border-gold/30'
+                      : 'text-dark-300 hover:bg-white/5'
+                      }`}
                   >
                     <Gift className="w-5 h-5" />
                     <span className="font-medium">Mes réservations</span>
                   </button>
                   <button
                     onClick={() => handleNavClick('faq')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      view === 'faq' 
-                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30' 
-                        : 'text-dark-300 hover:bg-white/5'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'faq'
+                      ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30'
+                      : 'text-dark-300 hover:bg-white/5'
+                      }`}
                   >
                     <HelpCircle className="w-5 h-5" />
                     <span className="font-medium">Aide & FAQ</span>

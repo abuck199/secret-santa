@@ -25,7 +25,7 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
           </h2>
           <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
         </div>
-        
+
         {assignments[currentUser.id] ? (
           <div>
             <div className="bg-gradient-to-br from-primary/20 via-primary-dark/20 to-emerald-900/20 backdrop-blur-sm border border-primary/30 text-white p-6 rounded-xl mb-4 shadow-lg relative overflow-hidden group">
@@ -39,8 +39,8 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
                 <ArrowRight className="w-6 h-6 animate-pulse" />
               </p>
             </div>
-            <button 
-              onClick={() => setView('assignment')} 
+            <button
+              onClick={() => setView('assignment')}
               className="w-full bg-gradient-to-r from-primary via-primary-600 to-primary-dark text-white py-3 rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-glow-red font-semibold flex items-center justify-center gap-2 group"
             >
               <Gift className="w-5 h-5 group-hover:rotate-12 transition-transform" />
@@ -71,8 +71,8 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
         {(wishLists[currentUser.id] || []).length > 0 ? (
           <div className="space-y-2 mb-4 max-h-56 overflow-y-auto scrollbar-hide">
             {(wishLists[currentUser.id] || []).map((item, index) => (
-              <div 
-                key={item.id} 
+              <div
+                key={item.id}
                 className="p-3 bg-gradient-to-r from-dark-700/50 to-dark-800/50 backdrop-blur-sm border border-white/10 rounded-lg hover:border-emerald-500/50 transition-all duration-300 hover:translate-x-1 group"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
@@ -97,8 +97,8 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
           </div>
         )}
 
-        <button 
-          onClick={() => setView('wishlist')} 
+        <button
+          onClick={() => setView('wishlist')}
           className="w-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-lg hover:shadow-glow-green font-semibold flex items-center justify-center gap-2 group"
         >
           <List className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -122,8 +122,8 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
             <p className="text-sm text-dark-400 mt-1">Protégez votre compte avec un mot de passe fort</p>
           </div>
         </div>
-        <button 
-          onClick={() => setView('change-password')} 
+        <button
+          onClick={() => setView('change-password')}
           className="bg-gradient-to-r from-gold via-gold-500 to-gold-600 text-dark-900 px-6 py-3 rounded-xl hover:from-gold-400 hover:to-gold-500 transition-all shadow-lg hover:shadow-glow-gold font-semibold flex items-center gap-2 group whitespace-nowrap"
         >
           <Lock className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -148,8 +148,8 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
               <p className="text-sm text-dark-400 mt-1">Gérez les participants et les attributions</p>
             </div>
           </div>
-          <button 
-            onClick={() => setView('admin')} 
+          <button
+            onClick={() => setView('admin')}
             className="bg-gradient-to-r from-primary via-primary-600 to-primary-dark text-white px-6 py-3 rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-glow-red font-semibold flex items-center gap-2 group whitespace-nowrap"
           >
             <Users className="w-5 h-5 group-hover:rotate-12 transition-transform" />

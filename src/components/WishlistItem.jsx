@@ -1,24 +1,21 @@
-// Dans WishlistItem.jsx - Modifier pour informer le parent de l'état d'édition
-
 import React, { useState, useEffect } from 'react';
 import { ExternalLink, Check, Edit2, X, Save, Sparkles, Lock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-const WishlistItem = ({ 
-  item, 
-  showToggle = true, 
-  toggleItemClaimed, 
-  currentUser, 
+const WishlistItem = ({
+  item,
+  showToggle = true,
+  toggleItemClaimed,
+  currentUser,
   hideClaimedBadge = false,
   onUpdate,
-  setIsEditing,  // ← NOUVELLE PROP
+  setIsEditing,
   loading = false
 }) => {
   const [isEditingLocal, setIsEditingLocal] = useState(false);
   const [editedName, setEditedName] = useState(item.item);
   const [editedLink, setEditedLink] = useState(item.link || '');
 
-  // ← NOUVEAU: Informer le parent quand on édite
   useEffect(() => {
     if (setIsEditing) {
       setIsEditing(isEditingLocal);
@@ -51,7 +48,7 @@ const WishlistItem = ({
         colors: ['#dc2626', '#fbbf24', '#10b981']
       });
     }
-    
+
     if (toggleItemClaimed) {
       toggleItemClaimed(item.id, item.claimed);
     }
@@ -60,7 +57,6 @@ const WishlistItem = ({
   const isReservedByCurrentUser = item.claimed && item.reservedBy === currentUser?.id;
   const isReservedByOther = item.claimed && item.reservedBy !== currentUser?.id;
 
-  // Mode édition
   if (isEditingLocal) {
     return (
       <div className="bg-gradient-to-br from-blue-900/30 to-blue-800/30 backdrop-blur-sm p-4 rounded-xl border-2 border-blue-500/50 shadow-lg animate-scale-in">
@@ -79,7 +75,7 @@ const WishlistItem = ({
               autoFocus
             />
           </div>
-          
+
           <div>
             <label className="block text-xs font-semibold text-blue-300 mb-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
@@ -115,7 +111,6 @@ const WishlistItem = ({
     );
   }
 
-  // Mode affichage normal
   return (
     <div className="bg-gradient-to-r from-dark-800/60 to-dark-900/60 backdrop-blur-sm p-4 rounded-xl border border-white/10 hover:border-emerald-500/50 transition-all duration-300 group hover:shadow-lg">
       <div className="flex items-start justify-between">
@@ -138,11 +133,11 @@ const WishlistItem = ({
               </>
             )}
           </div>
-          
+
           {item.link && (
-            <a 
-              href={item.link} 
-              target="_blank" 
+            <a
+              href={item.link}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1 mt-2 font-medium transition-colors group/link"
             >
@@ -170,10 +165,10 @@ const WishlistItem = ({
               {!item.claimed && (
                 <button
                   onClick={handleReserve}
-                  disabled={loading}  // ← AJOUTER disabled
+                  disabled={loading}
                   className="px-3 py-2 rounded-lg font-semibold transition-all bg-gradient-to-r from-primary via-primary-600 to-primary-dark text-white hover:from-primary-dark hover:to-primary shadow-lg hover:shadow-glow-red flex items-center gap-1.5 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? (  // ← AJOUTER indicateur de chargement
+                  {loading ? (
                     <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   ) : (
                     <Sparkles className="w-3.5 h-3.5 group-hover/btn:rotate-12 transition-transform" />
@@ -181,17 +176,17 @@ const WishlistItem = ({
                   {loading ? 'Réservation...' : 'Réserver'}
                 </button>
               )}
-              
+
               {isReservedByCurrentUser && (
                 <button
                   onClick={handleReserve}
-                  disabled={loading}  // ← AJOUTER disabled
+                  disabled={loading}
                   className="px-3 py-2 rounded-lg font-semibold transition-all bg-dark-700/50 hover:bg-dark-600/50 backdrop-blur-sm text-dark-200 border border-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Annulation...' : 'Annuler'}
                 </button>
               )}
-              
+
               {isReservedByOther && (
                 <button
                   disabled

@@ -5,7 +5,6 @@ const FAQView = ({ event, setView }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [openItems, setOpenItems] = useState([0]);
 
-  // Mapping des couleurs pour Tailwind (classes complètes)
   const colorMap = {
     emerald: {
       bg: 'from-emerald-900/10 to-emerald-800/10',
@@ -39,7 +38,6 @@ const FAQView = ({ event, setView }) => {
     }
   };
 
-  // Composant pour les sections de réponse
   const Section = ({ title, children, icon: Icon, color = "emerald" }) => {
     const colors = colorMap[color] || colorMap.emerald;
     return (
@@ -99,7 +97,6 @@ const FAQView = ({ event, setView }) => {
     </div>
   );
 
-  // Données FAQ avec le nouveau format
   const faqCategories = [
     {
       id: 'getting-started',
@@ -114,7 +111,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">{event?.name || 'Cette application'} vous permet d'organiser un échange de cadeaux facilement!</p>
-              
+
               <Section title="Les étapes" icon={Gift} color="primary">
                 <Step number="1">Créez votre liste de souhaits avec vos envies</Step>
                 <Step number="2">Consultez les listes des autres participants</Step>
@@ -132,7 +129,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">Bienvenue! Voici les 3 premières étapes:</p>
-              
+
               <Section title="1. Créez votre liste" icon={List} color="emerald">
                 <Bullet>Cliquez sur "Ma Liste" dans le menu</Bullet>
                 <Bullet>Ajoutez vos idées de cadeaux</Bullet>
@@ -188,7 +185,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">Oui! Vous pouvez modifier vos articles à tout moment:</p>
-              
+
               <Section title="Comment modifier" icon={List} color="blue">
                 <Step number="1">Allez dans "Ma Liste" 📋</Step>
                 <Step number="2">Cliquez sur l'icône ✏️ (crayon) sur l'article</Step>
@@ -230,7 +227,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">Vous pouvez changer l'ordre de vos articles par glisser-déposer:</p>
-              
+
               <Section title="Sur ordinateur" icon={null} color="blue">
                 <Bullet>Cliquez sur l'icône ☰ (trois lignes) à gauche</Bullet>
                 <Bullet>Maintenez et glissez l'article</Bullet>
@@ -307,7 +304,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">Oui! Vous pouvez annuler une réservation à tout moment:</p>
-              
+
               <Section title="Méthode 1: Depuis Mes Réservations" icon={Gift} color="gold">
                 <Step number="1">Allez dans "Mes Réservations" 🎁</Step>
                 <Step number="2">Trouvez l'article à annuler</Step>
@@ -391,7 +388,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">Vous connaîtrez votre attribution quand l'admin créera les attributions:</p>
-              
+
               <Section title="Vous recevrez un email" icon={Gift} color="primary">
                 <Bullet>Le nom de votre attribution</Bullet>
                 <Bullet>Un lien vers l'application</Bullet>
@@ -416,7 +413,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">Le Secret Santa (ou Père Noël Secret) c'est simple:</p>
-              
+
               <Section title="Attribution aléatoire" icon={Gift} color="primary">
                 <Bullet>Chaque personne tire au sort un nom</Bullet>
                 <Bullet>Vous offrez UN cadeau à cette personne</Bullet>
@@ -482,7 +479,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">Oui! Vous recevrez des emails pour:</p>
-              
+
               <Section title="Création de compte" icon={Gift} color="emerald">
                 <Bullet>Vos identifiants de connexion</Bullet>
                 <Bullet>Bienvenue sur la plateforme</Bullet>
@@ -545,7 +542,7 @@ const FAQView = ({ event, setView }) => {
           answer: (
             <>
               <p className="mb-4">L'administrateur gère {event?.name || "l'événement"}:</p>
-              
+
               <Section title="Ses responsabilités" icon={Users} color="purple">
                 <Bullet>Créer les attributions (qui offre à qui)</Bullet>
                 <Bullet>Ajouter/supprimer des participants</Bullet>
@@ -617,7 +614,7 @@ const FAQView = ({ event, setView }) => {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 animate-fade-in">
       {/* Back Button */}
-      <button 
+      <button
         onClick={() => setView('dashboard')}
         className="text-dark-300 hover:text-white bg-dark-800/50 hover:bg-dark-700/50 backdrop-blur-sm px-4 py-2 rounded-xl mb-6 font-medium transition-all flex items-center gap-2 border border-white/10 group"
       >

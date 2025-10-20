@@ -2,14 +2,14 @@ import React from 'react';
 import { ArrowLeft, Sparkles, Gift, Heart } from 'lucide-react';
 import WishlistItem from './WishlistItem';
 
-const AssignmentView = ({ 
-  currentUser, 
-  assignments, 
-  wishLists, 
-  getAssignedUser, 
-  toggleItemClaimed, 
+const AssignmentView = ({
+  currentUser,
+  assignments,
+  wishLists,
+  getAssignedUser,
+  toggleItemClaimed,
   setView,
-  event, 
+  event,
   loading
 }) => {
   const assignedUser = getAssignedUser(currentUser.id);
@@ -18,7 +18,7 @@ const AssignmentView = ({
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
       {/* Back Button */}
-      <button 
+      <button
         onClick={() => setView('dashboard')}
         className="text-dark-300 hover:text-white bg-dark-800/50 hover:bg-dark-700/50 backdrop-blur-sm px-4 py-2 rounded-xl mb-6 font-medium transition-all flex items-center gap-2 border border-white/10 group"
       >
@@ -31,7 +31,7 @@ const AssignmentView = ({
         <div className="relative mb-6 p-8 bg-gradient-to-br from-primary/30 via-primary/20 to-emerald-900/30 backdrop-blur-sm rounded-2xl border border-primary/30 overflow-hidden group">
           {/* Effet de brillance animé */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
-          
+
           <div className="relative">
             <div className="flex items-center gap-2 mb-3">
               <Gift className="w-5 h-5 text-primary animate-float" />
@@ -40,7 +40,7 @@ const AssignmentView = ({
                 <Sparkles className="w-4 h-4 text-gold animate-pulse" />
               </p>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold to-gold-600 flex items-center justify-center text-dark-900 font-bold text-2xl shadow-lg shadow-gold/50">
                 {assignedUser?.username.substring(0, 2).toUpperCase()}
@@ -72,12 +72,12 @@ const AssignmentView = ({
           {assignedUserWishlist.length > 0 ? (
             <div className="space-y-3">
               {assignedUserWishlist.map((item, index) => (
-                <div 
+                <div
                   key={item.id}
                   className="animate-slide-up"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <WishlistItem 
+                  <WishlistItem
                     item={item}
                     showToggle={true}
                     toggleItemClaimed={toggleItemClaimed}

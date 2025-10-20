@@ -12,26 +12,26 @@ const Navigation = ({ currentUser, activeTab, setActiveTab, handleLogout }) => (
           <p className="nav-subtitle">Organisateur de cadeaux</p>
         </div>
       </div>
-      
+
       <div className="nav-actions">
         <div className="nav-tabs">
-          <button 
-            onClick={() => setActiveTab('wishlist')} 
+          <button
+            onClick={() => setActiveTab('wishlist')}
             className={`nav-tab ${activeTab === 'wishlist' ? 'nav-tab-active' : ''}`}
           >
             <List size={20} />
             <span>Ma Liste</span>
           </button>
-          <button 
-            onClick={() => setActiveTab('all-lists')} 
+          <button
+            onClick={() => setActiveTab('all-lists')}
             className={`nav-tab ${activeTab === 'all-lists' ? 'nav-tab-active' : ''}`}
           >
             <Users size={20} />
             <span>Toutes les listes</span>
           </button>
           {currentUser?.is_admin && (
-            <button 
-              onClick={() => setActiveTab('admin')} 
+            <button
+              onClick={() => setActiveTab('admin')}
               className={`nav-tab ${activeTab === 'admin' ? 'nav-tab-active' : ''}`}
             >
               <Shuffle size={20} />

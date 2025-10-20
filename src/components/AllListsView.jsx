@@ -2,13 +2,13 @@ import React from 'react';
 import { Users, Sparkles, Crown } from 'lucide-react';
 import WishlistItem from './WishlistItem';
 
-const AllListsView = ({ 
-  users, 
-  wishLists, 
-  currentUser, 
+const AllListsView = ({
+  users,
+  wishLists,
+  currentUser,
   toggleItemClaimed,
   updateWishlistItem,
-  loading 
+  loading
 }) => (
   <div className="max-w-7xl mx-auto px-4 py-8 animate-fade-in">
     {/* Header avec effet festif */}
@@ -38,10 +38,10 @@ const AllListsView = ({
         const userWishlist = wishLists[user.id] || [];
         const reservedCount = userWishlist.filter(i => i.claimed).length;
         const isOwnList = user.id === currentUser.id;
-        
+
         return (
-          <div 
-            key={user.id} 
+          <div
+            key={user.id}
             className="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-glow-red animate-slide-up"
             style={{ animationDelay: `${index * 0.05}s` }}
           >
@@ -87,8 +87,8 @@ const AllListsView = ({
             {userWishlist.length > 0 ? (
               <div className="space-y-3">
                 {userWishlist.map((item) => (
-                  <WishlistItem 
-                    key={item.id} 
+                  <WishlistItem
+                    key={item.id}
                     item={item}
                     showToggle={!isOwnList}
                     toggleItemClaimed={toggleItemClaimed}

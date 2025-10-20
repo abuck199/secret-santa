@@ -26,54 +26,54 @@ const ChangePasswordView = ({ currentUser, supabase, bcrypt, setView }) => {
       toast.error('Tous les champs sont requis');
       return;
     }
-    
+
     if (passwords.new !== passwords.confirm) {
       toast.error('Les nouveaux mots de passe ne correspondent pas');
       return;
     }
-    
+
     if (passwords.new.length < 4) {
       toast.error('Le nouveau mot de passe doit avoir au moins 4 caractères');
       return;
     }
-    
+
     if (passwords.new === passwords.current) {
       toast.error('Le nouveau mot de passe doit être différent de l\'ancien');
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const { data: userData } = await supabase
         .from('users')
         .select('password')
         .eq('id', currentUser.id)
         .single();
-      
+
       if (!userData) {
         toast.error('Utilisateur non trouvé');
         setLoading(false);
         return;
       }
-      
+
       const passwordMatch = await bcrypt.compare(passwords.current, userData.password);
-      
+
       if (!passwordMatch) {
         toast.error('Le mot de passe actuel est incorrect');
         setLoading(false);
         return;
       }
-      
+
       const hashedPassword = await bcrypt.hash(passwords.new, 10);
-      
+
       const { error: updateError } = await supabase
         .from('users')
         .update({ password: hashedPassword })
         .eq('id', currentUser.id);
-      
+
       if (updateError) throw updateError;
-      
+
       toast.success('Mot de passe modifié avec succès !');
       setPasswords({
         current: '',
@@ -83,11 +83,11 @@ const ChangePasswordView = ({ currentUser, supabase, bcrypt, setView }) => {
         showNew: false,
         showConfirm: false
       });
-      
+
       setTimeout(() => {
         setView('dashboard');
       }, 2000);
-      
+
     } catch (error) {
       toast.error('Erreur lors de la modification du mot de passe');
       console.error('Erreur changement mot de passe:', error);
@@ -99,7 +99,7 @@ const ChangePasswordView = ({ currentUser, supabase, bcrypt, setView }) => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 animate-fade-in">
       {/* Back Button */}
-      <button 
+      <button
         onClick={() => setView('dashboard')}
         className="text-dark-300 hover:text-white bg-dark-800/50 hover:bg-dark-700/50 backdrop-blur-sm px-4 py-2 rounded-xl mb-6 font-medium transition-all flex items-center gap-2 border border-white/10 group"
       >
@@ -204,28 +204,25 @@ const ChangePasswordView = ({ currentUser, supabase, bcrypt, setView }) => {
 
           {/* Indicateur de force du mot de passe */}
           {passwords.new && strength && (
-            <div className={`p-4 bg-gradient-to-r ${
-              strength.color === 'red' ? 'from-red-900/20 to-red-800/20 border-red-500/30' :
-              strength.color === 'yellow' ? 'from-yellow-900/20 to-yellow-800/20 border-yellow-500/30' :
-              'from-green-900/20 to-green-800/20 border-green-500/30'
-            } backdrop-blur-sm border rounded-xl`}>
+            <div className={`p-4 bg-gradient-to-r ${strength.color === 'red' ? 'from-red-900/20 to-red-800/20 border-red-500/30' :
+                strength.color === 'yellow' ? 'from-yellow-900/20 to-yellow-800/20 border-yellow-500/30' :
+                  'from-green-900/20 to-green-800/20 border-green-500/30'
+              } backdrop-blur-sm border rounded-xl`}>
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-semibold text-dark-200">Force du mot de passe</p>
-                <span className={`text-sm font-bold ${
-                  strength.color === 'red' ? 'text-red-400' :
-                  strength.color === 'yellow' ? 'text-yellow-400' :
-                  'text-green-400'
-                }`}>
+                <span className={`text-sm font-bold ${strength.color === 'red' ? 'text-red-400' :
+                    strength.color === 'yellow' ? 'text-yellow-400' :
+                      'text-green-400'
+                  }`}>
                   {strength.label}
                 </span>
               </div>
               <div className="w-full bg-dark-800 rounded-full h-2">
-                <div 
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    strength.color === 'red' ? 'bg-gradient-to-r from-red-600 to-red-500 w-1/3' :
-                    strength.color === 'yellow' ? 'bg-gradient-to-r from-yellow-600 to-yellow-500 w-2/3' :
-                    'bg-gradient-to-r from-green-600 to-green-500 w-full'
-                  }`}
+                <div
+                  className={`h-2 rounded-full transition-all duration-300 ${strength.color === 'red' ? 'bg-gradient-to-r from-red-600 to-red-500 w-1/3' :
+                      strength.color === 'yellow' ? 'bg-gradient-to-r from-yellow-600 to-yellow-500 w-2/3' :
+                        'bg-gradient-to-r from-green-600 to-green-500 w-full'
+                    }`}
                 ></div>
               </div>
             </div>
@@ -233,19 +230,16 @@ const ChangePasswordView = ({ currentUser, supabase, bcrypt, setView }) => {
 
           {/* Match indicator */}
           {passwords.new && passwords.confirm && (
-            <div className={`p-3 rounded-lg flex items-center gap-2 ${
-              passwords.new === passwords.confirm 
-                ? 'bg-green-900/20 border border-green-500/30' 
+            <div className={`p-3 rounded-lg flex items-center gap-2 ${passwords.new === passwords.confirm
+                ? 'bg-green-900/20 border border-green-500/30'
                 : 'bg-red-900/20 border border-red-500/30'
-            }`}>
-              <CheckCircle className={`w-5 h-5 ${
-                passwords.new === passwords.confirm ? 'text-green-400' : 'text-red-400'
-              }`} />
-              <p className={`text-sm font-medium ${
-                passwords.new === passwords.confirm ? 'text-green-400' : 'text-red-400'
               }`}>
-                {passwords.new === passwords.confirm 
-                  ? 'Les mots de passe correspondent' 
+              <CheckCircle className={`w-5 h-5 ${passwords.new === passwords.confirm ? 'text-green-400' : 'text-red-400'
+                }`} />
+              <p className={`text-sm font-medium ${passwords.new === passwords.confirm ? 'text-green-400' : 'text-red-400'
+                }`}>
+                {passwords.new === passwords.confirm
+                  ? 'Les mots de passe correspondent'
                   : 'Les mots de passe ne correspondent pas'}
               </p>
             </div>

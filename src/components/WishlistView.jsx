@@ -45,12 +45,12 @@ const SortableWishlistItem = ({ item, currentUser, updateWishlistItem }) => {
       >
         <GripVertical className="w-5 h-5 text-dark-500 group-hover:text-emerald-500 transition-colors" />
       </div>
-      
+
       <div className="flex-1 min-w-0">
-        <WishlistItem 
-          item={item} 
-          showToggle={false} 
-          currentUser={currentUser} 
+        <WishlistItem
+          item={item}
+          showToggle={false}
+          currentUser={currentUser}
           hideClaimedBadge={true}
           onUpdate={updateWishlistItem}
         />
@@ -59,16 +59,16 @@ const SortableWishlistItem = ({ item, currentUser, updateWishlistItem }) => {
   );
 };
 
-const WishlistView = ({ 
-  currentUser, 
-  wishLists, 
-  itemForm, 
-  setItemForm, 
-  addWishlistItem, 
+const WishlistView = ({
+  currentUser,
+  wishLists,
+  itemForm,
+  setItemForm,
+  addWishlistItem,
   updateWishlistItem,
   updateWishlistOrder,
-  setView, 
-  loading 
+  setView,
+  loading
 }) => {
   const items = wishLists[currentUser.id] || [];
 
@@ -97,7 +97,7 @@ const WishlistView = ({
       const newIndex = items.findIndex((item) => item.id === over.id);
 
       const newItems = arrayMove(items, oldIndex, newIndex);
-      
+
       if (updateWishlistOrder) {
         updateWishlistOrder(currentUser.id, newItems);
       }
@@ -107,8 +107,8 @@ const WishlistView = ({
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 animate-fade-in">
       {/* Back Button */}
-      <button 
-        onClick={() => setView('dashboard')} 
+      <button
+        onClick={() => setView('dashboard')}
         className="text-dark-300 hover:text-white bg-dark-800/50 hover:bg-dark-700/50 backdrop-blur-sm px-4 py-2 rounded-xl mb-6 font-medium transition-all flex items-center gap-2 border border-white/10 group"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -139,7 +139,7 @@ const WishlistView = ({
             <h3 className="font-bold text-dark-100">Ajouter un article</h3>
             <Sparkles className="w-4 h-4 text-gold animate-pulse" />
           </div>
-          
+
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mb-4">
             <p className="text-xs text-blue-400 flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
@@ -148,24 +148,24 @@ const WishlistView = ({
           </div>
 
           <div className="space-y-3">
-            <input 
-              type="text" 
-              placeholder="Nom de l'article" 
+            <input
+              type="text"
+              placeholder="Nom de l'article"
               value={itemForm.item}
               onChange={(e) => setItemForm(p => ({ ...p, item: e.target.value }))}
               className="w-full px-4 py-3 bg-dark-900/50 border-2 border-white/10 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500/50 outline-none transition-all text-dark-100 placeholder-dark-500"
-              disabled={loading} 
+              disabled={loading}
             />
-            <input 
-              type="url" 
-              placeholder="Lien (optionnel)" 
+            <input
+              type="url"
+              placeholder="Lien (optionnel)"
               value={itemForm.link}
               onChange={(e) => setItemForm(p => ({ ...p, link: e.target.value }))}
               className="w-full px-4 py-3 bg-dark-900/50 border-2 border-white/10 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500/50 outline-none transition-all text-dark-100 placeholder-dark-500"
-              disabled={loading} 
+              disabled={loading}
             />
-            <button 
-              onClick={addWishlistItem} 
+            <button
+              onClick={addWishlistItem}
               disabled={loading}
               className="w-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-lg hover:shadow-glow-green font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
             >
@@ -199,9 +199,9 @@ const WishlistView = ({
             >
               <div className="space-y-3">
                 {items.map((item) => (
-                  <SortableWishlistItem 
-                    key={item.id} 
-                    item={item} 
+                  <SortableWishlistItem
+                    key={item.id}
+                    item={item}
                     currentUser={currentUser}
                     updateWishlistItem={updateWishlistItem}
                   />

@@ -33,7 +33,7 @@ const MyReservationsView = ({ getMyReservations, toggleItemClaimed, setView, loa
             <Gift className="w-20 h-20 text-dark-600 mx-auto mb-4 animate-float" />
             <p className="text-dark-400 text-lg font-medium mb-2">Aucune réservation</p>
             <p className="text-dark-500 text-sm mb-6">Explorez les listes pour réserver des cadeaux</p>
-            <button 
+            <button
               onClick={() => setView('all-lists')}
               className="bg-gradient-to-r from-primary via-primary-600 to-primary-dark text-white px-6 py-3 rounded-xl hover:from-primary-dark hover:to-primary font-semibold shadow-lg hover:shadow-glow-red transition-all flex items-center gap-2 mx-auto group"
             >
@@ -68,8 +68,8 @@ const MyReservationsView = ({ getMyReservations, toggleItemClaimed, setView, loa
                 }, {});
 
                 return Object.values(grouped).map((group, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className="bg-gradient-to-br from-dark-700/50 to-dark-800/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-lg animate-slide-up"
                     style={{ animationDelay: `${idx * 0.1}s` }}
                   >
@@ -93,12 +93,12 @@ const MyReservationsView = ({ getMyReservations, toggleItemClaimed, setView, loa
                         <span className="text-emerald-400 font-bold text-lg">{group.items.length}</span>
                       </div>
                     </div>
-                    
+
                     {/* Liste des articles */}
                     <div className="space-y-3">
                       {group.items.map((item) => (
-                        <div 
-                          key={item.id} 
+                        <div
+                          key={item.id}
                           className="p-4 bg-gradient-to-r from-dark-800/60 to-dark-900/60 backdrop-blur-sm border border-white/10 rounded-xl hover:border-emerald-500/50 transition-all group"
                         >
                           <div className="flex justify-between items-start gap-4">
@@ -110,9 +110,9 @@ const MyReservationsView = ({ getMyReservations, toggleItemClaimed, setView, loa
                                 </p>
                               </div>
                               {item.link && (
-                                <a 
-                                  href={item.link} 
-                                  target="_blank" 
+                                <a
+                                  href={item.link}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-emerald-400 hover:text-emerald-300 text-sm flex items-center gap-1 mt-2 font-medium transition-colors group/link"
                                 >
@@ -121,8 +121,8 @@ const MyReservationsView = ({ getMyReservations, toggleItemClaimed, setView, loa
                                 </a>
                               )}
                             </div>
-                            <button 
-                              onClick={() => toggleItemClaimed(item.id, item.claimed)} 
+                            <button
+                              onClick={() => toggleItemClaimed(item.id, item.claimed)}
                               disabled={loading}
                               className="px-4 py-2 rounded-lg text-sm font-semibold bg-dark-700/50 hover:bg-dark-600/50 backdrop-blur-sm text-dark-200 border border-white/10 hover:border-primary/50 disabled:opacity-50 transition-all"
                             >
