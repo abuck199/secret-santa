@@ -18,6 +18,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, ArrowLeft, Plus, Sparkles, List as ListIcon } from 'lucide-react';
 import WishlistItem from './WishlistItem';
+import AIGiftSuggestions from './AIGiftSuggestions';
 
 const SortableWishlistItem = ({ item, currentUser, updateWishlistItem }) => {
   const {
@@ -104,6 +105,15 @@ const WishlistView = ({
     }
   };
 
+  // Fonction pour ajouter un article depuis l'IA
+  const handleAddFromAI = (itemName, itemLink) => {
+    setItemForm({ item: itemName, link: itemLink });
+    // Déclencher l'ajout automatiquement
+    setTimeout(() => {
+      addWishlistItem();
+    }, 100);
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 animate-fade-in">
       {/* Back Button */}
@@ -132,11 +142,17 @@ const WishlistView = ({
           </div>
         </div>
 
-        {/* Formulaire d'ajout */}
+        {/* NOUVEAU: Composant d'IA */}
+        <AIGiftSuggestions 
+          onAddToList={handleAddFromAI}
+          currentUser={currentUser}
+        />
+
+        {/* Formulaire d'ajout manuel */}
         <div className="mb-6 p-5 bg-gradient-to-br from-emerald-900/20 via-dark-800/50 to-dark-900/50 backdrop-blur-sm border border-emerald-500/20 rounded-xl">
           <div className="flex items-center gap-2 mb-4">
             <Plus className="w-5 h-5 text-emerald-500" />
-            <h3 className="font-bold text-dark-100">Ajouter un article</h3>
+            <h3 className="font-bold text-dark-100">Ajouter manuellement</h3>
             <Sparkles className="w-4 h-4 text-gold animate-pulse" />
           </div>
 
@@ -215,7 +231,7 @@ const WishlistView = ({
             <p className="text-dark-400 flex items-center justify-center gap-2">
               Aucun article dans votre liste
             </p>
-            <p className="text-dark-500 text-sm mt-2">Ajoutez-en un ci-dessus ! 🎁</p>
+            <p className="text-dark-500 text-sm mt-2">Utilisez l'IA ou ajoutez manuellement ! 🎁</p>
           </div>
         )}
       </div>

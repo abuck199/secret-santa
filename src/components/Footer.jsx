@@ -35,10 +35,6 @@ const Footer = ({ currentUser, event, setView }) => {
               Organisez votre échange de cadeaux en toute simplicité. 
               Créez vos listes, réservez discrètement et partagez la magie des fêtes.
             </p>
-            <div className="flex items-center gap-2 text-xs text-dark-500">
-              <Sparkles className="w-3 h-3 text-gold" />
-              <span>Fait avec amour pour les fêtes</span>
-            </div>
           </div>
 
           {/* Navigation rapide */}
@@ -110,10 +106,6 @@ const Footer = ({ currentUser, event, setView }) => {
                 <Heart className="w-3 h-3 text-dark-600" />
                 <span>Réservations anonymes</span>
               </li>
-              <li className="text-sm text-dark-400 flex items-center gap-2">
-                <Star className="w-3 h-3 text-dark-600" />
-                <span>100% gratuit</span>
-              </li>
             </ul>
           </div>
 
@@ -132,15 +124,6 @@ const Footer = ({ currentUser, event, setView }) => {
                   <HelpCircle className="w-3 h-3" />
                   <span>Centre d'aide</span>
                 </button>
-              </li>
-              <li>
-                <a 
-                  href="mailto:support@secretsanta.app"
-                  className="text-sm text-dark-400 hover:text-gold transition-colors flex items-center gap-2"
-                >
-                  <Mail className="w-3 h-3" />
-                  <span>Nous contacter</span>
-                </a>
               </li>
               {currentUser?.is_admin && (
                 <li>
