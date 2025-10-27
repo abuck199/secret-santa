@@ -79,11 +79,6 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full group-hover:scale-125 transition-transform"></div>
                   <p className="font-semibold text-dark-100 flex-1">{item.item}</p>
-                  {item.claimed && (
-                    <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full border border-emerald-500/30">
-                      Réservé
-                    </span>
-                  )}
                 </div>
               </div>
             ))}

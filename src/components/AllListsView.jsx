@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Sparkles, Crown } from 'lucide-react';
+import { Users, Sparkles, Crown, UserX } from 'lucide-react';
 import WishlistItem from './WishlistItem';
 
 const AllListsView = ({
@@ -38,6 +38,7 @@ const AllListsView = ({
         const userWishlist = wishLists[user.id] || [];
         const reservedCount = userWishlist.filter(i => i.claimed).length;
         const isOwnList = user.id === currentUser.id;
+        const isNotInDraw = !user.participates_in_draw; // NOUVEAU
 
         return (
           <div
@@ -49,7 +50,10 @@ const AllListsView = ({
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  <div className={`w-12 h-12 rounded-full ${isNotInDraw
+                      ? 'bg-gradient-to-br from-purple-600 to-purple-700'
+                      : 'bg-gradient-to-br from-primary to-primary-dark'
+                    } flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
                     {user.username.substring(0, 2).toUpperCase()}
                   </div>
                   {isOwnList && (
@@ -66,11 +70,22 @@ const AllListsView = ({
                         Vous
                       </span>
                     )}
+                    {isNotInDraw && !isOwnList && (
+                      <span className="text-xs bg-gradient-to-r from-purple-900/30 to-purple-800/30 text-purple-400 px-2.5 py-1 rounded-full border border-purple-500/30 font-bold flex items-center gap-1">
+                        <UserX className="w-3 h-3" />
+                        Hors-tirage
+                      </span>
+                    )}
                   </h3>
                   {reservedCount > 0 && !isOwnList && (
                     <p className="text-sm text-emerald-400 font-medium flex items-center gap-1 mt-0.5">
                       <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                       {reservedCount} réservé{reservedCount > 1 ? 's' : ''}
+                    </p>
+                  )}
+                  {isNotInDraw && (
+                    <p className="text-xs text-purple-400 mt-1">
+                      Peut recevoir des cadeaux mais ne participe pas au tirage
                     </p>
                   )}
                 </div>
@@ -95,6 +110,7 @@ const AllListsView = ({
                     currentUser={currentUser}
                     hideClaimedBadge={isOwnList}
                     onUpdate={isOwnList ? updateWishlistItem : null}
+                    loading={loading}
                   />
                 ))}
               </div>
