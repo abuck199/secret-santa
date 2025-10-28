@@ -36,7 +36,7 @@ const AIGiftSuggestions = ({ onAddToList, currentUser }) => {
     const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
     
     if (!apiKey) {
-      toast.error('Clé API Gemini manquante. Ajoutez REACT_APP_GEMINI_API_KEY dans votre .env');
+      toast.error('Clé API manquante.');
       return;
     }
 
@@ -105,7 +105,7 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
       setCooldown(60);
 
     } catch (error) {
-      console.error('Erreur Gemini:', error);
+      console.error('Erreur:', error);
       
       if (error.message?.includes('API key') || error.message?.includes('401')) {
         toast.error('Clé API invalide. Vérifiez votre clé sur https://aistudio.google.com/app/apikey');
@@ -146,7 +146,6 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
             Assistant IA - Suggestions de cadeaux
             <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
           </h3>
-          <p className="text-xs text-dark-400 mt-0.5">Propulsé par Google Gemini 2.0</p>
         </div>
       </div>
 
