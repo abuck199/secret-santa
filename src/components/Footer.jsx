@@ -19,11 +19,8 @@ const Footer = ({ currentUser, event, setView }) => {
   
   return (
     <footer className="mt-16 bg-gradient-to-b from-dark-900/50 to-dark-950 backdrop-blur-xl border-t border-white/10">
-      {/* Section principale */}
       <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          
-          {/* Section À propos */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
@@ -36,8 +33,6 @@ const Footer = ({ currentUser, event, setView }) => {
               Créez vos listes, réservez discrètement et partagez la magie des fêtes.
             </p>
           </div>
-
-          {/* Navigation rapide */}
           <div className="space-y-4">
             <h3 className="font-bold text-dark-100 flex items-center gap-2">
               <Users className="w-4 h-4 text-emerald-500" />
@@ -86,8 +81,6 @@ const Footer = ({ currentUser, event, setView }) => {
               )}
             </ul>
           </div>
-
-          {/* Informations */}
           <div className="space-y-4">
             <h3 className="font-bold text-dark-100 flex items-center gap-2">
               <Shield className="w-4 h-4 text-blue-500" />
@@ -108,8 +101,6 @@ const Footer = ({ currentUser, event, setView }) => {
               </li>
             </ul>
           </div>
-
-          {/* Contact & Support */}
           <div className="space-y-4">
             <h3 className="font-bold text-dark-100 flex items-center gap-2">
               <Mail className="w-4 h-4 text-gold" />
@@ -140,8 +131,6 @@ const Footer = ({ currentUser, event, setView }) => {
           </div>
         </div>
       </div>
-
-      {/* Barre du bas */}
       <div className="bg-dark-950/50 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-dark-500">
