@@ -279,7 +279,6 @@ const SecretSantaApp = () => {
     setView('login');
   };
 
-  // === GESTION UTILISATEURS - MODIFIÉ ===
   const addUser = async () => {
     const { username, password, email, participatesInDraw } = userForm;
     const trimmedUsername = username.toLowerCase().trim();
