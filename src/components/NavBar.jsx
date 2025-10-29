@@ -16,9 +16,13 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
   const desktopMenuItems = [
     { id: 'dashboard', label: 'Accueil', icon: Home, color: 'text-primary' },
     { id: 'wishlist', label: 'Ma Liste', icon: Clipboard, color: 'text-emerald-500' },
-    { id: 'assignment', label: 'Mon Attribution', icon: Heart, color: 'text-primary' },
+    ...(currentUser.participates_in_draw ? [
+      { id: 'assignment', label: 'Mon Attribution', icon: Heart, color: 'text-primary' },
+    ] : []),
     { id: 'all-lists', label: 'Toutes les Listes', icon: List, color: 'text-blue-500' },
-    { id: 'my-reservations', label: 'Mes Réservations', icon: Gift, color: 'text-gold' },
+    ...(currentUser.participates_in_draw ? [
+      { id: 'my-reservations', label: 'Mes Réservations', icon: Gift, color: 'text-gold' },
+    ] : []),
     { id: 'faq', label: 'Aide', icon: HelpCircle, color: 'text-purple-500' },
   ];
 
@@ -275,16 +279,18 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                     <span className="font-medium">Ma liste de souhaits</span>
                   </button>
 
-                  <button
-                    onClick={() => handleNavClick('assignment')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'assignment'
-                      ? 'bg-primary/10 text-primary border border-primary/30'
-                      : 'text-dark-300 hover:bg-white/5'
-                      }`}
-                  >
-                    <Heart className="w-5 h-5" />
-                    <span className="font-medium">Mon attribution</span>
-                  </button>
+                  {currentUser.participates_in_draw && (
+                    <button
+                      onClick={() => handleNavClick('assignment')}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'assignment'
+                        ? 'bg-primary/10 text-primary border border-primary/30'
+                        : 'text-dark-300 hover:bg-white/5'
+                        }`}
+                    >
+                      <Heart className="w-5 h-5" />
+                      <span className="font-medium">Mon attribution</span>
+                    </button>
+                  )}
 
                   <button
                     onClick={() => handleNavClick('all-lists')}
@@ -297,16 +303,19 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
                     <span className="font-medium">Toutes les listes</span>
                   </button>
 
-                  <button
-                    onClick={() => handleNavClick('my-reservations')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'my-reservations'
-                      ? 'bg-gold/10 text-gold border border-gold/30'
-                      : 'text-dark-300 hover:bg-white/5'
-                      }`}
-                  >
-                    <Gift className="w-5 h-5" />
-                    <span className="font-medium">Mes réservations</span>
-                  </button>
+                  {currentUser.participates_in_draw && (
+                    <button
+                      onClick={() => handleNavClick('my-reservations')}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'my-reservations'
+                        ? 'bg-gold/10 text-gold border border-gold/30'
+                        : 'text-dark-300 hover:bg-white/5'
+                        }`}
+                    >
+                      <Gift className="w-5 h-5" />
+                      <span className="font-medium">Mes réservations</span>
+                    </button>
+                  )}
+
                   <button
                     onClick={() => handleNavClick('faq')}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${view === 'faq'

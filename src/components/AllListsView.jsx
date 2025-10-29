@@ -51,8 +51,8 @@ const AllListsView = ({
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className={`w-12 h-12 rounded-full ${isNotInDraw
-                      ? 'bg-gradient-to-br from-purple-600 to-purple-700'
-                      : 'bg-gradient-to-br from-primary to-primary-dark'
+                    ? 'bg-gradient-to-br from-purple-600 to-purple-700'
+                    : 'bg-gradient-to-br from-primary to-primary-dark'
                     } flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
                     {user.username.substring(0, 2).toUpperCase()}
                   </div>
@@ -105,7 +105,7 @@ const AllListsView = ({
                   <WishlistItem
                     key={item.id}
                     item={item}
-                    showToggle={!isOwnList}
+                    showToggle={!isOwnList && currentUser.participates_in_draw}
                     toggleItemClaimed={toggleItemClaimed}
                     currentUser={currentUser}
                     hideClaimedBadge={isOwnList}

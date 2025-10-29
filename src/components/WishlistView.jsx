@@ -143,7 +143,7 @@ const WishlistView = ({
         </div>
 
         {/* NOUVEAU: Composant d'IA */}
-        <AIGiftSuggestions 
+        <AIGiftSuggestions
           onAddToList={handleAddFromAI}
           currentUser={currentUser}
         />

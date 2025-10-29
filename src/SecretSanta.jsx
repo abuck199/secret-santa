@@ -989,7 +989,7 @@ const SecretSantaApp = () => {
         />
       )}
 
-      {view === 'assignment' && assignments[currentUser.id] && !showWelcome && (
+      {view === 'assignment' && assignments[currentUser.id] && currentUser.participates_in_draw && !showWelcome && (
         <AssignmentView
           currentUser={currentUser}
           assignments={assignments}
@@ -1042,7 +1042,7 @@ const SecretSantaApp = () => {
 
       {/* AJOUTER LE FOOTER ICI */}
       {currentUser && !showWelcome && (
-        <Footer 
+        <Footer
           currentUser={currentUser}
           event={event}
           setView={setView}

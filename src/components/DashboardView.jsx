@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gift, List, Users, Shuffle, Lock, Sparkles, ArrowRight } from 'lucide-react';
+import { Gift, List, Users, Shuffle, Lock, Sparkles, ArrowRight, UserX } from 'lucide-react';
 
 const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, setView }) => (
   <div className="max-w-7xl mx-auto px-4 py-8 animate-fade-in">
@@ -14,50 +14,53 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
     </div>
 
     <div className="grid md:grid-cols-2 gap-4">
-      {/* Attribution Card */}
-      <div className="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-4 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-glow-red animate-slide-up">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-dark-100 flex items-center gap-2">
-            <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
-              <Gift className="w-5 h-5 mr-2 text-primary" />
-            </div>
-            Votre attribution
-          </h2>
-          <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-        </div>
+      {/* Attribution Card - MASQUER pour les hors-tirage */}
+      {currentUser.participates_in_draw && (
+        <div className="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-4 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-glow-red animate-slide-up">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-dark-100 flex items-center gap-2">
+              <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
+                <Gift className="w-5 h-5 mr-2 text-primary" />
+              </div>
+              Votre attribution
+            </h2>
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+          </div>
 
-        {assignments[currentUser.id] ? (
-          <div>
-            <div className="bg-gradient-to-br from-primary/20 via-primary-dark/20 to-emerald-900/20 backdrop-blur-sm border border-primary/30 text-white p-6 rounded-xl mb-4 shadow-lg relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 group-hover:translate-x-full transition-transform duration-1000"></div>
-              <p className="text-sm opacity-90 mb-2 flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                Vous offrez un cadeau à :
-              </p>
-              <p className="text-3xl font-bold flex items-center gap-3">
-                {getAssignedUser(currentUser.id)?.username}
-                <ArrowRight className="w-6 h-6 animate-pulse" />
-              </p>
+          {assignments[currentUser.id] ? (
+            <div>
+              <div className="bg-gradient-to-br from-primary/20 via-primary-dark/20 to-emerald-900/20 backdrop-blur-sm border border-primary/30 text-white p-6 rounded-xl mb-4 shadow-lg relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 group-hover:translate-x-full transition-transform duration-1000"></div>
+                <p className="text-sm opacity-90 mb-2 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Vous offrez un cadeau à :
+                </p>
+                <p className="text-3xl font-bold flex items-center gap-3">
+                  {getAssignedUser(currentUser.id)?.username}
+                  <ArrowRight className="w-6 h-6 animate-pulse" />
+                </p>
+              </div>
+              <button
+                onClick={() => setView('assignment')}
+                className="w-full bg-gradient-to-r from-primary via-primary-600 to-primary-dark text-white py-3 rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-glow-red font-semibold flex items-center justify-center gap-2 group"
+              >
+                <Gift className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                Voir leur liste de souhaits
+              </button>
             </div>
-            <button
-              onClick={() => setView('assignment')}
-              className="w-full bg-gradient-to-r from-primary via-primary-600 to-primary-dark text-white py-3 rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-glow-red font-semibold flex items-center justify-center gap-2 group"
-            >
-              <Gift className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-              Voir leur liste de souhaits
-            </button>
-          </div>
-        ) : (
-          <div className="bg-gradient-to-br from-dark-700/50 to-dark-800/50 backdrop-blur-sm border border-white/10 p-8 rounded-xl text-center">
-            <Shuffle className="w-16 h-16 text-primary/50 mx-auto mb-3 animate-float" />
-            <p className="text-dark-200 font-semibold mb-2">Pas encore d'attribution</p>
-            <p className="text-sm text-dark-400">L'admin va créer les attributions bientôt! 🎁</p>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="bg-gradient-to-br from-dark-700/50 to-dark-800/50 backdrop-blur-sm border border-white/10 p-8 rounded-xl text-center">
+              <Shuffle className="w-16 h-16 text-primary/50 mx-auto mb-3 animate-float" />
+              <p className="text-dark-200 font-semibold mb-2">Pas encore d'attribution</p>
+              <p className="text-sm text-dark-400">L'admin va créer les attributions bientôt! 🎁</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Wishlist Card */}
-      <div className="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-glow-green animate-slide-up" style={{ animationDelay: '0.1s' }}>
+      <div className={`bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-glow-green animate-slide-up ${!currentUser.participates_in_draw ? 'md:col-span-2' : ''
+        }`} style={{ animationDelay: '0.1s' }}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-dark-100 flex items-center gap-2">
             <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg">
@@ -102,8 +105,28 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
       </div>
     </div>
 
+    {/* Message pour les hors-tirage */}
+    {!currentUser.participates_in_draw && (
+      <div className="mt-6 bg-gradient-to-br from-purple-900/20 to-purple-800/20 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-purple-500/30 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="p-3 bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-xl">
+            <UserX className="w-7 h-7 text-purple-500" />
+          </div>
+          <div className="text-center md:text-left">
+            <h2 className="text-xl font-bold text-dark-100 flex items-center justify-center md:justify-start gap-2 mb-2">
+              Mode liste seulement
+              <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full border border-purple-500/30">Hors-tirage</span>
+            </h2>
+            <p className="text-sm text-dark-400">
+              Vous pouvez créer votre liste et recevoir des cadeaux, mais vous ne participez pas au tirage au sort
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
+
     {/* Security Section */}
-    <div className="mt-6 bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-gold/50 transition-all duration-300 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+    <div className={`mt-6 bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-gold/50 transition-all duration-300 animate-slide-up`} style={{ animationDelay: currentUser.participates_in_draw ? '0.2s' : '0.3s' }}>
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-gradient-to-br from-gold/20 to-gold/10 rounded-xl">
@@ -129,7 +152,7 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
 
     {/* Admin Panel */}
     {currentUser.is_admin && (
-      <div className="mt-6 bg-gradient-to-br from-primary/20 via-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-primary/30 hover:border-primary/50 transition-all duration-300 animate-slide-up hover:shadow-glow-red" style={{ animationDelay: '0.3s' }}>
+      <div className={`mt-6 bg-gradient-to-br from-primary/20 via-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-primary/30 hover:border-primary/50 transition-all duration-300 animate-slide-up hover:shadow-glow-red`} style={{ animationDelay: currentUser.participates_in_draw ? '0.3s' : '0.4s' }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl">
