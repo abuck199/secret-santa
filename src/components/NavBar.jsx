@@ -12,7 +12,6 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
     setIsMenuOpen(false);
   };
 
-  // Menu items pour navigation DESKTOP principale
   const desktopMenuItems = [
     { id: 'dashboard', label: 'Accueil', icon: Home, color: 'text-primary' },
     { id: 'wishlist', label: 'Ma Liste', icon: Clipboard, color: 'text-emerald-500' },

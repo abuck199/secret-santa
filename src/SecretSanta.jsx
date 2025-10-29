@@ -440,8 +440,8 @@ const SecretSantaApp = () => {
   };
 
   // === GESTION WISHLIST ===
+  // MODIFIÉ: Suppression du window.confirm() - La confirmation est maintenant gérée par WishlistView
   const addWishlistItem = async () => {
-
     if (!itemForm.item.trim()) return;
 
     const userItems = wishLists[currentUser.id] || [];
@@ -472,8 +472,8 @@ const SecretSantaApp = () => {
       return;
     }
 
-    const msg = `Ajouter "${itemForm.item}"?\n\n⚠️ Impossible de supprimer après ajout.`;
-    if (!window.confirm(msg)) return;
+    // SUPPRIMÉ: Le window.confirm() qui était ici
+    // La confirmation est maintenant gérée par ConfirmationModal dans WishlistView
 
     setLoading(true);
 
