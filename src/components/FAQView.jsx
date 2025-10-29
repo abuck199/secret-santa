@@ -625,7 +625,7 @@ const FAQView = ({ event, setView }) => {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-3 mb-4">
-          <HelpCircle className="w-10 h-10 text-primary animate-float" />
+          <HelpCircle className="w-10 h-10 text-primary" />
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent">
             Foire Aux Questions
           </h1>

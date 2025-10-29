@@ -76,7 +76,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
               onClick={() => setView('dashboard')}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
             >
-              <span className="text-2xl animate-float group-hover:scale-110 transition-transform">🎄</span>
+              <span className="text-2xl group-hover:scale-110 transition-transform">🎄</span>
               <div>
                 <span className="text-xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent flex items-center gap-2">
                   {event.name}
@@ -179,7 +179,7 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
             onClick={() => setView('dashboard')}
             className="flex items-center gap-2"
           >
-            <span className="text-2xl animate-float">🎄</span>
+            <span className="text-2xl">🎄</span>
             <span className="text-base font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent truncate max-w-[120px]">
               {event.name}
             </span>
