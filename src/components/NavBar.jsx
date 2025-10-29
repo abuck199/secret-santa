@@ -189,25 +189,25 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
         </div>
       </nav>
 
-      {/* ========== MOBILE BOTTOM APP BAR (2 boutons seulement) ========== */}
+      {/* ========== MOBILE BOTTOM APP BAR - VERSION ÉQUILIBRÉE ========== */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
         <div className="bg-dark-900/95 backdrop-blur-xl border-t border-white/10 shadow-2xl">
-          <div className="flex items-center justify-around px-4 py-3">
-            {/* Bouton Accueil */}
+          <div className="flex items-center justify-around px-3 py-2.5">
+            {/* Bouton Accueil - VERSION ÉQUILIBRÉE */}
             <button
               onClick={() => handleNavClick('dashboard')}
-              className={`flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all duration-200 ${view === 'dashboard'
+              className={`flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-lg transition-all duration-200 ${view === 'dashboard'
                 ? 'bg-white/10 scale-105'
                 : 'hover:bg-white/5'
                 }`}
             >
               <Home
-                className={`w-7 h-7 transition-all ${view === 'dashboard'
+                className={`w-6 h-6 transition-all ${view === 'dashboard'
                   ? 'text-primary scale-110'
                   : 'text-dark-400'
                   }`}
               />
-              <span className={`text-sm font-medium transition-colors ${view === 'dashboard'
+              <span className={`text-xs font-medium transition-colors ${view === 'dashboard'
                 ? 'text-white'
                 : 'text-dark-500'
                 }`}>
@@ -215,19 +215,19 @@ const NavBar = ({ currentUser, event, view, setView, handleLogout }) => {
               </span>
             </button>
 
-            {/* Bouton Menu (hamburger) */}
+            {/* Bouton Menu (hamburger) - VERSION ÉQUILIBRÉE */}
             <button
               onClick={() => setIsMenuOpen(true)}
-              className="flex flex-col items-center gap-1 px-6 py-2 rounded-xl hover:bg-white/5 transition-all"
+              className="flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-lg hover:bg-white/5 transition-all"
             >
-              <Menu className="w-7 h-7 text-dark-400" />
-              <span className="text-sm font-medium text-dark-500">Menu</span>
+              <Menu className="w-6 h-6 text-dark-400" />
+              <span className="text-xs font-medium text-dark-500">Menu</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Full Menu (Swipe up style) - TOUS les menus */}
+      {/* Mobile Full Menu (Swipe up style) - GARDE LA VERSION ORIGINALE */}
       {isMenuOpen && (
         <>
           <div
