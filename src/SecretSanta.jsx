@@ -20,12 +20,10 @@ import FAQView from './components/FAQView';
 import Footer from './components/Footer';
 
 const SecretSantaApp = () => {
-  // Initialiser EmailJS
   useEffect(() => {
     emailjs.init(emailConfig.publicKey);
   }, []);
 
-  // États principaux
   const [currentUser, setCurrentUser] = useState(null);
   const [reservingItems, setReservingItems] = useState(new Set());
   const [isEditing, setIsEditing] = useState(false);
@@ -37,25 +35,21 @@ const SecretSantaApp = () => {
   const [event, setEvent] = useState({ id: null, name: 'Noël 2025' });
   const [initialLoading, setInitialLoading] = useState(true);
 
-  // Formulaires - MODIFIÉ: Ajout de participatesInDraw
   const [loginForm, setLoginForm] = useState({ username: '', password: '', showPassword: false });
   const [userForm, setUserForm] = useState({
     username: '',
     password: '',
     email: '',
-    participatesInDraw: true, // NOUVEAU
+    participatesInDraw: true,
     showForm: false
   });
   const [itemForm, setItemForm] = useState({ item: '', link: '' });
 
-  // UI
   const [loading, setLoading] = useState(false);
 
-  // Filtres
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // === EFFETS ===
   useEffect(() => {
     const checkUserSession = async () => {
       const savedUser = sessionStorage.getItem('currentUser');
@@ -69,7 +63,6 @@ const SecretSantaApp = () => {
       try {
         const parsedUser = JSON.parse(savedUser);
 
-        // MODIFIÉ: Ajouter participates_in_draw
         const { data, error } = await supabaseAnon
           .from('users')
           .select('id, username, email, is_admin, participates_in_draw')
@@ -171,7 +164,6 @@ const SecretSantaApp = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [view]);
 
-  // === CHARGEMENT DONNÉES ===
   const loadAllData = async () => {
     try {
       await Promise.all([loadEvent(), loadUsers(), loadWishLists(), loadAssignments()]);
@@ -186,9 +178,7 @@ const SecretSantaApp = () => {
     if (data) setEvent({ id: data.id, name: data.name });
   };
 
-  // MODIFIÉ: Charger participates_in_draw
   const loadUsers = async () => {
-    // Utiliser supabaseAnon pour la table users directement
     const { data } = await supabaseAnon
       .from('users')
       .select('id, username, email, is_admin, participates_in_draw')
@@ -225,7 +215,6 @@ const SecretSantaApp = () => {
     setAssignments(organized);
   };
 
-  // === AUTHENTIFICATION ===
   const handleLogin = async () => {
     setLoading(true);
 
@@ -319,7 +308,12 @@ const SecretSantaApp = () => {
           password: password.trim(),
           event_name: event.name,
           site_url: window.location.origin,
-          participates_in_draw: participatesInDraw ? 'Oui' : 'Non (liste seulement)'
+          participates_in_draw_text: participatesInDraw
+            ? 'Vous participez au tirage'
+            : 'Liste seulement (pas de tirage)',
+          participation_badge_html: participatesInDraw
+            ? '<span class="participation-badge">Vous participez au tirage</span>'
+            : '<span class="no-participation-badge">Liste seulement (pas de tirage)</span>'
         }
       );
     } catch (error) {
@@ -333,7 +327,7 @@ const SecretSantaApp = () => {
       password: hashedPassword,
       email: trimmedEmail,
       is_admin: false,
-      participates_in_draw: participatesInDraw // NOUVEAU
+      participates_in_draw: participatesInDraw
     }]);
     setLoading(false);
 
@@ -351,7 +345,6 @@ const SecretSantaApp = () => {
     toast.success(message);
   };
 
-  // NOUVELLE FONCTION: Toggle participation
   const toggleUserParticipation = async (userId) => {
     const user = users.find(u => u.id === userId);
     if (!user) return;
@@ -439,8 +432,6 @@ const SecretSantaApp = () => {
     }
   };
 
-  // === GESTION WISHLIST ===
-  // MODIFIÉ: Suppression du window.confirm() - La confirmation est maintenant gérée par WishlistView
   const addWishlistItem = async () => {
     if (!itemForm.item.trim()) return;
 
@@ -471,9 +462,6 @@ const SecretSantaApp = () => {
       toast.error('Le nom de l\'article est trop long (max 200 caractères)');
       return;
     }
-
-    // SUPPRIMÉ: Le window.confirm() qui était ici
-    // La confirmation est maintenant gérée par ConfirmationModal dans WishlistView
 
     setLoading(true);
 
@@ -660,7 +648,6 @@ const SecretSantaApp = () => {
     }
   };
 
-  // === ATTRIBUTIONS - MODIFIÉ ===
   const sendAssignmentEmails = async () => {
     if (Object.keys(assignments).length === 0) {
       toast.error('Aucune attribution à envoyer. Créez d\'abord les attributions.');
@@ -715,7 +702,6 @@ const SecretSantaApp = () => {
     }
   };
 
-  // MODIFIÉ: Exclure les non-participants
   const shuffleAssignments = async () => {
     const participatingUsers = users.filter(u => u.participates_in_draw);
 
@@ -814,7 +800,6 @@ const SecretSantaApp = () => {
     setLoading(false);
   };
 
-  // === UTILITAIRES - MODIFIÉ ===
   const getAssignedUser = useCallback((userId) => {
     return users.find(u => u.id === assignments[userId]);
   }, [users, assignments]);
@@ -832,7 +817,6 @@ const SecretSantaApp = () => {
     return reservations;
   }, [wishLists, users, currentUser]);
 
-  // MODIFIÉ: Stats séparées
   const getStatistics = useCallback(() => {
     const allItems = Object.values(wishLists).flat();
     const totalItems = allItems.length;
@@ -886,7 +870,6 @@ const SecretSantaApp = () => {
     );
   }
 
-  // === RENDU ===
   if (!currentUser) {
     return (
       <>
@@ -1029,7 +1012,7 @@ const SecretSantaApp = () => {
           sendAssignmentEmails={sendAssignmentEmails}
           setView={setView}
           loading={loading}
-          toggleUserParticipation={toggleUserParticipation} // NOUVEAU
+          toggleUserParticipation={toggleUserParticipation}
         />
       )}
 
@@ -1040,7 +1023,6 @@ const SecretSantaApp = () => {
         />
       )}
 
-      {/* AJOUTER LE FOOTER ICI */}
       {currentUser && !showWelcome && (
         <Footer
           currentUser={currentUser}

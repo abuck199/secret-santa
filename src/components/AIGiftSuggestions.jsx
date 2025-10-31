@@ -204,9 +204,6 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
                 $
               </div>
             </div>
-            <p className="text-xs text-purple-400 mt-2 flex items-center gap-1">
-              💡 L'IA trouvera 4 suggestions autour de ce prix
-            </p>
           </div>
 
           <button

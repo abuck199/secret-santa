@@ -164,13 +164,7 @@ const WishlistView = ({
             </div>
           </div>
 
-          {/* NOUVEAU: Composant d'IA */}
-          <AIGiftSuggestions
-            onAddToList={handleAddFromAI}
-            currentUser={currentUser}
-          />
-
-          {/* Formulaire d'ajout manuel */}
+          {/* ===== FORMULAIRE D'AJOUT MANUEL EN PREMIER ===== */}
           <div className="mb-6 p-5 bg-gradient-to-br from-emerald-900/20 via-dark-800/50 to-dark-900/50 backdrop-blur-sm border border-emerald-500/20 rounded-xl">
             <div className="flex items-center gap-2 mb-4">
               <Plus className="w-5 h-5 text-emerald-500" />
@@ -212,6 +206,12 @@ const WishlistView = ({
               </button>
             </div>
           </div>
+
+          {/* ===== ASSISTANT IA EN DEUXIÈME ===== */}
+          <AIGiftSuggestions
+            onAddToList={handleAddFromAI}
+            currentUser={currentUser}
+          />
 
           {/* Instructions */}
           {items.length > 0 && (
