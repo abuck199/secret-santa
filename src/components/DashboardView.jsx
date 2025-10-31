@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gift, List, Users, Shuffle, Lock, Sparkles, ArrowRight, UserX } from 'lucide-react';
+import { Gift, List, Users, Shuffle, Lock, Sparkles, ArrowRight, UserX, AlertCircle } from 'lucide-react';
 
 const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, setView }) => (
   <div className="max-w-7xl mx-auto px-4 py-8 animate-fade-in">
@@ -58,10 +58,9 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
         </div>
       )}
 
-      {/* Wishlist Card - VERSION ÉQUILIBRÉE */}
-      <div className={`bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-glow-green animate-slide-up ${
-        !currentUser.participates_in_draw ? 'md:col-span-2' : ''
-      }`} style={{ animationDelay: '0.1s' }}>
+      {/* Wishlist Card - VERSION ÉQUILIBRÉE AVEC INDICATEUR */}
+      <div className={`bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-glow-green animate-slide-up ${!currentUser.participates_in_draw ? 'md:col-span-2' : ''
+        }`} style={{ animationDelay: '0.1s' }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-dark-100 flex items-center gap-2">
             <div className="p-2 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg">
@@ -71,6 +70,16 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
           </h2>
           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
         </div>
+
+        {/* ===== AMÉLIORATION #1: INDICATEUR LISTE VIDE ===== */}
+        {(wishLists[currentUser.id] || []).length === 0 && (
+          <div className="bg-gradient-to-r from-red-900/20 to-red-800/20 border border-red-500/30 p-4 rounded-lg mb-3">
+            <p className="text-red-400 text-sm font-medium flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>Votre liste est vide ! Créez-la pour que les autres puissent vous réserver des cadeaux.</span>
+            </p>
+          </div>
+        )}
 
         {(wishLists[currentUser.id] || []).length > 0 ? (
           <div className="space-y-2 mb-3 max-h-52 overflow-y-auto scrollbar-hide">

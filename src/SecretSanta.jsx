@@ -18,6 +18,7 @@ import ChangePasswordView from './components/ChangePasswordView';
 import WelcomeAnimation from './components/WelcomeAnimation';
 import FAQView from './components/FAQView';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 
 const SecretSantaApp = () => {
   useEffect(() => {
@@ -1022,6 +1023,8 @@ const SecretSantaApp = () => {
           setView={setView}
         />
       )}
+
+      {currentUser && !showWelcome && <ScrollToTop />}
 
       {currentUser && !showWelcome && (
         <Footer
