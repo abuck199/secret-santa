@@ -20,6 +20,7 @@ import { GripVertical, ArrowLeft, Plus, Sparkles, List as ListIcon } from 'lucid
 import WishlistItem from './WishlistItem';
 import AIGiftSuggestions from './AIGiftSuggestions';
 import ConfirmationModal from './ConfirmationModal';
+import toast from 'react-hot-toast';
 
 const SortableWishlistItem = ({ item, currentUser, updateWishlistItem }) => {
   const {
@@ -70,7 +71,11 @@ const WishlistView = ({
   updateWishlistItem,
   updateWishlistOrder,
   setView,
-  loading
+  loading,
+  setIsEditing,
+  setLoading,
+  loadWishLists,
+  supabase
 }) => {
   const items = wishLists[currentUser.id] || [];
 
@@ -111,22 +116,58 @@ const WishlistView = ({
   };
 
   // Fonction pour ajouter un article depuis l'IA
-  const handleAddFromAI = (itemName, itemLink) => {
-    setPendingItem({ name: itemName, link: itemLink });
+  const handleAddFromAI = (itemName, itemLink, fromAI = false) => {
+    setPendingItem({ name: itemName, link: itemLink, fromAI: fromAI });
     setShowConfirmModal(true);
   };
 
-  // Fonction appelée lors du clic sur "Ajouter à ma liste"
   const handleAddClick = () => {
     if (!itemForm.item.trim()) return;
 
-    setPendingItem({ name: itemForm.item, link: itemForm.link });
+    setPendingItem({ name: itemForm.item, link: itemForm.link, fromAI: false });
     setShowConfirmModal(true);
   };
 
-  // Fonction de confirmation qui ajoute vraiment l'article
-  const confirmAddItem = () => {
-    if (pendingItem) {
+  const confirmAddItem = async () => {
+    if (!pendingItem) return;
+
+    setShowConfirmModal(false);
+
+    if (pendingItem.fromAI) {
+      const userItems = wishLists[currentUser.id] || [];
+      const MAX_ITEMS = 30;
+
+      if (userItems.length >= MAX_ITEMS) {
+        toast.error(`Vous avez atteint la limite de ${MAX_ITEMS} articles par liste`);
+        setPendingItem(null);
+        return;
+      }
+
+      setLoading(true);
+
+      const maxOrder = userItems.length > 0 ? Math.max(...userItems.map(i => i.displayOrder)) : 0;
+
+      const { error } = await supabase.from('wishlist_items').insert([{
+        user_id: currentUser.id,
+        item: pendingItem.name,
+        link: pendingItem.link || null,
+        claimed: false,
+        display_order: maxOrder + 1
+      }]);
+
+      if (error) {
+        toast.error('Erreur lors de l\'ajout de l\'article');
+        console.error('Erreur ajout item:', error);
+        setLoading(false);
+        setPendingItem(null);
+        return;
+      }
+
+      await loadWishLists();
+      toast.success('Article ajouté');
+      setLoading(false);
+      setPendingItem(null);
+    } else {
       setItemForm({ item: pendingItem.name, link: pendingItem.link });
       setTimeout(() => {
         addWishlistItem();
@@ -190,7 +231,7 @@ const WishlistView = ({
               />
               <input
                 type="url"
-                placeholder="Lien (optionnel)"
+                placeholder="Lien (optionnel) - ex: amazon.ca/produit"
                 value={itemForm.link}
                 onChange={(e) => setItemForm(p => ({ ...p, link: e.target.value }))}
                 className="w-full px-4 py-3 bg-dark-900/50 border-2 border-white/10 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500/50 outline-none transition-all text-dark-100 placeholder-dark-500"

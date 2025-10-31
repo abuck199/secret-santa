@@ -53,8 +53,8 @@ const SecretSantaApp = () => {
 
   useEffect(() => {
     const checkUserSession = async () => {
-      const savedUser = sessionStorage.getItem('currentUser');
-      const savedView = sessionStorage.getItem('currentView');
+      const savedUser = localStorage.getItem('currentUser'); // ← CHANGER ICI
+      const savedView = localStorage.getItem('currentView'); // ← CHANGER ICI
 
       if (!savedUser) {
         setInitialLoading(false);
@@ -72,8 +72,8 @@ const SecretSantaApp = () => {
 
         if (error || !data) {
           console.log('Utilisateur supprimé, déconnexion...');
-          sessionStorage.removeItem('currentUser');
-          sessionStorage.removeItem('currentView');
+          localStorage.removeItem('currentUser'); // ← CHANGER ICI
+          localStorage.removeItem('currentView'); // ← CHANGER ICI
           toast.error('Votre compte a été supprimé');
           setInitialLoading(false);
           return;
@@ -88,8 +88,8 @@ const SecretSantaApp = () => {
         }
       } catch (error) {
         console.error('Erreur lors du chargement de la session:', error);
-        sessionStorage.removeItem('currentUser');
-        sessionStorage.removeItem('currentView');
+        localStorage.removeItem('currentUser'); // ← CHANGER ICI
+        localStorage.removeItem('currentView'); // ← CHANGER ICI
       } finally {
         setInitialLoading(false);
       }
@@ -100,7 +100,7 @@ const SecretSantaApp = () => {
 
   useEffect(() => {
     if (currentUser && view !== 'login') {
-      sessionStorage.setItem('currentView', view);
+      localStorage.setItem('currentView', view);
     }
   }, [view, currentUser]);
 
@@ -146,7 +146,7 @@ const SecretSantaApp = () => {
           .single();
 
         if (error || !data) {
-          sessionStorage.removeItem('currentUser');
+          localStorage.removeItem('currentUser');
           setCurrentUser(null);
           setView('login');
           toast.error('Votre compte a été supprimé par un administrateur');
@@ -249,7 +249,7 @@ const SecretSantaApp = () => {
         return;
       }
 
-      sessionStorage.setItem('currentUser', JSON.stringify(data));
+      localStorage.setItem('currentUser', JSON.stringify(data));
 
       setCurrentUser(data);
       setShowWelcome(true);
@@ -263,10 +263,11 @@ const SecretSantaApp = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('currentUser');
-    sessionStorage.removeItem('currentView');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentView');
     setCurrentUser(null);
     setView('login');
+    toast.success('Déconnexion réussie ! À bientôt !');
   };
 
   const addUser = async () => {
@@ -437,26 +438,58 @@ const SecretSantaApp = () => {
     if (!itemForm.item.trim()) return;
 
     const userItems = wishLists[currentUser.id] || [];
-    const MAX_ITEMS = 50;
+    const MAX_ITEMS = 30;
 
     if (userItems.length >= MAX_ITEMS) {
       toast.error(`Vous avez atteint la limite de ${MAX_ITEMS} articles par liste`);
       return;
     }
 
+    const normalizeUrl = (url) => {
+      if (!url || !url.trim()) return null;
+
+      const trimmedUrl = url.trim();
+
+      if (trimmedUrl.toLowerCase().startsWith('javascript:') ||
+        trimmedUrl.toLowerCase().startsWith('data:')) {
+        return false;
+      }
+
+      let urlToValidate = trimmedUrl;
+
+      if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+        urlToValidate = trimmedUrl;
+      } else {
+        urlToValidate = `https://${trimmedUrl}`;
+      }
+
+      try {
+        const urlObj = new URL(urlToValidate);
+
+        if (!urlObj.hostname.includes('.')) {
+          return false;
+        }
+
+        if (urlObj.hostname === '.' || urlObj.hostname.startsWith('.') || urlObj.hostname.endsWith('.')) {
+          return false;
+        }
+
+        return urlToValidate;
+      } catch (e) {
+        return false;
+      }
+    };
+
     if (itemForm.link && itemForm.link.trim()) {
-      const link = itemForm.link.trim();
+      const normalizedLink = normalizeUrl(itemForm.link);
 
-      if (link.toLowerCase().startsWith('javascript:') ||
-        link.toLowerCase().startsWith('data:')) {
-        toast.error('Lien invalide');
+      if (normalizedLink === false) {
+        toast.error('Le lien doit être une URL valide (ex: amazon.ca/produit)');
         return;
       }
 
-      if (!link.startsWith('http://') && !link.startsWith('https://')) {
-        toast.error('Le lien doit commencer par http:// ou https://');
-        return;
-      }
+      // Mettre à jour le lien normalisé
+      itemForm.link = normalizedLink;
     }
 
     if (itemForm.item.length > 200) {
@@ -471,7 +504,7 @@ const SecretSantaApp = () => {
     const { error } = await supabase.from('wishlist_items').insert([{
       user_id: currentUser.id,
       item: itemForm.item,
-      link: itemForm.link,
+      link: itemForm.link || null,
       claimed: false,
       display_order: maxOrder + 1
     }]);
@@ -607,19 +640,52 @@ const SecretSantaApp = () => {
       return;
     }
 
-    if (newLink) {
-      if (newLink.toLowerCase().startsWith('javascript:') ||
-        newLink.toLowerCase().startsWith('data:')) {
-        toast.error('Lien invalide détecté');
+    const normalizeUrl = (url) => {
+      if (!url || !url.trim()) return null;
+
+      const trimmedUrl = url.trim();
+
+      if (trimmedUrl.toLowerCase().startsWith('javascript:') ||
+        trimmedUrl.toLowerCase().startsWith('data:')) {
+        return false;
+      }
+
+      let urlToValidate = trimmedUrl;
+
+      if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+        urlToValidate = trimmedUrl;
+      } else {
+        urlToValidate = `https://${trimmedUrl}`;
+      }
+
+      try {
+        const urlObj = new URL(urlToValidate);
+
+        if (!urlObj.hostname.includes('.')) {
+          return false;
+        }
+
+        if (urlObj.hostname === '.' || urlObj.hostname.startsWith('.') || urlObj.hostname.endsWith('.')) {
+          return false;
+        }
+
+        return urlToValidate;
+      } catch (e) {
+        return false;
+      }
+    };
+
+    let finalLink = null;
+
+    if (newLink && newLink.trim()) {
+      finalLink = normalizeUrl(newLink);
+
+      if (finalLink === false) {
+        toast.error('Le lien doit être une URL valide (ex: amazon.ca/produit)');
         return;
       }
 
-      if (!newLink.startsWith('http://') && !newLink.startsWith('https://')) {
-        toast.error('Le lien doit commencer par http:// ou https://');
-        return;
-      }
-
-      if (newLink.length > 500) {
+      if (finalLink && finalLink.length > 500) {
         toast.error('Le lien est trop long (max 500 caractères)');
         return;
       }
@@ -632,7 +698,7 @@ const SecretSantaApp = () => {
         .from('wishlist_items')
         .update({
           item: newName,
-          link: newLink || null
+          link: finalLink
         })
         .eq('id', itemId)
         .eq('user_id', currentUser.id);
@@ -944,6 +1010,9 @@ const SecretSantaApp = () => {
           setView={setView}
           loading={loading}
           setIsEditing={setIsEditing}
+          setLoading={setLoading}
+          loadWishLists={loadWishLists}
+          supabase={supabase}
         />
       )}
 

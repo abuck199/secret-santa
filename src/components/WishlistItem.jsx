@@ -86,7 +86,7 @@ const WishlistItem = ({
               value={editedLink}
               onChange={(e) => setEditedLink(e.target.value)}
               className="w-full px-3 py-2 bg-dark-900/50 border-2 border-blue-500/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500/50 outline-none text-dark-100 placeholder-dark-500"
-              placeholder="https://..."
+              placeholder="Lien (optionnel) - ex: amazon.ca/produit"
             />
           </div>
 
