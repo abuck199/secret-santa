@@ -812,43 +812,11 @@ const SecretSantaApp = () => {
       await supabase.from('assignments').insert(newAssignments);
       await loadAssignments();
 
-      let emailsSent = 0;
-      let emailsFailed = 0;
-
-      for (const assignment of newAssignments) {
-        const giver = participatingUsers.find(u => u.id === assignment.giver_id);
-        const receiver = participatingUsers.find(u => u.id === assignment.receiver_id);
-
-        if (giver?.email && receiver) {
-          try {
-            await emailjs.send(
-              emailConfig.serviceId,
-              emailConfig.templateIdAssignment,
-              {
-                to_email: giver.email,
-                to: giver.email,
-                from_name: 'Secret Santa',
-                to_name: giver.username,
-                receiver_name: receiver.username,
-                event_name: event.name,
-                site_url: window.location.origin
-              }
-            );
-            emailsSent++;
-          } catch (error) {
-            console.error(`Erreur email pour ${giver.username}:`, error);
-            emailsFailed++;
-          }
-        }
-      }
-
       const nonParticipants = users.filter(u => !u.participates_in_draw);
       let message = `Attributions créées pour ${participatingUsers.length} participants! 🎁`;
       if (nonParticipants.length > 0) {
         message += ` (${nonParticipants.length} personne(s) hors-tirage)`;
       }
-      if (emailsSent > 0) message += ` - ${emailsSent} email(s) envoyé(s)`;
-      if (emailsFailed > 0) message += `, ${emailsFailed} échec(s)`;
 
       toast.success(message);
     } catch (error) {
