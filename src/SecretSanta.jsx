@@ -1010,7 +1010,7 @@ const SecretSantaApp = () => {
         />
       )}
 
-      {view === 'assignment' && assignments[currentUser.id] && currentUser.participates_in_draw && !showWelcome && (
+      {view === 'assignment' && currentUser.participates_in_draw && !showWelcome && (
         <AssignmentView
           currentUser={currentUser}
           assignments={assignments}
