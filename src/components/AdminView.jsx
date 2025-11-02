@@ -428,7 +428,7 @@ const AdminView = ({
                 className="flex-1 bg-gradient-to-r from-primary via-primary-600 to-primary-dark text-white px-6 py-3 rounded-xl hover:from-primary-dark hover:to-primary font-bold disabled:opacity-50 shadow-lg hover:shadow-glow-red transition-all flex items-center justify-center gap-2 group"
               >
                 <Mail className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                {loading ? 'Envoi...' : 'Renvoyer les emails'}
+                {loading ? 'Envoi...' : 'Envoyer les emails'}
               </button>
             </div>
           </div>
