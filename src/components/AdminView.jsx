@@ -27,7 +27,7 @@ const AdminView = ({
   const nonParticipatingUsers = users.filter(u => !u.participates_in_draw);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 animate-fade-in">
       {/* Back Button */}
       <button
         onClick={() => setView('dashboard')}

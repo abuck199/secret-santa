@@ -97,7 +97,7 @@ const ChangePasswordView = ({ currentUser, supabase, bcrypt, setView }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="max-w-2xl mx-auto px-3 sm:px-4 py-8 animate-fade-in">
       {/* Back Button */}
       <button
         onClick={() => setView('dashboard')}

@@ -178,7 +178,7 @@ const WishlistView = ({
 
   return (
     <>
-      <div className="max-w-3xl mx-auto px-4 py-6 animate-fade-in">
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 py-6 animate-fade-in">
         {/* Back Button */}
         <button
           onClick={() => setView('dashboard')}

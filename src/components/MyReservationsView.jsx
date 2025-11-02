@@ -5,7 +5,7 @@ const MyReservationsView = ({ getMyReservations, toggleItemClaimed, setView, loa
   const reservations = getMyReservations();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-8 animate-fade-in">
       <div className="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10">
         {/* Header - VERSION COMPACTE */}
         <div className="flex items-center justify-between mb-6">

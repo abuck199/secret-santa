@@ -2,7 +2,7 @@ import React from 'react';
 import { Gift, List, Users, Shuffle, Lock, Sparkles, ArrowRight, UserX, AlertCircle } from 'lucide-react';
 
 const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, setView }) => (
-  <div className="max-w-7xl mx-auto px-4 py-8 animate-fade-in">
+  <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 animate-fade-in">
     {/* Welcome Header - VERSION ÉQUILIBRÉE */}
     <div className="mb-6 text-center">
       <h1 className="text-3xl md:text-3xl font-bold bg-gradient-to-r from-primary via-gold to-emerald-500 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2">
@@ -13,7 +13,7 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
       <p className="text-sm text-dark-400">Votre plateforme d'échange de cadeaux intelligente</p>
     </div>
 
-    <div className="grid md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Attribution Card - VERSION ÉQUILIBRÉE */}
       {currentUser.participates_in_draw && (
         <div className="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-glow-red animate-slide-up">
