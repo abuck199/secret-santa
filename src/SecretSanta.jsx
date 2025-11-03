@@ -219,7 +219,7 @@ const SecretSantaApp = () => {
   const handleLogin = async () => {
     setLoading(true);
 
-    const trimmedUsername = loginForm.username.toLowerCase().trim();
+    const trimmedUsername = loginForm.username.trim();
 
     if (!trimmedUsername || !loginForm.password) {
       toast.error('Veuillez remplir tous les champs');
@@ -231,7 +231,7 @@ const SecretSantaApp = () => {
       const { data } = await supabaseAnon
         .from('users')
         .select('*')
-        .eq('username', trimmedUsername)
+        .ilike('username', trimmedUsername)
         .single();
 
       if (!data) {
