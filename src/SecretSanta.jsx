@@ -726,44 +726,62 @@ const SecretSantaApp = () => {
     try {
       let emailsSent = 0;
       let emailsFailed = 0;
-      const emailPromises = [];
+      const totalEmails = Object.keys(assignments).length;
+
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+      toast.loading(`Envoi en cours... (0/${totalEmails})`, { id: 'email-progress' });
 
       for (const [giverId, receiverId] of Object.entries(assignments)) {
         const giver = users.find(u => u.id === giverId);
         const receiver = users.find(u => u.id === receiverId);
 
         if (giver?.email && receiver) {
-          const emailPromise = emailjs.send(
-            emailConfig.serviceId,
-            emailConfig.templateIdAssignment,
-            {
-              to_email: giver.email,
-              to: giver.email,
-              from_name: 'Secret Santa',
-              to_name: giver.username,
-              receiver_name: receiver.username,
-              event_name: event.name,
-              site_url: window.location.origin
-            }
-          )
-            .then(() => emailsSent++)
-            .catch(() => emailsFailed++);
+          try {
+            await emailjs.send(
+              emailConfig.serviceId,
+              emailConfig.templateIdAssignment,
+              {
+                to_email: giver.email,
+                to: giver.email,
+                from_name: 'Secret Santa',
+                to_name: giver.username,
+                receiver_name: receiver.username,
+                event_name: event.name,
+                site_url: window.location.origin
+              }
+            );
+            emailsSent++;
 
-          emailPromises.push(emailPromise);
+            toast.loading(`Envoi en cours... (${emailsSent}/${totalEmails})`, { id: 'email-progress' });
+
+            if (emailsSent < totalEmails) {
+              await delay(2000);
+            }
+          } catch (error) {
+            emailsFailed++;
+            console.error(`Erreur envoi email à ${giver.username}:`, error);
+
+            await delay(1000);
+          }
         }
       }
 
-      await Promise.all(emailPromises);
+      toast.dismiss('email-progress');
 
       let message = emailsSent > 0
-        ? `${emailsSent} email(s) renvoyé(s)`
+        ? `✅ ${emailsSent} email(s) envoyé(s) avec succès`
         : 'Aucun email envoyé';
 
-      if (emailsFailed > 0) message += `, ${emailsFailed} échec(s)`;
+      if (emailsFailed > 0) {
+        message += ` | ❌ ${emailsFailed} échec(s)`;
+      }
 
-      toast.success(message);
+      toast.success(message, { duration: 5000 });
     } catch (error) {
+      toast.dismiss('email-progress');
       toast.error('Erreur lors de l\'envoi des emails');
+      console.error('Erreur globale envoi emails:', error);
     } finally {
       setLoading(false);
     }
