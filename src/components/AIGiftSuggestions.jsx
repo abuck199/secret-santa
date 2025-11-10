@@ -74,10 +74,30 @@ FORMAT DE RÉPONSE (JSON valide uniquement, rien d'autre):
 
 IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-exp",
-        contents: enhancedPrompt,
-      });
+      // Essayer différents modèles avec fallback (du plus récent au plus ancien)
+      let response;
+      const models = [
+        "gemini-2.5-flash-lite",      // Gemini 2.5 lite (le plus récent et léger)
+        "gemini-2.0-flash-lite",      // Gemini 2.0 lite
+        "gemini-2.0-flash-exp",       // Gemini 2.0 expérimental
+        "gemini-1.5-flash"            // Fallback 1.5 (stable)
+      ];
+
+      for (const modelName of models) {
+        try {
+          response = await ai.models.generateContent({
+            model: modelName,
+            contents: enhancedPrompt,
+          });
+          break;
+        } catch (modelError) {
+          if (modelName === models[models.length - 1]) {
+            throw modelError;
+          }
+
+          continue;
+        }
+      }
 
       const text = response.text;
 
@@ -107,12 +127,15 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
     } catch (error) {
       console.error('Erreur:', error);
 
-      if (error.message?.includes('API key') || error.message?.includes('401')) {
+      // Gérer spécifiquement l'erreur 429 (quota exceeded)
+      if (error.message?.includes('429') || error.message?.includes('quota') || error.message?.includes('Quota exceeded')) {
+        toast.error('Quota API Gemini dépassé. Attendez quelques minutes ou régénérez votre clé API sur https://aistudio.google.com/app/apikey', { duration: 6000 });
+      } else if (error.message?.includes('API key') || error.message?.includes('401')) {
         toast.error('Clé API invalide. Vérifiez votre clé sur https://aistudio.google.com/app/apikey');
       } else if (error.message?.includes('model')) {
         toast.error('Modèle non disponible. Essayez de régénérer votre clé API.');
       } else {
-        toast.error('Erreur lors de la génération. Réessayez.');
+        toast.error('Erreur lors de la génération. Réessayez dans quelques instants.');
       }
 
       setSuggestions([]);
