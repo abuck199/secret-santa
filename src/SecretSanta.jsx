@@ -118,6 +118,7 @@ const SecretSantaApp = () => {
     if (currentUser) {
       loadAllData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   useEffect(() => {
@@ -450,6 +451,7 @@ const SecretSantaApp = () => {
 
       const trimmedUrl = url.trim();
 
+      // eslint-disable-next-line no-script-url
       if (trimmedUrl.toLowerCase().startsWith('javascript:') ||
         trimmedUrl.toLowerCase().startsWith('data:')) {
         return false;
@@ -645,6 +647,7 @@ const SecretSantaApp = () => {
 
       const trimmedUrl = url.trim();
 
+      // eslint-disable-next-line no-script-url
       if (trimmedUrl.toLowerCase().startsWith('javascript:') ||
         trimmedUrl.toLowerCase().startsWith('data:')) {
         return false;

@@ -12,7 +12,7 @@ const LoginPage = ({ loginForm, setLoginForm, handleLogin, loading, event }) => 
     }
 
     try {
-      const token = await executeRecaptcha('login');
+      await executeRecaptcha('login');
       handleLogin();
     } catch (error) {
       console.error('reCAPTCHA error:', error);

@@ -4,13 +4,8 @@ import {
   Shield, 
   HelpCircle, 
   Mail, 
-  Github, 
-  Sparkles, 
   Lock,
   Gift,
-  ExternalLink,
-  Coffee,
-  Star,
   Users
 } from 'lucide-react';
 

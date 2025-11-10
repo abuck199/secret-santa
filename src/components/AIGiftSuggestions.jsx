@@ -10,9 +10,7 @@ const AIGiftSuggestions = ({ onAddToList, currentUser }) => {
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [cooldown, setCooldown] = useState(0);
-  const [lastGenerationTime, setLastGenerationTime] = useState(null);
 
-  // Gestion du cooldown de 60 secondes
   React.useEffect(() => {
     if (cooldown > 0) {
       const timer = setTimeout(() => {
@@ -47,34 +45,39 @@ const AIGiftSuggestions = ({ onAddToList, currentUser }) => {
       // Initialiser le client avec la clé API
       const ai = new GoogleGenAI({ apiKey });
 
-      const enhancedPrompt = `Tu es un assistant expert en suggestions de cadeaux pour les fêtes.
+      const enhancedPrompt = `Tu es un assistant expert en suggestions de cadeaux pour les fêtes au Canada.
 
-Basé sur cette description: "${prompt}"
-Budget ciblé par article: ENVIRON ${budget}$ CAD
+CONTEXTE:
+Description des intérêts: "${prompt}"
+Budget par article: ${budget}$ CAD (flexible ±10$)
 
-Génère EXACTEMENT 4 suggestions de cadeaux créatives et variées.
+MISSION:
+Génère EXACTEMENT 4 suggestions de cadeaux créatives, variées et ACHETABLES au Canada.
 
-RÈGLES IMPORTANTES:
-- Tous les prix doivent être AUTOUR de ${budget}$ CAD (entre ${Math.max(1, parseFloat(budget) - 10)}$ et ${parseFloat(budget) + 10}$)
-- La majorité des suggestions doivent être près de ${budget}$
-- Suggestions concrètes et achetables
-- Adapté aux intérêts mentionnés
-- Suggestions réalistes disponibles au Canada/Québec
-- Variété dans les suggestions mais prix similaires
+RÈGLES CRITIQUES:
+1. Prix réalistes entre ${Math.max(1, parseFloat(budget) - 10)}$ et ${parseFloat(budget) + 10}$ CAD
+2. Produits RÉELS disponibles au Canada/Québec
+3. Variété: 1 tech/gadget, 1 loisir/hobby, 1 pratique/utile, 1 surprise/original
+4. Descriptions concises mais évocatrices (max 80 caractères)
+5. Noms de produits PRÉCIS avec marques si possible (ex: "Kindle Paperwhite" plutôt que "liseuse électronique")
 
-FORMAT DE RÉPONSE (JSON valide uniquement, rien d'autre):
+FORMAT JSON (rien d'autre):
 [
   {
-    "name": "Nom du cadeau court (max 60 caractères)",
-    "description": "Description courte en 1 phrase (max 100 caractères)",
-    "estimatedPrice": "Prix estimé proche de ${budget}$ (ex: ${Math.max(1, parseFloat(budget) - 5)}$ - ${parseFloat(budget) + 5}$)",
-    "searchUrl": "https://www.amazon.ca/s?k=nom+du+produit+encodé"
+    "name": "Nom précis du produit avec marque si pertinent (max 60 char)",
+    "description": "Description courte et attrayante (max 80 char)",
+    "estimatedPrice": "${Math.max(1, parseFloat(budget) - 5)}-${parseFloat(budget) + 5}$",
+    "category": "Tech|Loisir|Pratique|Surprise"
   }
 ]
 
-IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après.`;
+EXEMPLES DE BONNES SUGGESTIONS:
+- "Anker PowerCore 10000mAh" plutôt que "batterie portable"
+- "Moleskine Classic Notebook" plutôt que "carnet"
+- "Chemex 6-Cup Coffee Maker" plutôt que "cafetière"
 
-      // Essayer différents modèles avec fallback (du plus récent au plus ancien)
+IMPORTANT: Réponds UNIQUEMENT avec le JSON, aucun texte`;
+
       let response;
       const models = [
         "gemini-2.5-flash-lite",      // Gemini 2.5 lite (le plus récent et léger)
@@ -85,16 +88,18 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
 
       for (const modelName of models) {
         try {
+          console.log(`Tentative avec le modèle: ${modelName}`);
           response = await ai.models.generateContent({
             model: modelName,
             contents: enhancedPrompt,
           });
+          console.log(`✅ Succès avec ${modelName}`);
           break;
         } catch (modelError) {
+          console.warn(`❌ Échec avec ${modelName}:`, modelError.message);
           if (modelName === models[models.length - 1]) {
             throw modelError;
           }
-
           continue;
         }
       }
@@ -118,10 +123,19 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
         throw new Error('Format de réponse invalide');
       }
 
-      setSuggestions(parsedSuggestions);
-      toast.success(`${parsedSuggestions.length} suggestions générées ! 🎁`);
+      const suggestionsWithLinks = parsedSuggestions.map(suggestion => {
+        const searchQuery = encodeURIComponent(suggestion.name);
+        const amazonLink = `https://www.amazon.ca/s?k=${searchQuery}`;
+        
+        return {
+          ...suggestion,
+          link: amazonLink
+        };
+      });
 
-      setLastGenerationTime(Date.now());
+      setSuggestions(suggestionsWithLinks);
+      toast.success(`${suggestionsWithLinks.length} suggestions générées ! 🎁`);
+
       setCooldown(60);
 
     } catch (error) {
@@ -146,7 +160,8 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
 
   const handleAddClick = (suggestion) => {
     if (onAddToList) {
-      onAddToList(suggestion.name, suggestion.searchUrl || '', true);
+      const productLink = suggestion.link || suggestion.searchUrl || '';
+      onAddToList(suggestion.name, productLink, true);
     }
   };
 
@@ -273,9 +288,16 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h5 className="font-bold text-dark-100 mb-1 group-hover:text-purple-400 transition-colors">
-                          {suggestion.name}
-                        </h5>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h5 className="font-bold text-dark-100 group-hover:text-purple-400 transition-colors">
+                            {suggestion.name}
+                          </h5>
+                          {suggestion.category && (
+                            <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full font-semibold border border-purple-500/30">
+                              {suggestion.category}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-dark-400 mb-2 line-clamp-2">
                           {suggestion.description}
                         </p>
@@ -285,15 +307,15 @@ IMPORTANT: Réponds UNIQUEMENT avec le tableau JSON, aucun texte avant ou après
                               💰 {suggestion.estimatedPrice}
                             </span>
                           )}
-                          {suggestion.searchUrl && (
+                          {(suggestion.link || suggestion.searchUrl) && (
                             <a
-                              href={suggestion.searchUrl}
+                              href={suggestion.link || suggestion.searchUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
                             >
                               <ExternalLink className="w-3 h-3" />
-                              Rechercher
+                              Voir le produit
                             </a>
                           )}
                         </div>
