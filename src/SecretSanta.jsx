@@ -1072,6 +1072,8 @@ const SecretSantaApp = () => {
           setView={setView}
           loading={loading}
           toggleUserParticipation={toggleUserParticipation}
+          supabase={supabase}
+          loadUsers={loadUsers}
         />
       )}
 
