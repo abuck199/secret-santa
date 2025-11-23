@@ -53,8 +53,8 @@ const SecretSantaApp = () => {
 
   useEffect(() => {
     const checkUserSession = async () => {
-      const savedUser = localStorage.getItem('currentUser'); // ← CHANGER ICI
-      const savedView = localStorage.getItem('currentView'); // ← CHANGER ICI
+      const savedUser = localStorage.getItem('currentUser');
+      const savedView = localStorage.getItem('currentView');
 
       if (!savedUser) {
         setInitialLoading(false);
@@ -72,8 +72,8 @@ const SecretSantaApp = () => {
 
         if (error || !data) {
           console.log('Utilisateur supprimé, déconnexion...');
-          localStorage.removeItem('currentUser'); // ← CHANGER ICI
-          localStorage.removeItem('currentView'); // ← CHANGER ICI
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('currentView');
           toast.error('Votre compte a été supprimé');
           setInitialLoading(false);
           return;
@@ -88,8 +88,8 @@ const SecretSantaApp = () => {
         }
       } catch (error) {
         console.error('Erreur lors du chargement de la session:', error);
-        localStorage.removeItem('currentUser'); // ← CHANGER ICI
-        localStorage.removeItem('currentView'); // ← CHANGER ICI
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('currentView');
       } finally {
         setInitialLoading(false);
       }
@@ -200,6 +200,7 @@ const SecretSantaApp = () => {
         link: item.link || '',
         claimed: item.claimed,
         reservedBy: item.reserved_by || null,
+        purchased: item.purchased || false,
         displayOrder: item.display_order || 0,
         userId: item.user_id
       });
@@ -490,7 +491,6 @@ const SecretSantaApp = () => {
         return;
       }
 
-      // Mettre à jour le lien normalisé
       itemForm.link = normalizedLink;
     }
 
@@ -508,6 +508,7 @@ const SecretSantaApp = () => {
       item: itemForm.item,
       link: itemForm.link || null,
       claimed: false,
+      purchased: false,
       display_order: maxOrder + 1
     }]);
 
@@ -563,7 +564,8 @@ const SecretSantaApp = () => {
           .from('wishlist_items')
           .update({
             claimed: false,
-            reserved_by: null
+            reserved_by: null,
+            purchased: false
           })
           .eq('id', itemId)
           .eq('reserved_by', currentUser.id)
@@ -596,6 +598,41 @@ const SecretSantaApp = () => {
         newSet.delete(itemId);
         return newSet;
       });
+    }
+  };
+
+  // Nouvelle fonction pour toggle le statut acheté
+  const toggleItemPurchased = async (itemId, currentPurchasedStatus) => {
+    setLoading(true);
+
+    try {
+      const newPurchasedStatus = !currentPurchasedStatus;
+
+      const { data, error } = await supabase
+        .from('wishlist_items')
+        .update({ purchased: newPurchasedStatus })
+        .eq('id', itemId)
+        .eq('reserved_by', currentUser.id)
+        .select();
+
+      if (error || !data || data.length === 0) {
+        toast.error('Erreur lors de la mise à jour');
+        setLoading(false);
+        return;
+      }
+
+      await loadWishLists();
+
+      if (newPurchasedStatus) {
+        toast.success('Article marqué comme acheté ! 🎁');
+      } else {
+        toast.success('Article marqué comme non acheté');
+      }
+    } catch (err) {
+      toast.error('Erreur lors de la mise à jour');
+      console.error('Erreur toggle purchased:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -866,7 +903,12 @@ const SecretSantaApp = () => {
       items.forEach(item => {
         if (item.reservedBy === currentUser?.id && userId !== currentUser?.id) {
           const user = users.find(u => u.id === userId);
-          if (user) reservations.push({ ...item, userName: user.username, userId });
+          if (user) reservations.push({
+            ...item,
+            userName: user.username,
+            userId,
+            purchased: item.purchased || false
+          });
         }
       });
     });
@@ -1026,6 +1068,7 @@ const SecretSantaApp = () => {
         <MyReservationsView
           getMyReservations={getMyReservations}
           toggleItemClaimed={toggleItemClaimed}
+          toggleItemPurchased={toggleItemPurchased}
           setView={setView}
           loading={loading}
         />
