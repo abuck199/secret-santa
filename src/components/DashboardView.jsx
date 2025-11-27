@@ -1,19 +1,19 @@
 import React from 'react';
-import { Gift, List, Users, Shuffle, Lock, Sparkles, ArrowRight, UserX, AlertCircle, Bell, X } from 'lucide-react';
+import { Gift, List, Users, Shuffle, Lock, Sparkles, ArrowRight, UserX, AlertCircle, Bell, X, CalendarX, ShoppingBag } from 'lucide-react';
 
 const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, setView }) => {
   const [showAnnouncement, setShowAnnouncement] = React.useState(true);
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 animate-fade-in">
-      {/* ===== BANNIÈRE D'ANNONCES COMPACTE ===== */}
+      {/* ===== BANNIÈRE D'ANNONCES MISE À JOUR ===== */}
       {showAnnouncement && (
         <div className="mb-6 bg-gradient-to-r from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl border border-gold/30 shadow-lg animate-fade-in">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10">
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-gold" />
-              <span className="text-sm font-semibold text-gold">Nouveautés</span>
+              <span className="text-sm font-semibold text-gold">Annonces importantes</span>
             </div>
             <button
               onClick={() => setShowAnnouncement(false)}
@@ -26,22 +26,21 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
 
           {/* Contenu */}
           <div className="px-4 py-3 space-y-2">
-            {/* Annonce 1 */}
+            {/* Annonce 1 - Date limite passée */}
             <div className="flex items-start gap-3">
-              <span className="text-base">🚨</span>
+              <span className="text-base">🔒</span>
               <p className="text-sm text-dark-200">
-                <span className="text-red-400 font-semibold">Date limite :</span> Les réservations ferment le <span className="text-red-400 font-bold">26 novembre.</span>.
+                <span className="text-primary font-semibold">Période terminée :</span> L'ajout de nouveaux articles aux listes est maintenant <span className="text-primary font-bold">fermé</span>.
               </p>
             </div>
 
-            {/* Annonce 2 */}
             <div className="flex items-start gap-3">
               <span className="text-base">✨</span>
               <p className="text-sm text-dark-200">
-                <span className="text-emerald-400 font-semibold">Nouveau :</span> Marquez vos articles comme "Acheté" dans{' '}
+                <span className="text-gold font-semibold">Rappel :</span> Marquez vos articles comme "Acheté" dans{' '}
                 <button
                   onClick={() => setView('my-reservations')}
-                  className="text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-2 transition-colors"
+                  className="text-gold hover:text-gold-300 font-semibold underline underline-offset-2 transition-colors"
                 >
                   Mes Réservations
                 </button>
@@ -107,7 +106,7 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
           </div>
         )}
 
-        {/* Wishlist Card - VERSION ÉQUILIBRÉE AVEC INDICATEUR */}
+        {/* Wishlist Card - VERSION AVEC INDICATEUR DE FERMETURE */}
         <div className={`bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-glow-green animate-slide-up ${!currentUser.participates_in_draw ? 'md:col-span-2' : ''
           }`} style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between mb-4">
@@ -117,18 +116,22 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
               </div>
               Ma liste de souhaits
             </h2>
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            {/* Badge de fermeture */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-primary/20 to-primary/10 rounded-full border border-primary/30">
+              <Lock className="w-3 h-3 text-primary" />
+              <span className="text-xs font-semibold text-primary">Fermée</span>
+            </div>
           </div>
 
-          {/* ===== AMÉLIORATION #1: INDICATEUR LISTE VIDE ===== */}
-          {(wishLists[currentUser.id] || []).length === 0 && (
-            <div className="bg-gradient-to-r from-red-900/20 to-red-800/20 border border-red-500/30 p-4 rounded-lg mb-3">
-              <p className="text-red-400 text-sm font-medium flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>Votre liste est vide ! Créez-la pour que les autres puissent vous réserver des cadeaux.</span>
-              </p>
-            </div>
-          )}
+          {/* Message de fermeture compact */}
+          <div className="bg-gradient-to-r from-primary/10 to-gold/10 border border-primary/20 p-3 rounded-lg mb-3">
+            <p className="text-xs text-dark-300 flex items-center gap-2">
+              <CalendarX className="w-4 h-4 text-primary flex-shrink-0" />
+              <span>
+                <span className="font-semibold text-primary">Période terminée</span> — Vous pouvez encore modifier vos articles existants
+              </span>
+            </p>
+          </div>
 
           {(wishLists[currentUser.id] || []).length > 0 ? (
             <div className="space-y-2 mb-3 max-h-52 overflow-y-auto scrollbar-hide">
@@ -159,7 +162,7 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
             className="w-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-2.5 rounded-xl hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-lg hover:shadow-glow-green font-semibold flex items-center justify-center gap-2 group"
           >
             <List className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            Gérer ma liste
+            Voir ma liste
           </button>
         </div>
       </div>
@@ -184,8 +187,34 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
         </div>
       )}
 
+      {/* Raccourci vers les réservations */}
+      {currentUser.participates_in_draw && (
+        <div className="mt-5 bg-gradient-to-br from-gold/10 via-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-gold/30 hover:border-gold/50 transition-all duration-300 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-gradient-to-br from-gold/20 to-gold/10 rounded-xl">
+                <ShoppingBag className="w-6 h-6 text-gold" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-dark-100 flex items-center gap-2">
+                  Réservez des cadeaux
+                </h2>
+                <p className="text-sm text-dark-400 mt-1">Parcourez les listes et réservez vos cadeaux</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setView('all-lists')}
+              className="bg-gradient-to-r from-gold via-gold-500 to-gold-600 text-dark-900 px-5 py-2.5 rounded-xl hover:from-gold-400 hover:to-gold-500 transition-all shadow-lg hover:shadow-glow-gold font-semibold flex items-center gap-2 group whitespace-nowrap"
+            >
+              <Users className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              Voir toutes les listes
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Security Section - VERSION ÉQUILIBRÉE */}
-      <div className={`mt-5 bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-white/10 hover:border-gold/50 transition-all duration-300 animate-slide-up`} style={{ animationDelay: currentUser.participates_in_draw ? '0.2s' : '0.3s' }}>
+      <div className={`mt-5 bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-white/10 hover:border-gold/50 transition-all duration-300 animate-slide-up`} style={{ animationDelay: currentUser.participates_in_draw ? '0.25s' : '0.3s' }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-gradient-to-br from-gold/20 to-gold/10 rounded-xl">
@@ -211,7 +240,7 @@ const DashboardView = ({ currentUser, assignments, wishLists, getAssignedUser, s
 
       {/* Admin Panel - VERSION ÉQUILIBRÉE */}
       {currentUser.is_admin && (
-        <div className={`mt-5 bg-gradient-to-br from-primary/20 via-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-primary/30 hover:border-primary/50 transition-all duration-300 animate-slide-up hover:shadow-glow-red`} style={{ animationDelay: currentUser.participates_in_draw ? '0.3s' : '0.4s' }}>
+        <div className={`mt-5 bg-gradient-to-br from-primary/20 via-dark-800/90 to-dark-900/90 backdrop-blur-xl rounded-xl shadow-2xl p-5 border border-primary/30 hover:border-primary/50 transition-all duration-300 animate-slide-up hover:shadow-glow-red`} style={{ animationDelay: currentUser.participates_in_draw ? '0.35s' : '0.4s' }}>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl">

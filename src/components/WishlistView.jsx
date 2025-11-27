@@ -16,11 +16,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, ArrowLeft, Plus, Sparkles, List as ListIcon } from 'lucide-react';
+import { GripVertical, ArrowLeft, Sparkles, List as ListIcon, Clock, Lock, CalendarX, Gift, Edit2, PartyPopper } from 'lucide-react';
 import WishlistItem from './WishlistItem';
-import AIGiftSuggestions from './AIGiftSuggestions';
-import ConfirmationModal from './ConfirmationModal';
-import toast from 'react-hot-toast';
 
 const SortableWishlistItem = ({ item, currentUser, updateWishlistItem }) => {
   const {
@@ -62,6 +59,62 @@ const SortableWishlistItem = ({ item, currentUser, updateWishlistItem }) => {
   );
 };
 
+const DeadlineMessage = () => {
+  return (
+    <div className="mb-6 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-dark-800/80 to-dark-900/80 backdrop-blur-xl shadow-2xl">
+      <div className="relative bg-gradient-to-r from-primary/20 via-primary/10 to-gold/20 px-6 py-4 border-b border-white/10">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse"></div>
+        <div className="relative flex items-center gap-3">
+          <div className="p-2.5 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl border border-primary/30">
+            <CalendarX className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-dark-100 flex items-center gap-2">
+              Période d'ajout terminée
+              <Lock className="w-4 h-4 text-primary/70" />
+            </h3>
+            <p className="text-sm text-dark-400">26 novembre 2025</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-4">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0 p-3 bg-gradient-to-br from-gold/20 to-gold/5 rounded-xl border border-gold/30">
+            <Clock className="w-8 h-8 text-gold" />
+          </div>
+          <div className="flex-1">
+            <p className="text-dark-200 leading-relaxed">
+              La date limite pour ajouter des articles à votre liste était le <span className="font-bold text-primary">26 novembre 2025</span>.
+              Il n'est plus possible d'ajouter de nouveaux articles.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-emerald-900/20 to-emerald-800/20 border border-emerald-500/30 rounded-xl p-4">
+          <h4 className="font-semibold text-emerald-400 mb-3 flex items-center gap-2">
+            Ce que vous pouvez encore faire :
+          </h4>
+          <ul className="space-y-2">
+            <li className="flex items-center gap-2 text-sm text-dark-300">
+              <Edit2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              <span>Modifier vos articles existants (nom et lien)</span>
+            </li>
+            <li className="flex items-center gap-2 text-sm text-dark-300">
+              <GripVertical className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              <span>Réorganiser l'ordre de votre liste</span>
+            </li>
+            <li className="flex items-center gap-2 text-sm text-dark-300">
+              <Gift className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              <span>Réserver des articles dans les listes des autres</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const WishlistView = ({
   currentUser,
   wishLists,
@@ -78,10 +131,6 @@ const WishlistView = ({
   supabase
 }) => {
   const items = wishLists[currentUser.id] || [];
-
-  // État pour la modal de confirmation
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingItem, setPendingItem] = useState(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -115,67 +164,6 @@ const WishlistView = ({
     }
   };
 
-  // Fonction pour ajouter un article depuis l'IA
-  const handleAddFromAI = (itemName, itemLink, fromAI = false) => {
-    setPendingItem({ name: itemName, link: itemLink, fromAI: fromAI });
-    setShowConfirmModal(true);
-  };
-
-  const handleAddClick = () => {
-    if (!itemForm.item.trim()) return;
-
-    setPendingItem({ name: itemForm.item, link: itemForm.link, fromAI: false });
-    setShowConfirmModal(true);
-  };
-
-  const confirmAddItem = async () => {
-    if (!pendingItem) return;
-
-    setShowConfirmModal(false);
-
-    if (pendingItem.fromAI) {
-      const userItems = wishLists[currentUser.id] || [];
-      const MAX_ITEMS = 30;
-
-      if (userItems.length >= MAX_ITEMS) {
-        toast.error(`Vous avez atteint la limite de ${MAX_ITEMS} articles par liste`);
-        setPendingItem(null);
-        return;
-      }
-
-      setLoading(true);
-
-      const maxOrder = userItems.length > 0 ? Math.max(...userItems.map(i => i.displayOrder)) : 0;
-
-      const { error } = await supabase.from('wishlist_items').insert([{
-        user_id: currentUser.id,
-        item: pendingItem.name,
-        link: pendingItem.link || null,
-        claimed: false,
-        display_order: maxOrder + 1
-      }]);
-
-      if (error) {
-        toast.error('Erreur lors de l\'ajout de l\'article');
-        console.error('Erreur ajout item:', error);
-        setLoading(false);
-        setPendingItem(null);
-        return;
-      }
-
-      await loadWishLists();
-      toast.success('Article ajouté');
-      setLoading(false);
-      setPendingItem(null);
-    } else {
-      setItemForm({ item: pendingItem.name, link: pendingItem.link });
-      setTimeout(() => {
-        addWishlistItem();
-        setPendingItem(null);
-      }, 100);
-    }
-  };
-
   return (
     <>
       <div className="max-w-3xl mx-auto px-3 sm:px-4 py-6 animate-fade-in">
@@ -205,61 +193,15 @@ const WishlistView = ({
             </div>
           </div>
 
-          {/* ===== FORMULAIRE D'AJOUT MANUEL EN PREMIER ===== */}
-          <div className="mb-6 p-5 bg-gradient-to-br from-emerald-900/20 via-dark-800/50 to-dark-900/50 backdrop-blur-sm border border-emerald-500/20 rounded-xl">
-            <div className="flex items-center gap-2 mb-4">
-              <Plus className="w-5 h-5 text-emerald-500" />
-              <h3 className="font-bold text-dark-100">Ajouter manuellement</h3>
-              <Sparkles className="w-4 h-4 text-gold animate-pulse" />
-            </div>
+          {/* ===== MESSAGE DE DATE LIMITE DÉPASSÉE ===== */}
+          <DeadlineMessage />
 
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mb-4">
-              <p className="text-xs text-blue-400 flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                Vous pouvez modifier vos articles après les avoir ajoutés
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Nom de l'article"
-                value={itemForm.item}
-                onChange={(e) => setItemForm(p => ({ ...p, item: e.target.value }))}
-                className="w-full px-4 py-3 bg-dark-900/50 border-2 border-white/10 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500/50 outline-none transition-all text-dark-100 placeholder-dark-500"
-                disabled={loading}
-              />
-              <input
-                type="url"
-                placeholder="Lien (optionnel) - ex: amazon.ca/produit"
-                value={itemForm.link}
-                onChange={(e) => setItemForm(p => ({ ...p, link: e.target.value }))}
-                className="w-full px-4 py-3 bg-dark-900/50 border-2 border-white/10 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500/50 outline-none transition-all text-dark-100 placeholder-dark-500"
-                disabled={loading}
-              />
-              <button
-                onClick={handleAddClick}
-                disabled={loading || !itemForm.item.trim()}
-                className="w-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-lg hover:shadow-glow-green font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
-              >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                {loading ? 'Ajout...' : 'Ajouter à ma liste'}
-              </button>
-            </div>
-          </div>
-
-          {/* ===== ASSISTANT IA EN DEUXIÈME ===== */}
-          <AIGiftSuggestions
-            onAddToList={handleAddFromAI}
-            currentUser={currentUser}
-          />
-
-          {/* Instructions */}
+          {/* Instructions de modification */}
           {items.length > 0 && (
-            <div className="mb-4 p-3 bg-gradient-to-r from-gold/10 to-primary/10 border border-gold/30 rounded-lg backdrop-blur-sm">
-              <p className="text-sm text-gold flex items-center gap-2">
-                <GripVertical className="w-4 h-4" />
-                <span className="hidden md:inline">Utilisez ☰ pour réorganiser • Cliquez sur ✏️ pour modifier</span>
+            <div className="mb-4 p-3 bg-gradient-to-r from-blue-900/20 to-blue-800/20 border border-blue-500/30 rounded-lg backdrop-blur-sm">
+              <p className="text-sm text-blue-400 flex items-center gap-2">
+                <Edit2 className="w-4 h-4" />
+                <span className="hidden md:inline">Utilisez ☰ pour réorganiser • Cliquez sur ✏️ pour modifier vos articles</span>
                 <span className="md:hidden">Maintenez ☰ pour déplacer • ✏️ pour modifier</span>
               </p>
             </div>
@@ -292,45 +234,15 @@ const WishlistView = ({
             <div className="text-center py-12 bg-gradient-to-br from-dark-700/30 to-dark-800/30 backdrop-blur-sm rounded-xl border border-white/5">
               <ListIcon className="w-16 h-16 text-dark-600 mx-auto mb-4 animate-float" />
               <p className="text-dark-400 flex items-center justify-center gap-2">
-                Aucun article dans votre liste
+                Votre liste est vide
               </p>
-              <p className="text-dark-500 text-sm mt-2">Utilisez l'IA ou ajoutez manuellement ! 🎁</p>
+              <p className="text-dark-500 text-sm mt-2">
+                La période d'ajout est terminée
+              </p>
             </div>
           )}
         </div>
       </div>
-
-      {/* Modal de confirmation */}
-      <ConfirmationModal
-        isOpen={showConfirmModal}
-        onClose={() => {
-          setShowConfirmModal(false);
-          setPendingItem(null);
-        }}
-        onConfirm={confirmAddItem}
-        title="Ajouter cet article ?"
-        message={
-          <div className="space-y-3">
-            <p className="font-semibold text-dark-100">
-              "{pendingItem?.name}"
-            </p>
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-              <p className="text-sm text-red-400 font-medium mb-2">
-                ⚠️ Attention : Impossible de supprimer après ajout
-              </p>
-              <p className="text-xs text-red-300">
-                Vous pourrez seulement modifier le nom et le lien, mais l'article restera dans votre liste de façon permanente.
-              </p>
-            </div>
-            <p className="text-sm text-dark-400">
-              Êtes-vous sûr de vouloir ajouter cet article ?
-            </p>
-          </div>
-        }
-        confirmText="Ajouter"
-        cancelText="Annuler"
-        type="warning"
-      />
     </>
   );
 };
