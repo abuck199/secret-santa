@@ -23,7 +23,6 @@ import PageHeader from '../components/PageHeader';
 import { InlineLoading } from '../components/Loading';
 import ConfirmModal from '../components/ConfirmModal';
 import WishlistItem from '../components/WishlistItem';
-import AIGiftSuggestions from '../components/AIGiftSuggestions';
 import { normalizeUrl } from '../lib/url';
 
 const MAX_ITEMS = 50;
@@ -183,8 +182,6 @@ export default function WishlistView() {
           {items.length}/{MAX_ITEMS}
         </p>
       </div>
-
-      <AIGiftSuggestions onAdd={(idea) => addItem(idea)} />
 
       {/* List */}
       {loading ? (

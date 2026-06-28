@@ -9,8 +9,9 @@ function detectInitialLang() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && SUPPORTED.includes(saved)) return saved;
   } catch (_) {}
-  // Default to French; users can switch with the EN/FR toggle (choice is saved).
-  return 'fr';
+  // Follow the browser language; fall back to French when it isn't English.
+  const nav = (typeof navigator !== 'undefined' && navigator.language) || '';
+  return nav.toLowerCase().startsWith('en') ? 'en' : 'fr';
 }
 
 const I18nContext = createContext({

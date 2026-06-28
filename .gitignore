@@ -1,9 +1,14 @@
-# Dependency directories
+# Dependencies
 node_modules/
+
+# Env files
 .env
+.env.local
 !.env.sample
 
-/build
+# Build output (Vite)
+/dist
 
-# dependencies
-/node_modules
+# Misc
+.DS_Store
+*.log

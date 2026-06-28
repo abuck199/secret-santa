@@ -110,7 +110,6 @@ export const translations = {
     'wishlist.max': 'You reached the maximum of {max} items',
     'wishlist.dragHint': 'Drag to reorder',
     'wishlist.openLink': 'Open link',
-    'wishlist.aiSuggest': 'AI gift ideas',
 
     'members.title': 'Members & lists',
     'members.subtitle': 'Browse wishlists and reserve a gift. Reservations are hidden from the recipient.',
@@ -303,7 +302,6 @@ export const translations = {
     'wishlist.max': 'Vous avez atteint la limite de {max} articles',
     'wishlist.dragHint': 'Glissez pour réorganiser',
     'wishlist.openLink': 'Ouvrir le lien',
-    'wishlist.aiSuggest': "Idées cadeaux IA",
 
     'members.title': 'Membres et listes',
     'members.subtitle': 'Parcourez les listes et réservez un cadeau. Les réservations sont cachées au destinataire.',

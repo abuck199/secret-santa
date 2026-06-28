@@ -10,23 +10,25 @@ are never duplicates — and never any spoilers for the recipient. An optional
 - 📝 **Wishlists** with drag-and-drop ordering and optional links
 - 🤫 **Anonymous reservations** — recipients never see what's reserved
 - 🎲 **Optional Secret Santa** draw (admin-controlled, per household)
-- 🤖 **AI gift ideas** (Google Gemini, optional)
 - 🌍 **Bilingual** — English / French toggle
 - 🔐 **Supabase Auth** (email + password) with Row-Level Security; the browser
   only ever uses the public anon key
 
 ## Stack
 
-React 19 (CRA) · Tailwind CSS · Supabase (Postgres + Auth + RLS) ·
-@dnd-kit · lucide-react · react-hot-toast · Google Gemini (optional)
+React 19 + Vite · Tailwind CSS · Supabase (Postgres + Auth + RLS) ·
+@dnd-kit · lucide-react · react-hot-toast
 
 ## Setup
 
 ```bash
 npm install
 cp .env.sample .env   # then fill in your Supabase URL + anon key
-npm start
+npm run dev           # Vite dev server on http://localhost:3000
 ```
+
+Other scripts: `npm run build` (production build to `dist/`) and
+`npm run preview` (serve the built app locally).
 
 ### 1. Database
 
@@ -47,9 +49,8 @@ SECURITY DEFINER RPCs the app relies on.
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `REACT_APP_SUPABASE_URL` | yes | Supabase project URL |
-| `REACT_APP_SUPABASE_ANON_KEY` | yes | Public anon key |
-| `REACT_APP_GEMINI_API_KEY` | no | Enables the AI gift-idea helper |
+| `VITE_SUPABASE_URL` | yes | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | yes | Public anon / publishable key |
 
 ## Security model
 
