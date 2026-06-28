@@ -1,27 +1,27 @@
 import React from 'react';
 
-export default function PageHeader({ title, subtitle, icon: Icon, action }) {
+export default function PageHeader({ title, subtitle, eyebrow, action }) {
   return (
-    <div className="flex items-start justify-between gap-4 mb-6">
-      <div className="flex items-start gap-3">
-        {Icon && (
-          <span className="hidden sm:grid place-items-center w-11 h-11 rounded-2xl bg-brand-100 text-brand-600 shrink-0">
-            <Icon className="w-6 h-6" />
-          </span>
+    <div className="flex items-end justify-between gap-4 mb-8">
+      <div>
+        {eyebrow && (
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold mb-2">
+            {eyebrow}
+          </p>
         )}
-        <div>
-          <h1 className="text-2xl font-extrabold text-ink-900 tracking-tight">{title}</h1>
-          {subtitle && <p className="text-ink-500 text-sm mt-1 max-w-xl">{subtitle}</p>}
-        </div>
+        <h1 className="font-serif text-[22px] sm:text-2xl font-medium tracking-tight text-fg leading-tight">
+          {title}
+        </h1>
+        {subtitle && <p className="text-mute text-sm mt-2 max-w-xl leading-relaxed">{subtitle}</p>}
       </div>
-      {action}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }
 
 export function Page({ children, className = '' }) {
   return (
-    <div className={`max-w-5xl mx-auto px-4 py-6 sm:py-8 animate-fade-in ${className}`}>
+    <div className={`max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 animate-fade-in ${className}`}>
       {children}
     </div>
   );

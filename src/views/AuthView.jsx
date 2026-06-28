@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, Cake, ArrowLeft, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
 import * as api from '../lib/api';
 import Brand from '../components/Brand';
 import LanguageToggle from '../components/LanguageToggle';
+import ThemeToggle from '../components/ThemeToggle';
+import DatePicker from '../components/DatePicker';
 
 export default function AuthView() {
   const { t } = useI18n();
@@ -13,20 +15,13 @@ export default function AuthView() {
   const [loading, setLoading] = useState(false);
   const [confirmEmail, setConfirmEmail] = useState(null);
 
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-    displayName: '',
-    birthday: '',
-  });
-
+  const [form, setForm] = useState({ email: '', password: '', displayName: '', birthday: '' });
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
   function readableError(err) {
     const msg = (err && err.message) || '';
     if (/invalid login credentials/i.test(msg)) return t('auth.invalidCreds');
-    if (/already registered|already exists/i.test(msg))
-      return t('auth.haveAccount');
+    if (/already registered|already exists/i.test(msg)) return t('auth.haveAccount');
     return msg || t('err.generic');
   }
 
@@ -36,7 +31,6 @@ export default function AuthView() {
     setLoading(true);
     try {
       await api.signIn({ email: form.email.trim(), password: form.password });
-      // AuthContext picks up the session via onAuthStateChange.
     } catch (err) {
       toast.error(readableError(err));
     } finally {
@@ -46,8 +40,7 @@ export default function AuthView() {
 
   async function handleSignUp(e) {
     e.preventDefault();
-    if (!form.email || !form.password || !form.displayName.trim())
-      return toast.error(t('common.required'));
+    if (!form.email || !form.password || !form.displayName.trim()) return toast.error(t('common.required'));
     if (form.password.length < 6) return toast.error(t('auth.passwordShort'));
     setLoading(true);
     try {
@@ -57,10 +50,7 @@ export default function AuthView() {
         displayName: form.displayName.trim(),
         birthday: form.birthday || null,
       });
-      // If email confirmation is required there is no session yet.
-      if (!res.session) {
-        setConfirmEmail(form.email.trim());
-      }
+      if (!res.session) setConfirmEmail(form.email.trim());
     } catch (err) {
       toast.error(readableError(err));
     } finally {
@@ -87,13 +77,11 @@ export default function AuthView() {
     return (
       <AuthShell>
         <div className="text-center animate-scale-in">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 grid place-items-center mb-4">
-            <Mail className="w-7 h-7" />
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-goldsoft text-gold grid place-items-center mb-4">
+            <Mail className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-ink-900 mb-2">
-            {t('auth.checkEmail')}
-          </h2>
-          <p className="text-ink-500 text-sm mb-6">
+          <h2 className="font-serif text-xl font-medium text-fg mb-2">{t('auth.checkEmail')}</h2>
+          <p className="text-mute text-sm mb-6 leading-relaxed">
             {t('auth.confirmSent', { email: confirmEmail })}
           </p>
           <button
@@ -117,39 +105,27 @@ export default function AuthView() {
           <button
             type="button"
             onClick={() => setMode('signin')}
-            className="flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-700 mb-4"
+            className="flex items-center gap-1.5 text-sm text-mute hover:text-fg mb-4"
           >
             <ArrowLeft className="w-4 h-4" /> {t('common.back')}
           </button>
-          <h2 className="text-xl font-bold text-ink-900 mb-1">
-            {t('auth.forgotTitle')}
-          </h2>
-          <p className="text-ink-500 text-sm mb-5">{t('auth.forgotSubtitle')}</p>
-          <Field
-            icon={Mail}
-            type="email"
-            label={t('auth.email')}
-            value={form.email}
-            onChange={set('email')}
-            autoComplete="email"
-          />
+          <h2 className="font-serif text-xl font-medium text-fg mb-1">{t('auth.forgotTitle')}</h2>
+          <p className="text-mute text-sm mb-5">{t('auth.forgotSubtitle')}</p>
+          <Field icon={Mail} type="email" label={t('auth.email')} value={form.email} onChange={set('email')} autoComplete="email" />
           <button className="btn-primary w-full mt-5" disabled={loading}>
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('auth.sendReset')}
           </button>
         </form>
       ) : (
-        <form
-          onSubmit={mode === 'signin' ? handleSignIn : handleSignUp}
-          className="animate-scale-in"
-        >
-          <div className="flex gap-1 p-1 bg-ink-100 rounded-xl mb-6">
+        <form onSubmit={mode === 'signin' ? handleSignIn : handleSignUp} className="animate-scale-in">
+          <div className="flex gap-1 p-1 bg-panel-2 rounded-xl mb-6">
             {['signin', 'signup'].map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setMode(m)}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition ${
-                  mode === m ? 'bg-white text-brand-700 shadow-sm' : 'text-ink-500'
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+                  mode === m ? 'bg-panel text-fg shadow-soft' : 'text-mute'
                 }`}
               >
                 {m === 'signin' ? t('auth.signin') : t('auth.signup')}
@@ -158,28 +134,15 @@ export default function AuthView() {
           </div>
 
           {mode === 'signup' && (
-            <Field
-              icon={User}
-              label={t('auth.displayName')}
-              value={form.displayName}
-              onChange={set('displayName')}
-              autoComplete="name"
-            />
+            <Field icon={User} label={t('auth.displayName')} value={form.displayName} onChange={set('displayName')} autoComplete="name" />
           )}
 
-          <Field
-            icon={Mail}
-            type="email"
-            label={t('auth.email')}
-            value={form.email}
-            onChange={set('email')}
-            autoComplete="email"
-          />
+          <Field icon={Mail} type="email" label={t('auth.email')} value={form.email} onChange={set('email')} autoComplete="email" />
 
           <div className="mb-4">
             <label className="label">{t('auth.password')}</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={form.password}
@@ -191,7 +154,7 @@ export default function AuthView() {
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-fg"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -199,22 +162,19 @@ export default function AuthView() {
           </div>
 
           {mode === 'signup' && (
-            <Field
-              icon={Cake}
-              type="date"
-              label={`${t('auth.birthday')} (${t('common.optional')})`}
-              value={form.birthday}
-              onChange={set('birthday')}
-            />
+            <div className="mb-4">
+              <label className="label">{`${t('auth.birthday')} (${t('common.optional')})`}</label>
+              <DatePicker
+                value={form.birthday}
+                onChange={(v) => setForm((p) => ({ ...p, birthday: v }))}
+                placeholder={t('auth.birthday')}
+              />
+            </div>
           )}
 
           {mode === 'signin' && (
             <div className="text-right -mt-1 mb-3">
-              <button
-                type="button"
-                onClick={() => setMode('forgot')}
-                className="text-sm link"
-              >
+              <button type="button" onClick={() => setMode('forgot')} className="text-sm link">
                 {t('auth.forgot')}
               </button>
             </div>
@@ -238,22 +198,23 @@ export default function AuthView() {
 function AuthShell({ children }) {
   const { t } = useI18n();
   return (
-    <div className="min-h-screen bg-ink-50 bg-mesh flex flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="flex items-center justify-between mb-6">
+    <div className="min-h-screen bg-paper flex flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm">
+        <div className="flex items-center justify-between mb-7">
           <Brand size="md" />
-          <LanguageToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <LanguageToggle />
+          </div>
         </div>
         <div className="card p-6 sm:p-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-extrabold text-ink-900">
-              {t('auth.welcome')}
-            </h1>
-            <p className="text-ink-500 text-sm mt-1">{t('auth.subtitle')}</p>
+            <h1 className="font-serif text-2xl font-medium tracking-tight text-fg">{t('auth.welcome')}</h1>
+            <p className="text-mute text-sm mt-1.5">{t('auth.subtitle')}</p>
           </div>
           {children}
         </div>
-        <p className="text-center text-xs text-ink-400 mt-6">{t('app.tagline')}</p>
+        <p className="text-center text-xs text-mute mt-6">{t('app.tagline')}</p>
       </div>
     </div>
   );
@@ -264,9 +225,7 @@ function Field({ icon: Icon, label, type = 'text', ...props }) {
     <div className="mb-4">
       <label className="label">{label}</label>
       <div className="relative">
-        {Icon && (
-          <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-400" />
-        )}
+        {Icon && <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" />}
         <input type={type} className={`input ${Icon ? 'pl-11' : ''}`} {...props} />
       </div>
     </div>

@@ -9,17 +9,13 @@ export default function LanguageToggle({ className = '' }) {
     { code: 'fr', label: 'FR' },
   ];
   return (
-    <div
-      className={`inline-flex items-center rounded-full bg-ink-100 p-0.5 ${className}`}
-    >
+    <div className={`inline-flex items-center rounded-full border border-line p-0.5 ${className}`}>
       {langs.map((l) => (
         <button
           key={l.code}
           onClick={() => setLang(l.code)}
-          className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${
-            lang === l.code
-              ? 'bg-white text-brand-700 shadow-sm'
-              : 'text-ink-500 hover:text-ink-700'
+          className={`px-2.5 py-1 rounded-full text-xs font-semibold transition ${
+            lang === l.code ? 'bg-fg text-paper' : 'text-mute hover:text-fg'
           }`}
           aria-pressed={lang === l.code}
         >

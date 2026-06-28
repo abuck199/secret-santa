@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelpCircle, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 import { Page } from '../components/PageHeader';
 import PageHeader from '../components/PageHeader';
@@ -11,7 +11,7 @@ export default function FaqView() {
 
   return (
     <Page>
-      <PageHeader icon={HelpCircle} title={t('faq.title')} />
+      <PageHeader eyebrow={t('nav.faq')} title={t('faq.title')} />
       <div className="space-y-2">
         {faqs.map((f, i) => (
           <div key={i} className="card overflow-hidden">
@@ -19,17 +19,13 @@ export default function FaqView() {
               onClick={() => setOpen(open === i ? -1 : i)}
               className="w-full flex items-center justify-between gap-3 p-4 text-left"
             >
-              <span className="font-semibold text-ink-900">{f.q}</span>
+              <span className="font-medium text-fg">{f.q}</span>
               <ChevronDown
-                className={`w-5 h-5 text-ink-400 transition-transform shrink-0 ${
-                  open === i ? 'rotate-180' : ''
-                }`}
+                className={`w-5 h-5 text-mute transition-transform shrink-0 ${open === i ? 'rotate-180' : ''}`}
               />
             </button>
             {open === i && (
-              <p className="px-4 pb-4 -mt-1 text-sm text-ink-500 leading-relaxed animate-fade-in">
-                {f.a}
-              </p>
+              <p className="px-4 pb-4 -mt-1 text-sm text-mute leading-relaxed animate-fade-in">{f.a}</p>
             )}
           </div>
         ))}

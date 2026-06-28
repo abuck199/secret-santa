@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import * as api from '../lib/api';
 import Brand from '../components/Brand';
 import LanguageToggle from '../components/LanguageToggle';
+import ThemeToggle from '../components/ThemeToggle';
 
 // Shown when a signed-in user belongs to no household yet. Also reachable from
 // the nav ("New / join household") via the `embedded` + `onDone` props.
@@ -53,19 +54,19 @@ export default function OnboardingView({ embedded = false, onDone }) {
 
   const body = (
     <div className="card p-6 sm:p-8 animate-scale-in">
-      <div className="flex gap-1 p-1 bg-ink-100 rounded-xl mb-6">
+      <div className="flex gap-1 p-1 bg-panel-2 rounded-xl mb-6">
         <button
           onClick={() => setTab('create')}
-          className={`flex-1 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-            tab === 'create' ? 'bg-white text-brand-700 shadow-sm' : 'text-ink-500'
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
+            tab === 'create' ? 'bg-panel text-fg shadow-soft' : 'text-mute'
           }`}
         >
           <Home className="w-4 h-4" /> {t('onboard.createTab')}
         </button>
         <button
           onClick={() => setTab('join')}
-          className={`flex-1 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-            tab === 'join' ? 'bg-white text-brand-700 shadow-sm' : 'text-ink-500'
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
+            tab === 'join' ? 'bg-panel text-fg shadow-soft' : 'text-mute'
           }`}
         >
           <Ticket className="w-4 h-4" /> {t('onboard.joinTab')}
@@ -105,31 +106,34 @@ export default function OnboardingView({ embedded = false, onDone }) {
 
   if (embedded) {
     return (
-      <div className="max-w-md mx-auto px-4 py-8">
-        <h1 className="text-2xl font-extrabold text-ink-900 mb-1">
+      <div className="max-w-sm mx-auto px-4 py-10">
+        <h1 className="font-serif text-2xl font-medium tracking-tight text-fg mb-1">
           {t('nav.newHousehold')}
         </h1>
-        <p className="text-ink-500 text-sm mb-6">{t('onboard.subtitle')}</p>
+        <p className="text-mute text-sm mb-6">{t('onboard.subtitle')}</p>
         {body}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-ink-50 bg-mesh flex flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="flex items-center justify-between mb-6">
+    <div className="min-h-screen bg-paper flex flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm">
+        <div className="flex items-center justify-between mb-7">
           <Brand size="md" />
-          <LanguageToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <LanguageToggle />
+          </div>
         </div>
         <div className="mb-5">
-          <h1 className="text-2xl font-extrabold text-ink-900">{t('onboard.title')}</h1>
-          <p className="text-ink-500 text-sm mt-1">{t('onboard.subtitle')}</p>
+          <h1 className="font-serif text-2xl font-medium tracking-tight text-fg">{t('onboard.title')}</h1>
+          <p className="text-mute text-sm mt-1.5">{t('onboard.subtitle')}</p>
         </div>
         {body}
         <button
           onClick={signOut}
-          className="mx-auto mt-6 flex items-center gap-2 text-sm text-ink-400 hover:text-ink-600"
+          className="mx-auto mt-6 flex items-center gap-2 text-sm text-mute hover:text-fg"
         >
           <LogOut className="w-4 h-4" /> {t('auth.signOut')}
         </button>

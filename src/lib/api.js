@@ -189,6 +189,8 @@ export async function getMyItems(householdId) {
 
 export async function addItem({ householdId, item, link, displayOrder }) {
   const uid = await currentUserId();
+  // Only return the columns the `authenticated` role is granted — selecting
+  // `*` would touch the masked `reserved_by` column and be denied.
   return unwrap(
     await supabase
       .from('wishlist_items')
@@ -199,7 +201,7 @@ export async function addItem({ householdId, item, link, displayOrder }) {
         link: link || null,
         display_order: displayOrder ?? 0,
       })
-      .select()
+      .select('id, item, link, display_order')
       .single()
   );
 }
@@ -210,7 +212,7 @@ export async function updateItem(id, { item, link }) {
       .from('wishlist_items')
       .update({ item, link: link || null })
       .eq('id', id)
-      .select()
+      .select('id, item, link, display_order')
       .single()
   );
 }

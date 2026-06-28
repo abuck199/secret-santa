@@ -17,26 +17,20 @@ export default function ConfirmModal({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-      <div
-        className="absolute inset-0 bg-ink-900/40 backdrop-blur-sm animate-fade-in"
-        onClick={onCancel}
-      />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={onCancel} />
       <div className="relative card p-6 w-full max-w-sm animate-scale-in">
-        <button
-          onClick={onCancel}
-          className="absolute right-4 top-4 text-ink-400 hover:text-ink-600"
-        >
+        <button onClick={onCancel} className="absolute right-4 top-4 text-mute hover:text-fg">
           <X className="w-5 h-5" />
         </button>
         <div
           className={`w-11 h-11 rounded-xl grid place-items-center mb-3 ${
-            danger ? 'bg-accent-100 text-accent-600' : 'bg-brand-100 text-brand-600'
+            danger ? 'bg-red-500/10 text-red-600' : 'bg-goldsoft text-gold'
           }`}
         >
           <AlertTriangle className="w-6 h-6" />
         </div>
-        <h3 className="text-lg font-bold text-ink-900">{title}</h3>
-        {message && <p className="text-sm text-ink-500 mt-1.5">{message}</p>}
+        <h3 className="font-serif text-xl font-semibold text-fg">{title}</h3>
+        {message && <p className="text-sm text-mute mt-1.5 leading-relaxed">{message}</p>}
         <div className="flex gap-2 mt-5">
           <button className="btn-secondary flex-1" onClick={onCancel} disabled={loading}>
             {t('common.cancel')}

@@ -63,12 +63,14 @@ export default function App() {
       toastOptions={{
         style: {
           borderRadius: '12px',
-          background: '#0f172a',
-          color: '#fff',
+          background: 'rgb(var(--fg))',
+          color: 'rgb(var(--paper))',
           fontSize: '14px',
           fontWeight: 500,
+          padding: '10px 14px',
         },
-        success: { iconTheme: { primary: '#7c3aed', secondary: '#fff' } },
+        success: { iconTheme: { primary: 'rgb(var(--gold))', secondary: 'rgb(var(--paper))' } },
+        error: { iconTheme: { primary: '#e5484d', secondary: 'rgb(var(--paper))' } },
       }}
     />
   );
@@ -84,7 +86,7 @@ export default function App() {
     content = <OnboardingView />;
   } else {
     content = (
-      <div className="min-h-screen bg-ink-50 flex flex-col pb-24 md:pb-0">
+      <div className="min-h-screen bg-paper flex flex-col pb-24 md:pb-0">
         <NavBar view={view} setView={setView} />
         <main className="flex-1 w-full">
           {view === 'dashboard' && <DashboardView setView={setView} />}

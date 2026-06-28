@@ -12,8 +12,10 @@ export default function WishlistItem({ item, onSave, onDelete, disabled }) {
   const [name, setName] = useState(item.item);
   const [link, setLink] = useState(item.link || '');
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: item.id, disabled: editing || disabled });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+    disabled: editing || disabled,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -34,7 +36,7 @@ export default function WishlistItem({ item, onSave, onDelete, disabled }) {
 
   if (editing) {
     return (
-      <div ref={setNodeRef} style={style} className="card p-3 sm:p-4">
+      <div ref={setNodeRef} style={style} className="card p-4">
         <input
           className="input mb-2"
           value={name}
@@ -66,44 +68,44 @@ export default function WishlistItem({ item, onSave, onDelete, disabled }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`card p-3 sm:p-4 flex items-center gap-3 ${
-        isDragging ? 'shadow-card ring-2 ring-brand-200' : ''
+      className={`group card px-3 sm:px-4 py-3.5 flex items-center gap-3 transition ${
+        isDragging ? 'shadow-card ring-1 ring-gold/40' : 'hover:border-line'
       }`}
     >
       <button
         {...attributes}
         {...listeners}
-        className="text-ink-300 hover:text-ink-500 cursor-grab active:cursor-grabbing touch-none"
+        className="text-line group-hover:text-mute hover:!text-fg cursor-grab active:cursor-grabbing touch-none transition"
         title={t('wishlist.dragHint')}
       >
         <GripVertical className="w-5 h-5" />
       </button>
 
       <div className="min-w-0 flex-1">
-        <p className="font-semibold text-ink-900 break-words">{item.item}</p>
+        <p className="font-medium text-fg break-words">{item.item}</p>
         {item.link && (
           <a
             href={item.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-brand-600 hover:underline mt-0.5"
+            className="inline-flex items-center gap-1 text-xs text-mute hover:text-gold transition mt-0.5"
           >
             <ExternalLink className="w-3 h-3" /> {hostOf(item.link)}
           </a>
         )}
       </div>
 
-      <div className="flex items-center gap-1 shrink-0">
+      <div className="flex items-center gap-0.5 shrink-0 opacity-60 group-hover:opacity-100 transition">
         <button
           onClick={() => setEditing(true)}
-          className="p-2 rounded-lg text-ink-400 hover:text-brand-600 hover:bg-brand-50"
+          className="p-2 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
           title={t('common.edit')}
         >
           <Pencil className="w-4 h-4" />
         </button>
         <button
           onClick={() => onDelete(item)}
-          className="p-2 rounded-lg text-ink-400 hover:text-accent-600 hover:bg-accent-50"
+          className="p-2 rounded-lg text-mute hover:text-red-600 hover:bg-red-500/10"
           title={t('common.delete')}
         >
           <Trash2 className="w-4 h-4" />

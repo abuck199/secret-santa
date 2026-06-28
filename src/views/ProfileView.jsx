@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Save, Lock, Loader2, Globe } from 'lucide-react';
+import { Save, Lock, Loader2, Globe, Sun } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +7,8 @@ import * as api from '../lib/api';
 import { Page } from '../components/PageHeader';
 import PageHeader from '../components/PageHeader';
 import LanguageToggle from '../components/LanguageToggle';
+import ThemeToggle from '../components/ThemeToggle';
+import DatePicker from '../components/DatePicker';
 
 export default function ProfileView() {
   const { t } = useI18n();
@@ -58,30 +60,20 @@ export default function ProfileView() {
 
   return (
     <Page>
-      <PageHeader icon={User} title={t('profile.title')} />
+      <PageHeader eyebrow={t('nav.profile')} title={t('profile.title')} />
 
       <form onSubmit={saveProfile} className="card p-5 mb-4">
         <div className="mb-4">
           <label className="label">{t('profile.displayName')}</label>
-          <input
-            className="input"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            maxLength={60}
-          />
+          <input className="input" value={displayName} onChange={(e) => setDisplayName(e.target.value)} maxLength={60} />
         </div>
         <div className="mb-2">
           <label className="label">{t('profile.birthday')}</label>
-          <input
-            type="date"
-            className="input"
-            value={birthday || ''}
-            onChange={(e) => setBirthday(e.target.value)}
-          />
-          <p className="text-xs text-ink-400 mt-1.5">{t('profile.birthdayHint')}</p>
+          <DatePicker value={birthday} onChange={setBirthday} placeholder={t('profile.birthday')} />
+          <p className="text-xs text-mute mt-1.5">{t('profile.birthdayHint')}</p>
         </div>
         <div className="flex items-center justify-between mt-4">
-          <p className="text-xs text-ink-400">{user?.email}</p>
+          <p className="text-xs text-mute">{user?.email}</p>
           <button className="btn-primary" disabled={savingProfile}>
             {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {t('common.save')}
@@ -90,15 +82,23 @@ export default function ProfileView() {
       </form>
 
       <div className="card p-5 mb-4">
-        <h2 className="font-bold text-ink-900 mb-3 flex items-center gap-2">
-          <Globe className="w-4 h-4 text-brand-600" /> {t('profile.language')}
-        </h2>
-        <LanguageToggle />
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="font-serif text-lg font-medium text-fg flex items-center gap-2">
+            <Sun className="w-[18px] h-[18px] text-gold" /> {t('profile.language')}
+          </h2>
+          <ThemeToggle />
+        </div>
+        <div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t border-line">
+          <span className="text-sm text-mute flex items-center gap-2">
+            <Globe className="w-4 h-4" /> {t('lang.label')}
+          </span>
+          <LanguageToggle />
+        </div>
       </div>
 
       <form onSubmit={changePassword} className="card p-5">
-        <h2 className="font-bold text-ink-900 mb-3 flex items-center gap-2">
-          <Lock className="w-4 h-4 text-brand-600" /> {t('profile.changePassword')}
+        <h2 className="font-serif text-lg font-medium text-fg mb-3 flex items-center gap-2">
+          <Lock className="w-[18px] h-[18px] text-gold" /> {t('profile.changePassword')}
         </h2>
         <div className="mb-3">
           <label className="label">{t('auth.newPassword')}</label>

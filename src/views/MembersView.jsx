@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Search, ExternalLink, Gift, Check, Loader2, Cake } from 'lucide-react';
+import { Search, ExternalLink, Gift, Check, Loader2, Cake } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
 import { useAuth } from '../context/AuthContext';
@@ -72,7 +72,6 @@ export default function MembersView() {
         toast.success(t('members.reservedToast'));
       }
     } catch (e) {
-      // Most likely someone else grabbed it first — refresh to show truth.
       toast.error(t('members.takenToast'));
       load();
     } finally {
@@ -87,7 +86,6 @@ export default function MembersView() {
   const q = query.trim().toLowerCase();
   const visibleMembers = useMemo(() => {
     const ordered = [...members].sort((a, b) => {
-      // Put "me" last so others' lists are front and center.
       if (a.userId === user?.id) return 1;
       if (b.userId === user?.id) return -1;
       return a.displayName.localeCompare(b.displayName);
@@ -95,18 +93,16 @@ export default function MembersView() {
     if (!q) return ordered;
     return ordered.filter((m) => {
       if (m.displayName.toLowerCase().includes(q)) return true;
-      return (itemsByUser[m.userId] || []).some((it) =>
-        it.item.toLowerCase().includes(q)
-      );
+      return (itemsByUser[m.userId] || []).some((it) => it.item.toLowerCase().includes(q));
     });
   }, [members, itemsByUser, q, user]);
 
   return (
     <Page>
-      <PageHeader icon={Users} title={t('members.title')} subtitle={t('members.subtitle')} />
+      <PageHeader eyebrow={t('nav.members')} title={t('members.title')} subtitle={t('members.subtitle')} />
 
-      <div className="relative mb-5">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-400" />
+      <div className="relative mb-6">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" />
         <input
           className="input pl-11"
           value={query}
@@ -119,27 +115,29 @@ export default function MembersView() {
         <InlineLoading />
       ) : (
         <div className="space-y-4">
-          {visibleMembers.map((m) => {
+          {visibleMembers.map((m, idx) => {
             const isMe = m.userId === user?.id;
             const items = itemsByUser[m.userId] || [];
             return (
-              <div key={m.userId} className="card p-4 sm:p-5">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-brand-gradient text-white font-bold grid place-items-center">
+              <div
+                key={m.userId}
+                className="card p-5 sm:p-6 animate-slide-up"
+                style={{ animationDelay: `${Math.min(idx, 8) * 50}ms`, animationFillMode: 'backwards' }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-fg text-paper font-medium grid place-items-center">
                     {(m.displayName[0] || '?').toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-ink-900 truncate">
-                      {m.displayName}{' '}
-                      {isMe && <span className="text-ink-400 font-normal">({t('common.you')})</span>}
+                    <p className="font-medium text-fg truncate flex items-center gap-2">
+                      {m.displayName}
+                      {isMe && <span className="text-mute font-normal">· {t('common.you')}</span>}
                       {m.role === 'admin' && (
-                        <span className="chip bg-brand-100 text-brand-700 ml-1 align-middle">
-                          {t('common.admin')}
-                        </span>
+                        <span className="chip bg-panel-2 text-mute border border-line">{t('common.admin')}</span>
                       )}
                     </p>
                     {m.birthday && (
-                      <p className="text-xs text-ink-400 flex items-center gap-1">
+                      <p className="text-xs text-mute flex items-center gap-1 mt-0.5">
                         <Cake className="w-3 h-3" /> {formatBirthday(m.birthday, lang)}
                       </p>
                     )}
@@ -147,24 +145,16 @@ export default function MembersView() {
                 </div>
 
                 {items.length === 0 ? (
-                  <p className="text-sm text-ink-400 pl-1">{t('members.noItems')}</p>
+                  <p className="text-sm text-mute pl-1">{t('members.noItems')}</p>
                 ) : (
                   <div className="space-y-2">
                     {items.map((it) => (
-                      <ItemRow
-                        key={it.id}
-                        item={it}
-                        isMe={isMe}
-                        busy={busy.has(it.id)}
-                        onToggle={() => toggleReserve(it)}
-                      />
+                      <ItemRow key={it.id} item={it} isMe={isMe} busy={busy.has(it.id)} onToggle={() => toggleReserve(it)} />
                     ))}
                   </div>
                 )}
 
-                {isMe && (
-                  <p className="text-xs text-ink-400 mt-3 italic">{t('members.ownList')}</p>
-                )}
+                {isMe && <p className="text-xs text-mute mt-3 italic">{t('members.ownList')}</p>}
               </div>
             );
           })}
@@ -176,13 +166,12 @@ export default function MembersView() {
 
 function ItemRow({ item, isMe, busy, onToggle }) {
   const { t } = useI18n();
-  // On your own list, reservation state is always hidden to keep the surprise.
   const reservedByOther = !isMe && item.is_reserved && !item.reserved_by_me;
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-ink-50/70 border border-ink-100">
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-panel-2 border border-line">
       <div className="min-w-0 flex-1">
-        <p className={`font-medium break-words ${reservedByOther ? 'text-ink-400 line-through' : 'text-ink-900'}`}>
+        <p className={`font-medium break-words ${reservedByOther ? 'text-mute line-through' : 'text-fg'}`}>
           {item.item}
         </p>
         {item.link && (
@@ -190,7 +179,7 @@ function ItemRow({ item, isMe, busy, onToggle }) {
             href={item.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-brand-600 hover:underline mt-0.5"
+            className="inline-flex items-center gap-1 text-xs text-mute hover:text-gold transition mt-0.5"
           >
             <ExternalLink className="w-3 h-3" /> {hostOf(item.link)}
           </a>
@@ -201,20 +190,16 @@ function ItemRow({ item, isMe, busy, onToggle }) {
         <button
           onClick={onToggle}
           disabled={busy}
-          className="chip bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition"
+          className="chip bg-goldsoft text-gold border border-gold/30 hover:opacity-80 transition"
           title={t('members.reservedByYou')}
         >
           {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
           {t('members.reservedByYou')}
         </button>
       ) : reservedByOther ? (
-        <span className="chip bg-ink-100 text-ink-400">{t('members.reserved')}</span>
+        <span className="chip bg-panel text-mute border border-line">{t('members.reserved')}</span>
       ) : (
-        <button
-          onClick={onToggle}
-          disabled={busy}
-          className="btn-primary px-3 py-1.5 text-sm"
-        >
+        <button onClick={onToggle} disabled={busy} className="btn-primary px-3 py-1.5 text-sm">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4" />}
           {busy ? t('members.reserving') : t('members.reserve')}
         </button>

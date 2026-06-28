@@ -13,7 +13,7 @@ import {
   verticalListSortingStrategy,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { ClipboardList, Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, ClipboardList } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
 import { useAuth } from '../context/AuthContext';
@@ -149,13 +149,13 @@ export default function WishlistView() {
   return (
     <Page>
       <PageHeader
-        icon={ClipboardList}
+        eyebrow={t('nav.wishlist')}
         title={t('wishlist.title')}
         subtitle={t('wishlist.subtitle')}
       />
 
       {/* Add form */}
-      <div className="card p-4 mb-4">
+      <div className="card p-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-2">
           <input
             className="input"
@@ -166,7 +166,7 @@ export default function WishlistView() {
             maxLength={200}
           />
           <input
-            className="input sm:max-w-[40%]"
+            className="input sm:max-w-[38%]"
             value={form.link}
             onChange={(e) => setForm((p) => ({ ...p, link: e.target.value }))}
             onKeyDown={(e) => e.key === 'Enter' && addItem()}
@@ -178,8 +178,8 @@ export default function WishlistView() {
             <span className="sm:hidden lg:inline">{t('common.add')}</span>
           </button>
         </div>
-        <p className="text-xs text-ink-400 mt-2 text-right">
-          {items.length}/{MAX_ITEMS}
+        <p className="text-xs text-mute mt-2.5 text-right tabular-nums">
+          {items.length} / {MAX_ITEMS}
         </p>
       </div>
 
@@ -187,18 +187,18 @@ export default function WishlistView() {
       {loading ? (
         <InlineLoading />
       ) : items.length === 0 ? (
-        <div className="card p-10 text-center text-ink-400">{t('wishlist.empty')}</div>
+        <div className="card p-12 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-panel-2 grid place-items-center mx-auto mb-4">
+            <ClipboardList className="w-6 h-6 text-mute" strokeWidth={1.6} />
+          </div>
+          <p className="text-mute">{t('wishlist.empty')}</p>
+        </div>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
             <div className="space-y-2">
               {items.map((item) => (
-                <WishlistItem
-                  key={item.id}
-                  item={item}
-                  onSave={saveItem}
-                  onDelete={setToDelete}
-                />
+                <WishlistItem key={item.id} item={item} onSave={saveItem} onDelete={setToDelete} />
               ))}
             </div>
           </SortableContext>

@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import * as api from '../lib/api';
 import Brand from '../components/Brand';
 import LanguageToggle from '../components/LanguageToggle';
+import ThemeToggle from '../components/ThemeToggle';
 
 // Shown when Supabase emits PASSWORD_RECOVERY (user clicked the email link).
 export default function ResetPasswordView() {
@@ -33,21 +34,24 @@ export default function ResetPasswordView() {
   }
 
   return (
-    <div className="min-h-screen bg-ink-50 bg-mesh flex flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="flex items-center justify-between mb-6">
+    <div className="min-h-screen bg-paper flex flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm">
+        <div className="flex items-center justify-between mb-7">
           <Brand size="md" />
-          <LanguageToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <LanguageToggle />
+          </div>
         </div>
         <form onSubmit={handleSubmit} className="card p-6 sm:p-8 animate-scale-in">
-          <h1 className="text-2xl font-extrabold text-ink-900 mb-5">
+          <h1 className="font-serif text-2xl font-medium tracking-tight text-fg mb-5">
             {t('auth.resetTitle')}
           </h1>
 
           <div className="mb-4">
             <label className="label">{t('auth.newPassword')}</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" />
               <input
                 type={show ? 'text' : 'password'}
                 value={password}
@@ -59,7 +63,7 @@ export default function ResetPasswordView() {
               <button
                 type="button"
                 onClick={() => setShow((s) => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-fg"
               >
                 {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -69,7 +73,7 @@ export default function ResetPasswordView() {
           <div className="mb-5">
             <label className="label">{t('auth.confirmPassword')}</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" />
               <input
                 type={show ? 'text' : 'password'}
                 value={confirm}
@@ -82,11 +86,7 @@ export default function ResetPasswordView() {
           </div>
 
           <button className="btn-primary w-full" disabled={loading}>
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              t('auth.updatePassword')
-            )}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('auth.updatePassword')}
           </button>
         </form>
       </div>

@@ -5,12 +5,12 @@ export default function Footer() {
   const { t } = useI18n();
   const year = new Date().getFullYear();
   return (
-    <footer className="hidden md:block border-t border-ink-200 bg-white/60 mt-12">
-      <div className="max-w-5xl mx-auto px-4 py-6 flex items-center justify-between text-sm text-ink-400">
+    <footer className="hidden md:block border-t border-line mt-16">
+      <div className="max-w-4xl mx-auto px-6 py-6 flex items-center justify-between text-sm text-mute">
         <span>
-          <span className="font-bold text-ink-600">Wishly</span> · {t('app.tagline')}
+          <span className="font-serif font-semibold text-fg">Wishly</span> · {t('app.tagline')}
         </span>
-        <span>© {year}</span>
+        <span className="tabular-nums">© {year}</span>
       </div>
     </footer>
   );

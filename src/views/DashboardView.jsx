@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Cake, ClipboardList, Gift, Users, ArrowRight } from 'lucide-react';
+import { Cake, ClipboardList, Gift, Users, ArrowUpRight } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../lib/api';
 import { Page } from '../components/PageHeader';
-import { InlineLoading } from '../components/Loading';
+import { DashboardSkeleton } from '../components/Skeleton';
+import NextBirthdayCard from '../components/NextBirthdayCard';
+import { useCountUp } from '../lib/useCountUp';
 import { daysUntilBirthday, ageTurningNext, formatBirthday } from '../lib/dates';
 
 export default function DashboardView({ setView }) {
   const { t, lang } = useI18n();
-  const { profile, currentHouseholdId, user } = useAuth();
+  const { profile, currentHousehold, currentHouseholdId, user } = useAuth();
   const [members, setMembers] = useState([]);
   const [myCount, setMyCount] = useState(0);
   const [resCount, setResCount] = useState(0);
@@ -41,13 +43,8 @@ export default function DashboardView({ setView }) {
 
   const birthdays = members
     .filter((m) => m.birthday)
-    .map((m) => ({
-      ...m,
-      days: daysUntilBirthday(m.birthday),
-      age: ageTurningNext(m.birthday),
-    }))
-    .sort((a, b) => a.days - b.days)
-    .slice(0, 6);
+    .map((m) => ({ ...m, days: daysUntilBirthday(m.birthday), age: ageTurningNext(m.birthday) }))
+    .sort((a, b) => a.days - b.days);
 
   function whenLabel(days) {
     if (days === 0) return t('dash.birthdayToday');
@@ -55,119 +52,122 @@ export default function DashboardView({ setView }) {
     return t('dash.birthdayInDays', { days });
   }
 
+  const hero = birthdays[0];
+  const rest = birthdays.slice(1, 6);
+
+  const stats = [
+    { icon: ClipboardList, value: myCount, label: t('nav.wishlist'), to: 'wishlist' },
+    { icon: Gift, value: resCount, label: t('nav.reservations'), to: 'reservations' },
+    { icon: Users, value: members.length, label: t('nav.members'), to: 'members' },
+  ];
+
   return (
     <Page>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-ink-900 tracking-tight mb-6">
-        {t('dash.greeting', { name: profile?.display_name || '' })}
-      </h1>
-
-      {/* Quick stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-        <StatCard
-          icon={ClipboardList}
-          tint="brand"
-          value={myCount}
-          label={t('dash.myListCount', { count: myCount })}
-          onClick={() => setView('wishlist')}
-        />
-        <StatCard
-          icon={Gift}
-          tint="accent"
-          value={resCount}
-          label={t('dash.reservedCount', { count: resCount })}
-          onClick={() => setView('reservations')}
-        />
-        <StatCard
-          icon={Users}
-          tint="emerald"
-          value={members.length}
-          label={t('dash.seeMembers')}
-          onClick={() => setView('members')}
-        />
+      <div className="mb-10">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold mb-2">
+          {currentHousehold?.name}
+        </p>
+        <h1 className="font-serif text-[26px] sm:text-3xl font-medium tracking-tight text-fg leading-tight">
+          {t('dash.greeting', { name: profile?.display_name || '' })}
+        </h1>
       </div>
 
-      {/* Birthdays */}
-      <div className="card p-5 sm:p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Cake className="w-5 h-5 text-accent-500" />
-          <h2 className="text-lg font-bold text-ink-900">{t('dash.upcomingBirthdays')}</h2>
-        </div>
+      {loading ? (
+        <DashboardSkeleton />
+      ) : (
+        <>
+          {/* Hero: next birthday */}
+          {hero && (
+            <NextBirthdayCard
+              person={hero}
+              isMe={hero.userId === user?.id}
+              whenLabel={whenLabel(hero.days)}
+              onView={() => setView('members')}
+            />
+          )}
 
-        {loading ? (
-          <InlineLoading />
-        ) : birthdays.length === 0 ? (
-          <p className="text-sm text-ink-400 py-4">{t('dash.noBirthdays')}</p>
-        ) : (
-          <ul className="divide-y divide-ink-100">
-            {birthdays.map((m) => {
-              const isMe = m.userId === user?.id;
-              const soon = m.days <= 14;
-              return (
-                <li key={m.userId} className="flex items-center gap-3 py-3">
-                  <div
-                    className={`w-10 h-10 rounded-full grid place-items-center font-bold text-white shrink-0 ${
-                      m.days === 0 ? 'bg-accent-500' : 'bg-brand-gradient'
-                    }`}
-                  >
-                    {(m.displayName[0] || '?').toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-ink-900 truncate">
-                      {m.displayName} {isMe && <span className="text-ink-400 font-normal">({t('common.you')})</span>}
-                    </p>
-                    <p className="text-xs text-ink-400">
-                      {formatBirthday(m.birthday, lang)}
-                      {m.age ? ` · ${t('dash.turning', { age: m.age })}` : ''}
-                    </p>
-                  </div>
-                  <span
-                    className={`chip ${
-                      m.days === 0
-                        ? 'bg-accent-100 text-accent-700'
-                        : soon
-                        ? 'bg-brand-100 text-brand-700'
-                        : 'bg-ink-100 text-ink-500'
-                    }`}
-                  >
-                    {whenLabel(m.days)}
-                  </span>
-                  {!isMe && (
-                    <button
-                      onClick={() => setView('members')}
-                      className="hidden sm:inline-flex text-ink-400 hover:text-brand-600"
-                      title={t('dash.viewList')}
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
+          {/* Stats */}
+          <div className="card grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-line mb-10 overflow-hidden">
+            {stats.map(({ icon: Icon, value, label, to }, i) => (
+              <button
+                key={to}
+                onClick={() => setView(to)}
+                className="group flex items-center gap-4 p-5 sm:p-6 text-left hover:bg-panel-2 transition animate-slide-up"
+                style={{ animationDelay: `${i * 70}ms`, animationFillMode: 'backwards' }}
+              >
+                <Icon className="w-5 h-5 text-gold shrink-0" strokeWidth={1.8} />
+                <div className="min-w-0 flex-1">
+                  <StatNumber value={value} />
+                  <p className="text-xs text-mute mt-1.5 uppercase tracking-wide">{label}</p>
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-mute opacity-0 group-hover:opacity-100 transition" />
+              </button>
+            ))}
+          </div>
+
+          {/* More upcoming birthdays */}
+          {!hero ? (
+            <div className="card p-6">
+              <p className="text-sm text-mute">{t('dash.noBirthdays')}</p>
+            </div>
+          ) : rest.length > 0 ? (
+            <>
+              <h2 className="font-serif text-lg font-medium text-fg flex items-center gap-2.5 mb-4">
+                <Cake className="w-[18px] h-[18px] text-gold" strokeWidth={1.8} />
+                {t('dash.upcomingBirthdays')}
+              </h2>
+              <div className="card overflow-hidden">
+                <ul className="divide-y divide-line">
+                  {rest.map((m, i) => {
+                    const isMe = m.userId === user?.id;
+                    const today = m.days === 0;
+                    const soon = m.days <= 14;
+                    return (
+                      <li
+                        key={m.userId}
+                        className="flex items-center gap-4 px-5 sm:px-6 py-4 animate-slide-up"
+                        style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'backwards' }}
+                      >
+                        <div
+                          className={`w-11 h-11 rounded-full grid place-items-center font-serif font-semibold shrink-0 border ${
+                            today ? 'bg-gold text-paper border-gold' : 'bg-panel-2 text-fg border-line'
+                          }`}
+                        >
+                          {(m.displayName[0] || '?').toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-fg truncate">
+                            {m.displayName}{' '}
+                            {isMe && <span className="text-mute font-normal">· {t('common.you')}</span>}
+                          </p>
+                          <p className="text-xs text-mute mt-0.5">
+                            {formatBirthday(m.birthday, lang)}
+                            {m.age ? ` · ${t('dash.turning', { age: m.age })}` : ''}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-sm font-medium tabular-nums ${
+                            today ? 'text-gold' : soon ? 'text-fg' : 'text-mute'
+                          }`}
+                        >
+                          {whenLabel(m.days)}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </>
+          ) : null}
+        </>
+      )}
     </Page>
   );
 }
 
-function StatCard({ icon: Icon, value, label, tint, onClick }) {
-  const tints = {
-    brand: 'bg-brand-100 text-brand-600',
-    accent: 'bg-accent-100 text-accent-600',
-    emerald: 'bg-emerald-100 text-emerald-600',
-  };
+function StatNumber({ value }) {
+  const animated = useCountUp(value);
   return (
-    <button
-      onClick={onClick}
-      className="card p-4 flex items-center gap-3 text-left hover:shadow-card transition"
-    >
-      <span className={`w-11 h-11 rounded-2xl grid place-items-center shrink-0 ${tints[tint]}`}>
-        <Icon className="w-5 h-5" />
-      </span>
-      <div className="min-w-0">
-        <p className="text-2xl font-extrabold text-ink-900 leading-none">{value}</p>
-        <p className="text-xs text-ink-500 mt-1 truncate">{label}</p>
-      </div>
-    </button>
+    <p className="font-serif text-2xl font-medium text-fg leading-none tabular-nums">{animated}</p>
   );
 }

@@ -25,6 +25,8 @@ export const translations = {
     'common.member': 'Member',
     'common.required': 'This field is required',
     'common.somethingWrong': 'Something went wrong. Please try again.',
+    'common.selectDate': 'Select a date',
+    'common.clear': 'Clear',
 
     'lang.label': 'Language',
     'lang.en': 'English',
@@ -87,6 +89,9 @@ export const translations = {
 
     'dash.greeting': 'Hi {name} 👋',
     'dash.upcomingBirthdays': 'Upcoming birthdays',
+    'dash.nextBirthday': 'Next birthday',
+    'dash.dayUnit': 'day',
+    'dash.daysUnit': 'days',
     'dash.noBirthdays': 'No birthdays on file yet. Members can add theirs in their profile.',
     'dash.birthdayToday': 'Today! 🎂',
     'dash.birthdayInDays': 'in {days} days',
@@ -217,6 +222,8 @@ export const translations = {
     'common.member': 'Membre',
     'common.required': 'Ce champ est requis',
     'common.somethingWrong': "Une erreur s'est produite. Veuillez réessayer.",
+    'common.selectDate': 'Choisir une date',
+    'common.clear': 'Effacer',
 
     'lang.label': 'Langue',
     'lang.en': 'English',
@@ -279,6 +286,9 @@ export const translations = {
 
     'dash.greeting': 'Bonjour {name} 👋',
     'dash.upcomingBirthdays': 'Anniversaires à venir',
+    'dash.nextBirthday': 'Prochain anniversaire',
+    'dash.dayUnit': 'jour',
+    'dash.daysUnit': 'jours',
     'dash.noBirthdays': 'Aucun anniversaire enregistré. Les membres peuvent ajouter le leur dans leur profil.',
     'dash.birthdayToday': "Aujourd'hui ! 🎂",
     'dash.birthdayInDays': 'dans {days} jours',
