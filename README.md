@@ -1,46 +1,67 @@
-# 🎄 Secret Santa
+# 🎁 Wishly
 
-Application web pour organiser des échanges de cadeaux de Noël. Créez vos listes, réservez anonymement et découvrez votre attribution secrète !
+Shared wishlists for birthdays and every occasion. Family or group members add
+what they'd love to receive, and others can quietly **reserve** gifts so there
+are never duplicates — and never any spoilers for the recipient. An optional
+**Secret Santa** draw is built in per household.
 
-![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat-square&logo=react)
-![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwind-css)
+- 🏠 **Multi-tenant households** — create or join with an invite link
+- 🎂 **Birthdays** — upcoming birthdays surface on the home page
+- 📝 **Wishlists** with drag-and-drop ordering and optional links
+- 🤫 **Anonymous reservations** — recipients never see what's reserved
+- 🎲 **Optional Secret Santa** draw (admin-controlled, per household)
+- 🤖 **AI gift ideas** (Google Gemini, optional)
+- 🌍 **Bilingual** — English / French toggle
+- 🔐 **Supabase Auth** (email + password) with Row-Level Security; the browser
+  only ever uses the public anon key
 
-## ✨ Fonctionnalités principales
+## Stack
 
-- 📝 Listes de souhaits avec drag & drop
-- 🤖 **Assistant IA** (Google Gemini) pour suggestions de cadeaux
-- 🎁 Réservations anonymes
-- 🎲 Système d'attribution Secret Santa
-- 👤 Participants "hors-tirage" (liste seulement, pas de pige)
-- 📧 Notifications email automatiques
-- 📱 Responsive mobile/desktop
-- 🎨 Interface dark mode festive
+React 19 (CRA) · Tailwind CSS · Supabase (Postgres + Auth + RLS) ·
+@dnd-kit · lucide-react · react-hot-toast · Google Gemini (optional)
 
-## 🚀 Installation rapide
+## Setup
 
 ```bash
-# Cloner et installer
-git clone https://github.com/votre-username/secret-santa.git
-cd secret-santa
 npm install
-
-# Créer .env avec vos clés
-cp .env.example .env
-# Éditer .env avec vos credentials Supabase, EmailJS et Gemini
-
-# Lancer
+cp .env.sample .env   # then fill in your Supabase URL + anon key
 npm start
+```
 
-## 🛠️ Stack
+### 1. Database
 
-- **React 18** + Tailwind CSS
-- **Supabase** (PostgreSQL)
-- **EmailJS** (notifications)
-- **Google Gemini 2.0** (assistant IA)
-- **@dnd-kit** (drag & drop)
-- **bcrypt.js** (sécurité)
+Run `db/schema.sql` in your Supabase project's SQL editor (already done if you
+ran it during setup). It creates the tables, RLS policies and the
+SECURITY DEFINER RPCs the app relies on.
+
+### 2. Supabase Auth settings
+
+- Enable the **Email** provider.
+- Set **Site URL** to your app origin (e.g. `http://localhost:3000` in dev).
+- Add your origin to **Redirect URLs** (used by signup confirmation and the
+  password-reset link).
+- For local testing you may turn off "Confirm email" so signups log in
+  immediately.
+
+### 3. Environment variables (`.env`)
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `REACT_APP_SUPABASE_URL` | yes | Supabase project URL |
+| `REACT_APP_SUPABASE_ANON_KEY` | yes | Public anon key |
+| `REACT_APP_GEMINI_API_KEY` | no | Enables the AI gift-idea helper |
+
+## Security model
+
+There is **no service key in the browser**. Every read is constrained by RLS and
+every privileged write goes through a SECURITY DEFINER RPC:
+
+- `create_household`, `accept_invite`
+- `get_household_wishlists` (masks the reserver — only `is_reserved` /
+  `reserved_by_me` are ever exposed)
+- `reserve_item`, `cancel_reservation`, `set_purchased`, `get_my_reservations`
+- `shuffle_assignments` (admin only)
 
 ---
 
-Made with ❄️ by Buck
+Made with 🎁 — Wishly

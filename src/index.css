@@ -2,95 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========================================
-   FIX BARRE BLANCHE - GLOBAL
-   ======================================== */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  color-scheme: light;
 }
 
 html {
-  height: 100%;
-  overflow-x: hidden;
-  background: #0f172a; /* Couleur dark pour éviter le blanc */
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  padding: 0;
-  min-height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #0f172a; /* Couleur dark pour éviter le blanc */
-  overflow-x: hidden;
+  color: #0f172a;
+  background-color: #f8fafc;
 }
 
-#root {
-  min-height: 100vh;
-  min-height: 100dvh;
-  background: #0f172a;
+/* Respect iOS safe areas for the mobile bottom bar */
+.pb-safe {
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl border border-ink-200/70 shadow-soft;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .input {
+    @apply w-full px-4 py-3 bg-white border border-ink-200 rounded-xl outline-none transition
+      text-ink-900 placeholder-ink-400
+      focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15;
+  }
+
+  .label {
+    @apply block text-sm font-semibold text-ink-700 mb-1.5;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold
+      transition active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+      disabled:active:scale-100 select-none;
+  }
+
+  .btn-primary {
+    @apply btn text-white bg-brand-gradient shadow-glow hover:brightness-105;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-ink-700 border border-ink-200 hover:bg-ink-50;
+  }
+
+  .btn-ghost {
+    @apply btn text-ink-600 hover:bg-ink-100;
+  }
+
+  .btn-danger {
+    @apply btn text-white bg-accent-600 hover:bg-accent-700;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .link {
+    @apply text-brand-600 font-semibold hover:text-brand-700 hover:underline;
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+/* Thin, unobtrusive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
 }
-
-/* Masquer complètement la scrollbar */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
-}
-
-/* Custom scrollbar pour dark mode */
-.custom-scrollbar::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(30, 41, 59, 0.3);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(220, 38, 38, 0.5);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(220, 38, 38, 0.7);
-}
-
-/* Empêcher le white space qui apparaît parfois */
-html,
-body,
-#root {
-  max-width: 100vw;
-  overflow-x: hidden;
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
 }

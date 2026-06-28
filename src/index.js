@@ -1,15 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { Analytics } from '@vercel/analytics/react';
 import './index.css';
-import SecretSantaApp from './SecretSanta';
+import App from './App';
+import { I18nProvider } from './i18n/I18nContext';
+import { AuthProvider } from './context/AuthContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <GoogleReCaptchaProvider reCaptchaKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ''}>
-      <SecretSantaApp />
-      <Analytics />
-    </GoogleReCaptchaProvider>
+    <I18nProvider>
+      <AuthProvider>
+        <App />
+        <Analytics />
+      </AuthProvider>
+    </I18nProvider>
   </React.StrictMode>
 );

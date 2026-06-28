@@ -1,130 +1,88 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	content: [
-		"./src/**/*.{js,jsx,ts,tsx}",
-	],
-	theme: {
-		extend: {
-			colors: {
-				primary: {
-					50: '#fef2f2',
-					100: '#fee2e2',
-					200: '#fecaca',
-					300: '#fca5a5',
-					400: '#f87171',
-					500: '#ef4444',
-					600: '#dc2626',
-					700: '#b91c1c',
-					800: '#991b1b',
-					900: '#7f1d1d',
-					DEFAULT: '#dc2626',
-					dark: '#991b1b',
-				},
-				emerald: {
-					50: '#ecfdf5',
-					100: '#d1fae5',
-					200: '#a7f3d0',
-					300: '#6ee7b7',
-					400: '#34d399',
-					500: '#10b981',
-					600: '#059669',
-					700: '#047857',
-					800: '#065f46',
-					900: '#064e3b',
-				},
-				gold: {
-					50: '#fffbeb',
-					100: '#fef3c7',
-					200: '#fde68a',
-					300: '#fcd34d',
-					400: '#fbbf24',
-					500: '#f59e0b',
-					600: '#d97706',
-					700: '#b45309',
-					800: '#92400e',
-					900: '#78350f',
-					DEFAULT: '#fbbf24',
-				},
-				dark: {
-					50: '#f8fafc',
-					100: '#f1f5f9',
-					200: '#e2e8f0',
-					300: '#cbd5e1',
-					400: '#94a3b8',
-					500: '#64748b',
-					600: '#475569',
-					700: '#334155',
-					800: '#1e293b',
-					900: '#0f172a',
-					950: '#020617',
-				},
-			},
-			fontSize: {
-				'xs': ['0.75rem', { lineHeight: '1rem' }],
-				'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-				'base': ['1rem', { lineHeight: '1.5rem' }],
-				'lg': ['1.0625rem', { lineHeight: '1.5rem' }],
-				'xl': ['1.125rem', { lineHeight: '1.75rem' }],
-				'2xl': ['1.375rem', { lineHeight: '1.875rem' }],
-				'3xl': ['1.625rem', { lineHeight: '2rem' }],
-				'4xl': ['2rem', { lineHeight: '2.25rem' }],
-				'5xl': ['2.5rem', { lineHeight: '2.5rem' }],
-				'6xl': ['3rem', { lineHeight: '1' }],
-			},
-			spacing: {
-				'18': '4.5rem',
-				'22': '5.5rem',
-			},
-			backgroundImage: {
-				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-				'gradient-christmas': 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
-				'gradient-festive': 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #064e3b 100%)',
-				'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-			},
-			boxShadow: {
-				'glow-red': '0 0 20px rgba(220, 38, 38, 0.5)',
-				'glow-green': '0 0 20px rgba(16, 185, 129, 0.5)',
-				'glow-gold': '0 0 20px rgba(251, 191, 36, 0.5)',
-				'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-			},
-			backdropBlur: {
-				xs: '2px',
-			},
-			animation: {
-				'fade-in': 'fadeIn 0.5s ease-in-out',
-				'slide-up': 'slideUp 0.5s ease-out',
-				'slide-down': 'slideDown 0.3s ease-out',
-				'scale-in': 'scaleIn 0.3s ease-out',
-				'glow': 'glow 2s ease-in-out infinite alternate',
-				'float': 'float 3s ease-in-out infinite',
-			},
-			keyframes: {
-				fadeIn: {
-					'0%': { opacity: '0' },
-					'100%': { opacity: '1' },
-				},
-				slideUp: {
-					'0%': { transform: 'translateY(20px)', opacity: '0' },
-					'100%': { transform: 'translateY(0)', opacity: '1' },
-				},
-				slideDown: {
-					'0%': { transform: 'translateY(-20px)', opacity: '0' },
-					'100%': { transform: 'translateY(0)', opacity: '1' },
-				},
-				scaleIn: {
-					'0%': { transform: 'scale(0.9)', opacity: '0' },
-					'100%': { transform: 'scale(1)', opacity: '1' },
-				},
-				glow: {
-					'0%': { boxShadow: '0 0 5px rgba(251, 191, 36, 0.5)' },
-					'100%': { boxShadow: '0 0 20px rgba(251, 191, 36, 0.8)' },
-				},
-				float: {
-					'0%, 100%': { transform: 'translateY(0px)' },
-					'50%': { transform: 'translateY(-10px)' },
-				},
-			},
-		},
-	},
-	plugins: [],
-}
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        // Wishly brand — warm violet/indigo with a rose accent.
+        brand: {
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+        },
+        accent: {
+          50: '#fff1f5',
+          100: '#ffe4ec',
+          200: '#fecdd8',
+          300: '#fda4ba',
+          400: '#fb7199',
+          500: '#f43f76',
+          600: '#e11d57',
+          700: '#be123f',
+        },
+        ink: {
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+          700: '#334155',
+          800: '#1e293b',
+          900: '#0f172a',
+        },
+      },
+      boxShadow: {
+        soft: '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.06)',
+        card: '0 1px 3px rgba(15,23,42,0.06), 0 12px 32px rgba(15,23,42,0.08)',
+        glow: '0 10px 30px rgba(124,58,237,0.30)',
+      },
+      backgroundImage: {
+        'brand-gradient': 'linear-gradient(135deg, #7c3aed 0%, #a855f7 45%, #f43f76 100%)',
+        'mesh':
+          'radial-gradient(60% 60% at 20% 10%, rgba(124,58,237,0.12) 0%, rgba(124,58,237,0) 100%), radial-gradient(50% 50% at 90% 20%, rgba(244,63,118,0.12) 0%, rgba(244,63,118,0) 100%)',
+      },
+      borderRadius: {
+        xl: '0.875rem',
+        '2xl': '1.25rem',
+        '3xl': '1.75rem',
+      },
+      keyframes: {
+        'fade-in': { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
+        'scale-in': {
+          '0%': { opacity: 0, transform: 'scale(0.96)' },
+          '100%': { opacity: 1, transform: 'scale(1)' },
+        },
+        'slide-up': {
+          '0%': { opacity: 0, transform: 'translateY(16px)' },
+          '100%': { opacity: 1, transform: 'translateY(0)' },
+        },
+        float: {
+          '0%,100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.3s ease-out',
+        'scale-in': 'scale-in 0.25s ease-out',
+        'slide-up': 'slide-up 0.35s ease-out',
+        float: 'float 4s ease-in-out infinite',
+      },
+    },
+  },
+  plugins: [],
+};
