@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 
-const STORAGE_KEY = 'wishly:theme';
+const STORAGE_KEY = 'souhaity:theme';
 
 function getInitialTheme() {
   // Honor an explicit choice the user made via the toggle; otherwise follow the

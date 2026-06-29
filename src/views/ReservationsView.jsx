@@ -137,8 +137,9 @@ export default function ReservationsView() {
                   disabled={isBusy}
                   className="p-2 rounded-lg text-mute hover:text-red-600 hover:bg-red-500/10"
                   title={t('res.cancel')}
+                  aria-label={t('res.cancel')}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             );

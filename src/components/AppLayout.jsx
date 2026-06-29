@@ -22,14 +22,20 @@ export default function AppLayout() {
 
   useEffect(() => {
     const key = TITLE_KEYS[location.pathname];
-    document.title = key ? `${t(key)} · Wishly` : 'Wishly';
+    document.title = key ? `${t(key)} · Souhaity` : 'Souhaity';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location.pathname, t]);
 
   return (
     <div className="min-h-screen bg-paper flex flex-col pb-24 md:pb-0">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-fg focus:text-paper focus:shadow-card focus:text-sm focus:font-medium"
+      >
+        {t('a11y.skip')}
+      </a>
       <NavBar />
-      <main className="flex-1 w-full">
+      <main id="main-content" tabIndex={-1} className="flex-1 w-full outline-none">
         <Outlet />
       </main>
       <Footer />

@@ -77,8 +77,9 @@ export default function WishlistItem({ item, onSave, onDelete, disabled }) {
         {...listeners}
         className="text-line group-hover:text-mute hover:!text-fg cursor-grab active:cursor-grabbing touch-none transition"
         title={t('wishlist.dragHint')}
+        aria-label={t('wishlist.dragHint')}
       >
-        <GripVertical className="w-5 h-5" />
+        <GripVertical className="w-5 h-5" aria-hidden="true" />
       </button>
 
       <div className="min-w-0 flex-1">
@@ -100,15 +101,17 @@ export default function WishlistItem({ item, onSave, onDelete, disabled }) {
           onClick={() => setEditing(true)}
           className="p-2 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
           title={t('common.edit')}
+          aria-label={t('common.edit')}
         >
-          <Pencil className="w-4 h-4" />
+          <Pencil className="w-4 h-4" aria-hidden="true" />
         </button>
         <button
           onClick={() => onDelete(item)}
           className="p-2 rounded-lg text-mute hover:text-red-600 hover:bg-red-500/10"
           title={t('common.delete')}
+          aria-label={t('common.delete')}
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
     </div>

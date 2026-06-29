@@ -7,7 +7,7 @@ import { parsePublicPath, localizedPath } from '../lib/seo';
 // between the English and French (/fr) variants so the route reflects the
 // language; inside the app it just changes the language preference.
 export default function LanguageToggle({ className = '' }) {
-  const { lang, setLang } = useI18n();
+  const { lang, setLang, t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,7 +23,7 @@ export default function LanguageToggle({ className = '' }) {
   ];
 
   return (
-    <div className={`inline-flex items-center rounded-full border border-line p-0.5 ${className}`}>
+    <div role="group" aria-label={t('a11y.language')} className={`inline-flex items-center rounded-full border border-line p-0.5 ${className}`}>
       {langs.map((l) => (
         <button
           key={l.code}

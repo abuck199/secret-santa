@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Home, Ticket, Loader2, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -20,6 +20,8 @@ export default function OnboardingView({ embedded = false, onDone }) {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const nameId = useId();
+  const codeId = useId();
 
   async function handleCreate(e) {
     e.preventDefault();
@@ -60,47 +62,51 @@ export default function OnboardingView({ embedded = false, onDone }) {
       <div className="flex gap-1 p-1 bg-panel-2 rounded-xl mb-6">
         <button
           onClick={() => setTab('create')}
+          aria-pressed={tab === 'create'}
           className={`flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
             tab === 'create' ? 'bg-panel text-fg shadow-soft' : 'text-mute'
           }`}
         >
-          <Home className="w-4 h-4" /> {t('onboard.createTab')}
+          <Home className="w-4 h-4" aria-hidden="true" /> {t('onboard.createTab')}
         </button>
         <button
           onClick={() => setTab('join')}
+          aria-pressed={tab === 'join'}
           className={`flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
             tab === 'join' ? 'bg-panel text-fg shadow-soft' : 'text-mute'
           }`}
         >
-          <Ticket className="w-4 h-4" /> {t('onboard.joinTab')}
+          <Ticket className="w-4 h-4" aria-hidden="true" /> {t('onboard.joinTab')}
         </button>
       </div>
 
       {tab === 'create' ? (
         <form onSubmit={handleCreate}>
-          <label className="label">{t('onboard.householdName')}</label>
+          <label htmlFor={nameId} className="label">{t('onboard.householdName')}</label>
           <input
+            id={nameId}
             className="input"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={t('onboard.householdPlaceholder')}
             maxLength={60}
           />
-          <button className="btn-primary w-full mt-5" disabled={loading}>
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('onboard.createCta')}
+          <button className="btn-primary w-full mt-5" disabled={loading} aria-busy={loading} aria-label={t('onboard.createCta')}>
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('onboard.createCta')}
           </button>
         </form>
       ) : (
         <form onSubmit={handleJoin}>
-          <label className="label">{t('onboard.inviteCode')}</label>
+          <label htmlFor={codeId} className="label">{t('onboard.inviteCode')}</label>
           <input
+            id={codeId}
             className="input font-mono tracking-wide"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="a1b2c3d4…"
           />
-          <button className="btn-primary w-full mt-5" disabled={loading}>
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('onboard.joinCta')}
+          <button className="btn-primary w-full mt-5" disabled={loading} aria-busy={loading} aria-label={t('onboard.joinCta')}>
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('onboard.joinCta')}
           </button>
         </form>
       )}
@@ -138,7 +144,7 @@ export default function OnboardingView({ embedded = false, onDone }) {
           onClick={signOut}
           className="mx-auto mt-6 flex items-center gap-2 text-sm text-mute hover:text-fg"
         >
-          <LogOut className="w-4 h-4" /> {t('auth.signOut')}
+          <LogOut className="w-4 h-4" aria-hidden="true" /> {t('auth.signOut')}
         </button>
       </div>
     </div>

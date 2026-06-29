@@ -35,6 +35,12 @@ export default function LandingView({ onSignIn, onGetStarted }) {
 
   return (
     <div className="min-h-screen bg-paper text-fg">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-fg focus:text-paper focus:shadow-card focus:text-sm focus:font-medium"
+      >
+        {t('a11y.skip')}
+      </a>
       {/* Nav */}
       <header className="sticky top-0 z-40 bg-paper/80 backdrop-blur-xl border-b border-line">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
@@ -54,6 +60,7 @@ export default function LandingView({ onSignIn, onGetStarted }) {
         </div>
       </header>
 
+      <main id="main-content" tabIndex={-1} className="outline-none">
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 sm:pt-20 pb-16">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
@@ -69,18 +76,18 @@ export default function LandingView({ onSignIn, onGetStarted }) {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
               <button onClick={onGetStarted} className="btn-primary w-full sm:w-auto px-5 py-3 text-base">
-                {t('landing.hero.cta')} <ArrowRight className="w-4 h-4" />
+                {t('landing.hero.cta')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </button>
               <button onClick={onSignIn} className="btn-secondary w-full sm:w-auto px-5 py-3 text-base">
                 {t('landing.hero.secondary')}
               </button>
             </div>
             <p className="text-xs text-mute mt-4 flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-gold" /> {t('landing.hero.free')}
+              <Check className="w-3.5 h-3.5 text-gold" aria-hidden="true" /> {t('landing.hero.free')}
             </p>
           </div>
 
-          <div className="min-w-0 animate-scale-in">
+          <div className="min-w-0 animate-scale-in" aria-hidden="true">
             <MockPreview />
           </div>
         </div>
@@ -101,7 +108,7 @@ export default function LandingView({ onSignIn, onGetStarted }) {
             {features.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="card p-6">
                 <div className="w-10 h-10 rounded-xl bg-goldsoft text-gold grid place-items-center mb-4">
-                  <Icon className="w-5 h-5" strokeWidth={1.8} />
+                  <Icon className="w-5 h-5" strokeWidth={1.8} aria-hidden="true" />
                 </div>
                 <h3 className="font-medium text-fg mb-1.5">{title}</h3>
                 <p className="text-sm text-mute leading-relaxed">{desc}</p>
@@ -140,10 +147,12 @@ export default function LandingView({ onSignIn, onGetStarted }) {
           </h2>
           <p className="text-mute mt-3 max-w-md mx-auto">{t('landing.cta.subtitle')}</p>
           <button onClick={onGetStarted} className="btn-primary px-6 py-3 text-base mt-7">
-            {t('landing.getStarted')} <ArrowRight className="w-4 h-4" />
+            {t('landing.getStarted')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </section>
+
+      </main>
 
       {/* Footer */}
       <Footer />

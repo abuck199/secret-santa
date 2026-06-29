@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/react';
 import { useAuth } from './context/AuthContext';
 import { useI18n } from './i18n/I18nContext';
 import { localizedPath } from './lib/seo';
 import Loading from './components/Loading';
 import AppLayout from './components/AppLayout';
 import LandingView from './views/LandingView';
+import PrivacyView from './views/PrivacyView';
+import TermsView from './views/TermsView';
 import AuthView from './views/AuthView';
 import ResetPasswordView from './views/ResetPasswordView';
 import OnboardingView from './views/OnboardingView';
@@ -100,6 +103,9 @@ export default function App() {
         />
         <Route path="/join/:code" element={<JoinRoute />} />
 
+        <Route path="/privacy" element={<PrivacyView />} />
+        <Route path="/terms" element={<TermsView />} />
+
         <Route path="/app" element={session ? <AppGuard /> : <Navigate to="/" replace />}>
           <Route index element={<DashboardView />} />
           <Route path="list" element={<WishlistView />} />
@@ -121,6 +127,8 @@ export default function App() {
     <>
       {toaster}
       {content}
+      {/* Cookieless, privacy-friendly analytics (no tracking cookies, no consent banner needed). */}
+      <Analytics />
     </>
   );
 }

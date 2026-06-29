@@ -4,4 +4,4 @@ Disallow: /app
 Disallow: /join
 
 # TODO: replace with your real production domain
-Sitemap: https://wishly.vercel.app/sitemap.xml
+Sitemap: https://souhaity.com/sitemap.xml

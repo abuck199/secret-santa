@@ -51,6 +51,16 @@ body {
   font-optical-sizing: auto;
 }
 
+@layer base {
+  /* Visible keyboard-focus ring for interactive elements. Mouse clicks do not
+     trigger :focus-visible, so this stays out of the way for pointer users.
+     Inputs keep their own focus ring (they set outline-none in utilities). */
+  :focus-visible {
+    outline: 2px solid rgb(var(--gold));
+    outline-offset: 2px;
+  }
+}
+
 @layer components {
   .card {
     @apply bg-panel border border-line rounded-2xl shadow-soft;
@@ -64,6 +74,11 @@ body {
 
   .label {
     @apply block text-sm font-medium text-fg mb-1.5;
+  }
+
+  /* Applied to an .input when its field has a validation error. */
+  .input-error {
+    @apply !border-red-500 focus:!border-red-500 focus:!ring-4 focus:!ring-red-500/20;
   }
 
   .btn {
@@ -98,7 +113,7 @@ body {
 }
 
 /* Shimmering skeleton placeholder */
-@keyframes wishly-shimmer {
+@keyframes souhaity-shimmer {
   100% {
     transform: translateX(100%);
   }
@@ -114,7 +129,7 @@ body {
   inset: 0;
   transform: translateX(-100%);
   background: linear-gradient(90deg, transparent, rgb(var(--line) / 0.7), transparent);
-  animation: wishly-shimmer 1.5s infinite;
+  animation: souhaity-shimmer 1.5s infinite;
 }
 
 /* Subtle hover lift used on featured surfaces */
@@ -126,6 +141,16 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Honour the user's OS setting: near-instant everything, no smooth scroll.
+     Covers the slide-up / scale-in / fade-in entrance animations too. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
   .skeleton::after {
     animation: none;
   }

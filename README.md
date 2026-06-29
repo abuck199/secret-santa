@@ -1,4 +1,4 @@
-# 🎁 Wishly
+# 🎁 Souhaity
 
 Shared wishlists for birthdays and every occasion. Family or group members add
 what they'd love to receive, and others can quietly **reserve** gifts so there
@@ -65,4 +65,4 @@ every privileged write goes through a SECURITY DEFINER RPC:
 
 ---
 
-Made with 🎁 — Wishly
+Made with 🎁 — Souhaity

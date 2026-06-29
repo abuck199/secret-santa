@@ -5,26 +5,26 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml"
 >
   <url>
-    <loc>https://wishly.vercel.app/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://wishly.vercel.app/" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://wishly.vercel.app/fr" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://wishly.vercel.app/" />
+    <loc>https://souhaity.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://souhaity.com/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://souhaity.com/fr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://souhaity.com/" />
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://wishly.vercel.app/signup</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://wishly.vercel.app/signup" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://wishly.vercel.app/fr/signup" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://wishly.vercel.app/signup" />
+    <loc>https://souhaity.com/signup</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://souhaity.com/signup" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://souhaity.com/fr/signup" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://souhaity.com/signup" />
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://wishly.vercel.app/login</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://wishly.vercel.app/login" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://wishly.vercel.app/fr/login" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://wishly.vercel.app/login" />
+    <loc>https://souhaity.com/login</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://souhaity.com/login" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://souhaity.com/fr/login" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://souhaity.com/login" />
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

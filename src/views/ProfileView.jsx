@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { Save, Lock, Loader2, Globe, Sun } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
@@ -20,6 +20,12 @@ export default function ProfileView() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [savingPw, setSavingPw] = useState(false);
+
+  const nameId = useId();
+  const bdayLabelId = useId();
+  const bdayHintId = useId();
+  const pwId = useId();
+  const confirmId = useId();
 
   useEffect(() => {
     setDisplayName(profile?.display_name || '');
@@ -64,18 +70,35 @@ export default function ProfileView() {
 
       <form onSubmit={saveProfile} className="card p-5 mb-4">
         <div className="mb-4">
-          <label className="label">{t('profile.displayName')}</label>
-          <input className="input" value={displayName} onChange={(e) => setDisplayName(e.target.value)} maxLength={60} />
+          <label htmlFor={nameId} className="label">{t('profile.displayName')}</label>
+          <input
+            id={nameId}
+            className="input"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            maxLength={60}
+            placeholder={t('auth.namePlaceholder')}
+          />
         </div>
         <div className="mb-2">
-          <label className="label">{t('profile.birthday')}</label>
-          <DatePicker value={birthday} onChange={setBirthday} placeholder={t('profile.birthday')} />
-          <p className="text-xs text-mute mt-1.5">{t('profile.birthdayHint')}</p>
+          <label id={bdayLabelId} className="label">{t('profile.birthday')}</label>
+          <DatePicker
+            value={birthday}
+            onChange={setBirthday}
+            placeholder={t('profile.birthday')}
+            ariaLabelledby={bdayLabelId}
+            ariaDescribedby={bdayHintId}
+          />
+          <p id={bdayHintId} className="text-xs text-mute mt-1.5">{t('profile.birthdayHint')}</p>
         </div>
         <div className="flex items-center justify-between mt-4">
           <p className="text-xs text-mute">{user?.email}</p>
-          <button className="btn-primary" disabled={savingProfile}>
-            {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          <button className="btn-primary" disabled={savingProfile} aria-busy={savingProfile}>
+            {savingProfile ? (
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Save className="w-4 h-4" aria-hidden="true" />
+            )}
             {t('common.save')}
           </button>
         </div>
@@ -84,13 +107,13 @@ export default function ProfileView() {
       <div className="card p-5 mb-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="font-serif text-lg font-medium text-fg flex items-center gap-2">
-            <Sun className="w-[18px] h-[18px] text-gold" /> {t('profile.language')}
+            <Sun className="w-[18px] h-[18px] text-gold" aria-hidden="true" /> {t('profile.language')}
           </h2>
           <ThemeToggle />
         </div>
         <div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t border-line">
           <span className="text-sm text-mute flex items-center gap-2">
-            <Globe className="w-4 h-4" /> {t('lang.label')}
+            <Globe className="w-4 h-4" aria-hidden="true" /> {t('lang.label')}
           </span>
           <LanguageToggle />
         </div>
@@ -98,11 +121,12 @@ export default function ProfileView() {
 
       <form onSubmit={changePassword} className="card p-5">
         <h2 className="font-serif text-lg font-medium text-fg mb-3 flex items-center gap-2">
-          <Lock className="w-[18px] h-[18px] text-gold" /> {t('profile.changePassword')}
+          <Lock className="w-[18px] h-[18px] text-gold" aria-hidden="true" /> {t('profile.changePassword')}
         </h2>
         <div className="mb-3">
-          <label className="label">{t('auth.newPassword')}</label>
+          <label htmlFor={pwId} className="label">{t('auth.newPassword')}</label>
           <input
+            id={pwId}
             type="password"
             className="input"
             value={password}
@@ -112,8 +136,9 @@ export default function ProfileView() {
           />
         </div>
         <div className="mb-4">
-          <label className="label">{t('auth.confirmPassword')}</label>
+          <label htmlFor={confirmId} className="label">{t('auth.confirmPassword')}</label>
           <input
+            id={confirmId}
             type="password"
             className="input"
             value={confirm}
@@ -122,8 +147,12 @@ export default function ProfileView() {
             placeholder="••••••••"
           />
         </div>
-        <button className="btn-secondary" disabled={savingPw}>
-          {savingPw ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+        <button className="btn-secondary" disabled={savingPw} aria-busy={savingPw}>
+          {savingPw ? (
+            <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Lock className="w-4 h-4" aria-hidden="true" />
+          )}
           {t('profile.changePassword')}
         </button>
       </form>

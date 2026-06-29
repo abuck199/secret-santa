@@ -10,8 +10,8 @@ import React, {
 import { supabase } from '../supabaseClient';
 import * as api from '../lib/api';
 
-const HOUSEHOLD_KEY = 'wishly:household';
-const PENDING_INVITE_KEY = 'wishly:pendingInvite';
+const HOUSEHOLD_KEY = 'souhaity:household';
+const PENDING_INVITE_KEY = 'souhaity:pendingInvite';
 
 // Capture an ?invite=CODE param as early as possible, then clean the URL.
 (function captureInvite() {

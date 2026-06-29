@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import { Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
@@ -16,6 +16,8 @@ export default function ResetPasswordView() {
   const [confirm, setConfirm] = useState('');
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const pwId = useId();
+  const confirmId = useId();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -49,10 +51,11 @@ export default function ResetPasswordView() {
           </h1>
 
           <div className="mb-4">
-            <label className="label">{t('auth.newPassword')}</label>
+            <label htmlFor={pwId} className="label">{t('auth.newPassword')}</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" aria-hidden="true" />
               <input
+                id={pwId}
                 type={show ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -63,18 +66,21 @@ export default function ResetPasswordView() {
               <button
                 type="button"
                 onClick={() => setShow((s) => !s)}
+                aria-label={show ? t('a11y.hidePassword') : t('a11y.showPassword')}
+                aria-pressed={show}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-fg"
               >
-                {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {show ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
               </button>
             </div>
           </div>
 
           <div className="mb-5">
-            <label className="label">{t('auth.confirmPassword')}</label>
+            <label htmlFor={confirmId} className="label">{t('auth.confirmPassword')}</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" aria-hidden="true" />
               <input
+                id={confirmId}
                 type={show ? 'text' : 'password'}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
@@ -85,8 +91,8 @@ export default function ResetPasswordView() {
             </div>
           </div>
 
-          <button className="btn-primary w-full" disabled={loading}>
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('auth.updatePassword')}
+          <button className="btn-primary w-full" disabled={loading} aria-busy={loading} aria-label={t('auth.updatePassword')}>
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('auth.updatePassword')}
           </button>
         </form>
       </div>

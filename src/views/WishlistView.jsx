@@ -163,6 +163,7 @@ export default function WishlistView() {
             onChange={(e) => setForm((p) => ({ ...p, item: e.target.value }))}
             onKeyDown={(e) => e.key === 'Enter' && addItem()}
             placeholder={t('wishlist.addPlaceholder')}
+            aria-label={t('wishlist.addPlaceholder')}
             maxLength={200}
           />
           <input
@@ -171,10 +172,20 @@ export default function WishlistView() {
             onChange={(e) => setForm((p) => ({ ...p, link: e.target.value }))}
             onKeyDown={(e) => e.key === 'Enter' && addItem()}
             placeholder={t('wishlist.linkPlaceholder')}
+            aria-label={t('wishlist.linkPlaceholder')}
             maxLength={500}
           />
-          <button className="btn-primary shrink-0" onClick={() => addItem()} disabled={saving}>
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          <button
+            className="btn-primary shrink-0"
+            onClick={() => addItem()}
+            disabled={saving}
+            aria-label={t('common.add')}
+          >
+            {saving ? (
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Plus className="w-4 h-4" aria-hidden="true" />
+            )}
             <span className="sm:hidden lg:inline">{t('common.add')}</span>
           </button>
         </div>

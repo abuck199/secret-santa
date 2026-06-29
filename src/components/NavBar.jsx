@@ -100,12 +100,15 @@ export default function NavBar() {
     <div className={block ? '' : 'relative'} ref={block ? undefined : switcherRef}>
       <button
         onClick={() => setSwitcherOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={switcherOpen}
+        aria-label={t('nav.switchHousehold')}
         className={`flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 text-sm font-medium text-fg hover:bg-panel-2 transition ${
           block ? 'w-full justify-between' : ''
         }`}
       >
         <span className="truncate max-w-[160px]">{currentHousehold?.name || ''}</span>
-        <ChevronDown className="w-4 h-4 text-mute" />
+        <ChevronDown className="w-4 h-4 text-mute" aria-hidden="true" />
       </button>
       {switcherOpen && (
         <div className={`${block ? 'mt-2' : 'absolute left-0 mt-2 w-64'} z-50 card p-1.5 animate-scale-in`}>
@@ -147,14 +150,16 @@ export default function NavBar() {
                 <button
                   key={path}
                   onClick={() => navigate(path)}
+                  aria-label={label}
+                  aria-current={active ? 'page' : undefined}
                   className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
                     active ? 'text-fg' : 'text-mute hover:text-fg'
                   }`}
                 >
-                  <Icon className="w-4 h-4" strokeWidth={1.9} />
+                  <Icon className="w-4 h-4" strokeWidth={1.9} aria-hidden="true" />
                   <span className="hidden lg:inline">{label}</span>
                   {active && (
-                    <span className="absolute -bottom-[1.35rem] left-2 right-2 h-0.5 bg-gold rounded-full" />
+                    <span aria-hidden="true" className="absolute -bottom-[1.35rem] left-2 right-2 h-0.5 bg-gold rounded-full" />
                   )}
                 </button>
               );
@@ -167,6 +172,9 @@ export default function NavBar() {
             <div className="relative" ref={profileRef}>
               <button
                 onClick={() => setProfileOpen((o) => !o)}
+                aria-label={t('a11y.account')}
+                aria-haspopup="menu"
+                aria-expanded={profileOpen}
                 className="w-9 h-9 rounded-full bg-fg text-paper text-sm font-semibold grid place-items-center hover:opacity-90 transition"
               >
                 {initials(name)}
@@ -222,19 +230,22 @@ export default function NavBar() {
             <button
               key={path}
               onClick={() => navigate(path)}
+              aria-current={isActive(path) ? 'page' : undefined}
               className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg ${
                 isActive(path) ? 'text-fg' : 'text-mute'
               }`}
             >
-              <Icon className="w-5 h-5" strokeWidth={1.9} />
+              <Icon className="w-5 h-5" strokeWidth={1.9} aria-hidden="true" />
               <span className="text-[11px] font-medium">{label}</span>
             </button>
           ))}
           <button
             onClick={() => setMenuOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={menuOpen}
             className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-mute"
           >
-            <Menu className="w-5 h-5" strokeWidth={1.9} />
+            <Menu className="w-5 h-5" strokeWidth={1.9} aria-hidden="true" />
             <span className="text-[11px] font-medium">{t('nav.menu')}</span>
           </button>
         </div>
@@ -247,11 +258,16 @@ export default function NavBar() {
             className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 animate-fade-in"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-panel rounded-t-3xl shadow-card max-h-[85vh] overflow-y-auto animate-slide-up pb-safe border-t border-line">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('nav.menu')}
+            className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-panel rounded-t-3xl shadow-card max-h-[85vh] overflow-y-auto animate-slide-up pb-safe border-t border-line"
+          >
             <div className="flex items-center justify-between px-5 py-4 border-b border-line">
               <span className="font-serif text-lg font-medium text-fg">{t('nav.menu')}</span>
-              <button onClick={() => setMenuOpen(false)} className="text-mute">
-                <X className="w-5 h-5" />
+              <button onClick={() => setMenuOpen(false)} aria-label={t('a11y.closeMenu')} className="text-mute">
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 

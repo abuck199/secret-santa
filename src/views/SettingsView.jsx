@@ -185,10 +185,27 @@ export default function SettingsView() {
 
       <Section title={t('settings.rename')}>
         <div className="flex gap-2">
-          <input className="input" value={name} onChange={(e) => setName(e.target.value)} disabled={!isAdmin} maxLength={60} />
+          <input
+            className="input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={!isAdmin}
+            maxLength={60}
+            placeholder={t('onboard.householdPlaceholder')}
+          />
           {isAdmin && (
-            <button className="btn-primary shrink-0" onClick={saveName} disabled={savingName}>
-              {savingName ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            <button
+              className="btn-primary shrink-0"
+              onClick={saveName}
+              disabled={savingName}
+              aria-busy={savingName}
+              aria-label={t('common.save')}
+            >
+              {savingName ? (
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Save className="w-4 h-4" aria-hidden="true" />
+              )}
               <span className="hidden sm:inline">{t('common.save')}</span>
             </button>
           )}
@@ -198,7 +215,7 @@ export default function SettingsView() {
       <Section title={t('settings.secretSanta')}>
         <div className="flex items-center justify-between gap-4">
           <p className="text-sm text-mute">{t('settings.secretSantaDesc')}</p>
-          <Toggle on={secretSanta} disabled={!isAdmin} onClick={toggleSecretSanta} />
+          <Toggle on={secretSanta} disabled={!isAdmin} onClick={toggleSecretSanta} label={t('settings.secretSanta')} />
         </div>
         {isAdmin && secretSanta && (
           <button className="btn-secondary mt-4" onClick={runDraw} disabled={drawing}>
@@ -234,15 +251,17 @@ export default function SettingsView() {
                         onClick={() => toggleRole(m)}
                         className="p-2 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
                         title={m.role === 'admin' ? t('settings.removeAdmin') : t('settings.makeAdmin')}
+                        aria-label={m.role === 'admin' ? t('settings.removeAdmin') : t('settings.makeAdmin')}
                       >
-                        {m.role === 'admin' ? <ShieldOff className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
+                        {m.role === 'admin' ? <ShieldOff className="w-4 h-4" aria-hidden="true" /> : <Shield className="w-4 h-4" aria-hidden="true" />}
                       </button>
                       <button
                         onClick={() => setConfirm({ type: 'removeMember', payload: m })}
                         className="p-2 rounded-lg text-mute hover:text-red-600 hover:bg-red-500/10"
                         title={t('settings.remove')}
+                        aria-label={t('settings.remove')}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </div>
                   )}
@@ -262,21 +281,23 @@ export default function SettingsView() {
           <div className="space-y-2">
             {invites.map((inv) => (
               <div key={inv.id} className="flex items-center gap-2 p-2.5 rounded-xl bg-panel-2 border border-line">
-                <Link2 className="w-4 h-4 text-mute shrink-0" />
+                <Link2 className="w-4 h-4 text-mute shrink-0" aria-hidden="true" />
                 <code className="text-xs text-mute truncate flex-1">{inviteLink(inv.code)}</code>
                 <button
                   onClick={() => copy(inviteLink(inv.code), inv.id)}
                   className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel"
                   title={t('common.copy')}
+                  aria-label={copied === inv.id ? t('common.copied') : t('common.copy')}
                 >
-                  {copied === inv.id ? <Check className="w-4 h-4 text-gold" /> : <Copy className="w-4 h-4" />}
+                  {copied === inv.id ? <Check className="w-4 h-4 text-gold" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
                 </button>
                 <button
                   onClick={() => setConfirm({ type: 'deleteInvite', payload: inv.id })}
                   className="p-1.5 rounded-lg text-mute hover:text-red-600 hover:bg-panel"
                   title={t('common.delete')}
+                  aria-label={t('common.delete')}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             ))}
@@ -331,9 +352,13 @@ function Section({ title, children }) {
   );
 }
 
-function Toggle({ on, onClick, disabled }) {
+function Toggle({ on, onClick, disabled, label }) {
   return (
     <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
       onClick={onClick}
       disabled={disabled}
       className={`relative w-12 h-7 rounded-full transition shrink-0 ${on ? 'bg-fg' : 'bg-line'} ${
@@ -341,6 +366,7 @@ function Toggle({ on, onClick, disabled }) {
       }`}
     >
       <span
+        aria-hidden="true"
         className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-paper transition-transform ${on ? 'translate-x-5' : ''}`}
       />
     </button>

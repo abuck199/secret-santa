@@ -102,12 +102,14 @@ export default function MembersView() {
       <PageHeader eyebrow={t('nav.members')} title={t('members.title')} subtitle={t('members.subtitle')} />
 
       <div className="relative mb-6">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" aria-hidden="true" />
         <input
+          type="search"
           className="input pl-11"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('members.search')}
+          aria-label={t('members.search')}
         />
       </div>
 

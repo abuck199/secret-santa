@@ -14,7 +14,16 @@ function parse(value) {
   return { y, m: m - 1, d };
 }
 
-export default function DatePicker({ value, onChange, placeholder, minYear = 1920 }) {
+export default function DatePicker({
+  value,
+  onChange,
+  placeholder,
+  minYear = 1920,
+  invalid = false,
+  id,
+  ariaLabelledby,
+  ariaDescribedby,
+}) {
   const { t, lang } = useI18n();
   const locale = lang === 'fr' ? 'fr-CA' : 'en-US';
   const ref = useRef(null);
@@ -71,6 +80,12 @@ export default function DatePicker({ value, onChange, placeholder, minYear = 192
     [maxYear, minYear]
   );
 
+  // Full, localized date string used as the accessible name for each day cell.
+  const dayLabelFmt = useMemo(
+    () => new Intl.DateTimeFormat(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+    [locale]
+  );
+
   const grid = useMemo(() => {
     const firstWeekday = new Date(view.y, view.m, 1).getDay();
     const offset = (firstWeekday - firstDow + 7) % 7;
@@ -108,35 +123,36 @@ export default function DatePicker({ value, onChange, placeholder, minYear = 192
     <div className="relative" ref={ref}>
       <button
         type="button"
+        id={id}
         onClick={() => setOpen((o) => !o)}
-        className={`input flex items-center gap-2.5 text-left ${value ? 'text-fg' : 'text-mute'}`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-invalid={invalid || undefined}
+        aria-labelledby={ariaLabelledby}
+        aria-describedby={ariaDescribedby}
+        className={`input flex items-center gap-2.5 text-left ${value ? 'pr-10' : ''} ${invalid ? 'input-error' : ''} ${value ? 'text-fg' : 'text-mute'}`}
       >
-        <Calendar className="w-[18px] h-[18px] text-mute shrink-0" />
+        <Calendar className="w-[18px] h-[18px] text-mute shrink-0" aria-hidden="true" />
         <span className="flex-1 truncate">{label || placeholder || t('common.selectDate')}</span>
-        {value && (
-          <span
-            role="button"
-            tabIndex={0}
-            onClick={(e) => {
-              e.stopPropagation();
-              onChange('');
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.stopPropagation();
-                onChange('');
-              }
-            }}
-            className="text-mute hover:text-fg p-0.5 rounded"
-            aria-label={t('common.clear')}
-          >
-            <X className="w-4 h-4" />
-          </span>
-        )}
       </button>
 
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange('')}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-fg p-0.5 rounded"
+          aria-label={t('common.clear')}
+        >
+          <X className="w-4 h-4" aria-hidden="true" />
+        </button>
+      )}
+
       {open && (
-        <div className="absolute z-50 mt-2 w-[300px] max-w-[calc(100vw-2rem)] card p-3 animate-scale-in">
+        <div
+          role="dialog"
+          aria-label={t('common.selectDate')}
+          className="absolute z-50 mt-2 w-[300px] max-w-[calc(100vw-2rem)] card p-3 animate-scale-in"
+        >
           {/* Header: nav + month/year selects */}
           <div className="flex items-center gap-1.5 mb-3">
             <button
@@ -145,12 +161,13 @@ export default function DatePicker({ value, onChange, placeholder, minYear = 192
               className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
               aria-label={t('common.prevMonth')}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </button>
 
             <select
               value={view.m}
               onChange={(e) => setView((v) => ({ ...v, m: Number(e.target.value) }))}
+              aria-label={t('a11y.month')}
               className="flex-1 bg-panel border border-line rounded-lg px-2 py-1.5 text-sm font-medium text-fg outline-none focus:border-gold cursor-pointer"
             >
               {months.map((name, i) => (
@@ -163,6 +180,7 @@ export default function DatePicker({ value, onChange, placeholder, minYear = 192
             <select
               value={view.y}
               onChange={(e) => setView((v) => ({ ...v, y: Number(e.target.value) }))}
+              aria-label={t('a11y.year')}
               className="bg-panel border border-line rounded-lg px-2 py-1.5 text-sm font-medium text-fg outline-none focus:border-gold cursor-pointer"
             >
               {years.map((y) => (
@@ -178,12 +196,12 @@ export default function DatePicker({ value, onChange, placeholder, minYear = 192
               className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
               aria-label={t('common.nextMonth')}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
 
           {/* Weekday labels */}
-          <div className="grid grid-cols-7 mb-1">
+          <div className="grid grid-cols-7 mb-1" aria-hidden="true">
             {weekdays.map((w, i) => (
               <div key={i} className="text-center text-[11px] font-semibold uppercase text-mute py-1">
                 {w.slice(0, 2)}
@@ -208,6 +226,9 @@ export default function DatePicker({ value, onChange, placeholder, minYear = 192
                   type="button"
                   disabled={disabled}
                   onClick={() => pick(d)}
+                  aria-label={dayLabelFmt.format(new Date(view.y, view.m, d))}
+                  aria-pressed={isSelected || undefined}
+                  aria-current={isToday ? 'date' : undefined}
                   className={`h-9 rounded-lg text-sm grid place-items-center transition ${
                     isSelected
                       ? 'bg-fg text-paper font-medium'
