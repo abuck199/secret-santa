@@ -280,25 +280,47 @@ export default function SettingsView() {
           <p className="text-xs text-mute mb-3">{t('settings.inviteHint')}</p>
           <div className="space-y-2">
             {invites.map((inv) => (
-              <div key={inv.id} className="flex items-center gap-2 p-2.5 rounded-xl bg-panel-2 border border-line">
-                <Link2 className="w-4 h-4 text-mute shrink-0" aria-hidden="true" />
-                <code className="text-xs text-mute truncate flex-1">{inviteLink(inv.code)}</code>
-                <button
-                  onClick={() => copy(inviteLink(inv.code), inv.id)}
-                  className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel"
-                  title={t('common.copy')}
-                  aria-label={copied === inv.id ? t('common.copied') : t('common.copy')}
-                >
-                  {copied === inv.id ? <Check className="w-4 h-4 text-gold" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
-                </button>
-                <button
-                  onClick={() => setConfirm({ type: 'deleteInvite', payload: inv.id })}
-                  className="p-1.5 rounded-lg text-mute hover:text-red-600 hover:bg-panel"
-                  title={t('common.delete')}
-                  aria-label={t('common.delete')}
-                >
-                  <Trash2 className="w-4 h-4" aria-hidden="true" />
-                </button>
+              <div key={inv.id} className="p-2.5 rounded-xl bg-panel-2 border border-line">
+                <div className="flex items-center gap-2">
+                  <Link2 className="w-4 h-4 text-mute shrink-0" aria-hidden="true" />
+                  <code className="text-xs text-mute truncate flex-1">{inviteLink(inv.code)}</code>
+                  <button
+                    onClick={() => copy(inviteLink(inv.code), inv.id)}
+                    className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel"
+                    title={t('common.copy')}
+                    aria-label={copied === inv.id ? t('common.copied') : t('common.copy')}
+                  >
+                    {copied === inv.id ? <Check className="w-4 h-4 text-gold" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
+                  </button>
+                  <button
+                    onClick={() => setConfirm({ type: 'deleteInvite', payload: inv.id })}
+                    className="p-1.5 rounded-lg text-mute hover:text-red-600 hover:bg-panel"
+                    title={t('common.delete')}
+                    aria-label={t('common.delete')}
+                  >
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 mt-2 pl-6 text-xs flex-wrap">
+                  <span className="text-mute">
+                    {t('settings.inviteCreatedBy', {
+                      name: inv.creatorId === user?.id ? t('common.you') : inv.creatorName || t('common.member'),
+                    })}
+                  </span>
+                  {inv.joiners.length === 0 ? (
+                    <span className="chip bg-panel text-mute border border-line">{t('settings.inviteUnused')}</span>
+                  ) : (
+                    <>
+                      <span className="text-mute">{t('settings.inviteJoinedLabel', { count: inv.joiners.length })}</span>
+                      {inv.joiners.map((j) => (
+                        <span key={j.userId} className="chip bg-goldsoft text-gold border border-gold/30">
+                          <Check className="w-3 h-3" aria-hidden="true" />
+                          {j.userId === user?.id ? t('common.you') : j.name || t('common.member')}
+                        </span>
+                      ))}
+                    </>
+                  )}
+                </div>
               </div>
             ))}
           </div>

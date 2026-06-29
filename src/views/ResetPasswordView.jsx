@@ -37,7 +37,7 @@ export default function ResetPasswordView() {
 
   return (
     <div className="min-h-screen bg-paper flex flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm">
+      <main id="main-content" className="w-full max-w-sm">
         <div className="flex items-center justify-between mb-7">
           <Brand size="md" />
           <div className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export default function ResetPasswordView() {
             {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('auth.updatePassword')}
           </button>
         </form>
-      </div>
+      </main>
     </div>
   );
 }

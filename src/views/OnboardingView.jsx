@@ -127,7 +127,7 @@ export default function OnboardingView({ embedded = false, onDone }) {
 
   return (
     <div className="min-h-screen bg-paper flex flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm">
+      <main id="main-content" className="w-full max-w-sm">
         <div className="flex items-center justify-between mb-7">
           <Brand size="md" />
           <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export default function OnboardingView({ embedded = false, onDone }) {
         >
           <LogOut className="w-4 h-4" aria-hidden="true" /> {t('auth.signOut')}
         </button>
-      </div>
+      </main>
     </div>
   );
 }

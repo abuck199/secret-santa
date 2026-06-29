@@ -4,9 +4,9 @@
     @media (prefers-color-scheme: dark) { .box { fill: #F4F2EE; } }
   </style>
   <g transform="translate(0,10)">
-    <path d="M256 104 L267 141 L304 152 L267 163 L256 200 L245 163 L208 152 L245 141 Z" fill="#A17836"/>
+    <path d="M256 104 L267 141 L304 152 L267 163 L256 200 L245 163 L208 152 L245 141 Z" fill="#8A6321"/>
     <rect class="box" x="138" y="216" width="236" height="46" rx="12"/>
     <rect class="box" x="154" y="262" width="204" height="128" rx="14"/>
-    <rect x="239" y="216" width="34" height="174" fill="#A17836"/>
+    <rect x="239" y="216" width="34" height="174" fill="#8A6321"/>
   </g>
 </svg>

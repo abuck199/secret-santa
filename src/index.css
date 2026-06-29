@@ -9,8 +9,8 @@
   --panel-2: 244 242 236; /* nested subtle surface */
   --line: 230 226 219;    /* hairline borders */
   --fg: 30 28 25;         /* near-black warm text */
-  --mute: 122 116 108;    /* muted text */
-  --gold: 161 120 54;     /* refined accent */
+  --mute: 111 105 96;     /* muted text — AA (4.5:1) on cream */
+  --gold: 138 99 33;      /* refined accent — AA for small text on light */
   --goldsoft: 242 235 222;/* accent wash */
 }
 

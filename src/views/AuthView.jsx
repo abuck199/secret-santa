@@ -297,7 +297,7 @@ function AuthShell({ children, onBack, hideHeader }) {
   const { t } = useI18n();
   return (
     <div className="min-h-screen bg-paper flex flex-col items-center px-4 pt-14 sm:pt-20 pb-12">
-      <div className="w-full max-w-sm">
+      <main id="main-content" className="w-full max-w-sm">
         <div className="flex items-center justify-between mb-7">
           <Brand size="md" onClick={onBack} />
           <div className="flex items-center gap-2">
@@ -315,7 +315,7 @@ function AuthShell({ children, onBack, hideHeader }) {
           {children}
         </div>
         <p className="text-center text-xs text-mute mt-6">{t('app.tagline')}</p>
-      </div>
+      </main>
     </div>
   );
 }

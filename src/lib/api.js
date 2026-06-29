@@ -272,14 +272,52 @@ export async function shuffleAssignments(householdId) {
 
 /* ---------------------------- Invites --------------------------- */
 
+// Returns each redemption of every invite in a household: who joined, when,
+// via which link. Admin-only (enforced in the RPC). Degrades to [] if the
+// function isn't deployed yet (e.g. before the migration is run).
+export async function getInviteRedemptions(householdId) {
+  try {
+    return (
+      unwrap(await supabase.rpc('get_invite_redemptions', { p_household: householdId })) || []
+    );
+  } catch (e) {
+    return [];
+  }
+}
+
 export async function getInvites(householdId) {
-  return unwrap(
-    await supabase
-      .from('invites')
-      .select('id, code, role, expires_at, created_at, accepted_by')
-      .eq('household_id', householdId)
-      .order('created_at', { ascending: false })
-  );
+  const [invites, redemptions] = await Promise.all([
+    unwrap(
+      await supabase
+        .from('invites')
+        .select('id, code, role, expires_at, created_at, invited_by, accepted_by')
+        .eq('household_id', householdId)
+        .order('created_at', { ascending: false })
+    ),
+    getInviteRedemptions(householdId),
+  ]);
+
+  // Creator names (invited_by) via profiles.
+  const creatorIds = [...new Set(invites.map((i) => i.invited_by).filter(Boolean))];
+  const profiles = creatorIds.length ? await getProfiles(creatorIds) : [];
+  const nameById = Object.fromEntries(profiles.map((p) => [p.id, p.display_name]));
+
+  // Group joiners by invite.
+  const joinersByInvite = {};
+  for (const r of redemptions) {
+    (joinersByInvite[r.invite_id] = joinersByInvite[r.invite_id] || []).push({
+      userId: r.user_id,
+      name: r.display_name || '',
+      joinedAt: r.joined_at,
+    });
+  }
+
+  return invites.map((i) => ({
+    ...i,
+    creatorId: i.invited_by || null,
+    creatorName: i.invited_by ? nameById[i.invited_by] || '' : '',
+    joiners: joinersByInvite[i.id] || [],
+  }));
 }
 
 export async function createInvite(householdId, role = 'member') {
