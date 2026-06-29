@@ -3,6 +3,8 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 const STORAGE_KEY = 'wishly:theme';
 
 function getInitialTheme() {
+  // Honor an explicit choice the user made via the toggle; otherwise follow the
+  // OS preference, defaulting to light.
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === 'light' || saved === 'dark') return saved;

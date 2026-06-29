@@ -1,7 +1,7 @@
 import React from 'react';
 import { Gift } from 'lucide-react';
 
-// Wishly wordmark — serif display type with a minimal monochrome mark.
+// Wishly wordmark: serif display type with a minimal monochrome mark.
 export default function Brand({ size = 'md', onClick, showMark = true, className = '' }) {
   const dims = {
     sm: { box: 'w-7 h-7', icon: 'w-4 h-4', text: 'text-lg' },

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Cake, ClipboardList, Gift, Users, ArrowUpRight } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 import { useAuth } from '../context/AuthContext';
@@ -9,8 +10,9 @@ import NextBirthdayCard from '../components/NextBirthdayCard';
 import { useCountUp } from '../lib/useCountUp';
 import { daysUntilBirthday, ageTurningNext, formatBirthday } from '../lib/dates';
 
-export default function DashboardView({ setView }) {
+export default function DashboardView() {
   const { t, lang } = useI18n();
+  const navigate = useNavigate();
   const { profile, currentHousehold, currentHouseholdId, user } = useAuth();
   const [members, setMembers] = useState([]);
   const [myCount, setMyCount] = useState(0);
@@ -56,9 +58,9 @@ export default function DashboardView({ setView }) {
   const rest = birthdays.slice(1, 6);
 
   const stats = [
-    { icon: ClipboardList, value: myCount, label: t('nav.wishlist'), to: 'wishlist' },
-    { icon: Gift, value: resCount, label: t('nav.reservations'), to: 'reservations' },
-    { icon: Users, value: members.length, label: t('nav.members'), to: 'members' },
+    { icon: ClipboardList, value: myCount, label: t('nav.wishlist'), to: '/app/list' },
+    { icon: Gift, value: resCount, label: t('nav.reservations'), to: '/app/reservations' },
+    { icon: Users, value: members.length, label: t('nav.members'), to: '/app/members' },
   ];
 
   return (
@@ -82,7 +84,7 @@ export default function DashboardView({ setView }) {
               person={hero}
               isMe={hero.userId === user?.id}
               whenLabel={whenLabel(hero.days)}
-              onView={() => setView('members')}
+              onView={() => navigate('/app/members')}
             />
           )}
 
@@ -91,7 +93,7 @@ export default function DashboardView({ setView }) {
             {stats.map(({ icon: Icon, value, label, to }, i) => (
               <button
                 key={to}
-                onClick={() => setView(to)}
+                onClick={() => navigate(to)}
                 className="group flex items-center gap-4 p-5 sm:p-6 text-left hover:bg-panel-2 transition animate-slide-up"
                 style={{ animationDelay: `${i * 70}ms`, animationFillMode: 'backwards' }}
               >

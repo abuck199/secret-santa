@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ExternalLink, Check, X, Loader2, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
@@ -9,8 +10,9 @@ import PageHeader from '../components/PageHeader';
 import { InlineLoading } from '../components/Loading';
 import { hostOf } from '../lib/url';
 
-export default function ReservationsView({ setView }) {
+export default function ReservationsView() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const { currentHouseholdId } = useAuth();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function ReservationsView({ setView }) {
       const ownerIds = [...new Set(mine.map((r) => r.owner_id))];
       const profiles = await api.getProfiles(ownerIds);
       const byId = Object.fromEntries(profiles.map((p) => [p.id, p.display_name]));
-      setRows(mine.map((r) => ({ ...r, ownerName: byId[r.owner_id] || '—' })));
+      setRows(mine.map((r) => ({ ...r, ownerName: byId[r.owner_id] || '' })));
     } catch (e) {
       toast.error(t('err.generic'));
     } finally {
@@ -86,7 +88,7 @@ export default function ReservationsView({ setView }) {
             <ShoppingBag className="w-6 h-6 text-mute" strokeWidth={1.6} />
           </div>
           <p className="text-mute">{t('res.empty')}</p>
-          <button className="btn-secondary mt-5" onClick={() => setView('members')}>
+          <button className="btn-secondary mt-5" onClick={() => navigate('/app/members')}>
             {t('dash.seeMembers')}
           </button>
         </div>

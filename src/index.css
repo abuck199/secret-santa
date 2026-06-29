@@ -27,6 +27,10 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Belt-and-suspenders against stray horizontal overflow on mobile.
+     `clip` (unlike `hidden`) does not create a scroll container, so it
+     leaves position: sticky working. */
+  overflow-x: clip;
 }
 
 body {

@@ -1,0 +1,7 @@
+# Public marketing pages are crawlable; the signed-in app is not.
+User-agent: *
+Disallow: /app
+Disallow: /join
+
+# TODO: replace with your real production domain
+Sitemap: https://wishly.vercel.app/sitemap.xml

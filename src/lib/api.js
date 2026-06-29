@@ -157,7 +157,7 @@ export async function getMembers(householdId) {
       userId: m.user_id,
       role: m.role,
       joinedAt: m.joined_at,
-      displayName: byId[m.user_id]?.display_name || '—',
+      displayName: byId[m.user_id]?.display_name || '',
       birthday: byId[m.user_id]?.birthday || null,
     }))
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
@@ -189,7 +189,7 @@ export async function getMyItems(householdId) {
 
 export async function addItem({ householdId, item, link, displayOrder }) {
   const uid = await currentUserId();
-  // Only return the columns the `authenticated` role is granted — selecting
+  // Only return the columns the `authenticated` role is granted. Selecting
   // `*` would touch the masked `reserved_by` column and be denied.
   return unwrap(
     await supabase

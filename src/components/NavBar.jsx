@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
   ClipboardList,
@@ -24,11 +25,11 @@ import ThemeToggle from './ThemeToggle';
 function useNavItems(secretSanta) {
   const { t } = useI18n();
   return [
-    { id: 'dashboard', label: t('nav.dashboard'), icon: Home },
-    { id: 'wishlist', label: t('nav.wishlist'), icon: ClipboardList },
-    { id: 'members', label: t('nav.members'), icon: Users },
-    { id: 'reservations', label: t('nav.reservations'), icon: Gift },
-    ...(secretSanta ? [{ id: 'assignment', label: t('nav.assignment'), icon: Heart }] : []),
+    { label: t('nav.dashboard'), icon: Home, path: '/app' },
+    { label: t('nav.wishlist'), icon: ClipboardList, path: '/app/list' },
+    { label: t('nav.members'), icon: Users, path: '/app/members' },
+    { label: t('nav.reservations'), icon: Gift, path: '/app/reservations' },
+    ...(secretSanta ? [{ label: t('nav.assignment'), icon: Heart, path: '/app/match' }] : []),
   ];
 }
 
@@ -38,8 +39,10 @@ function initials(name) {
   return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || name[0].toUpperCase();
 }
 
-export default function NavBar({ view, setView }) {
+export default function NavBar() {
   const { t } = useI18n();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { profile, currentHousehold, households, switchHousehold, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -49,6 +52,9 @@ export default function NavBar({ view, setView }) {
 
   const items = useNavItems(currentHousehold?.secret_santa_enabled);
   const name = profile?.display_name || '';
+
+  const isActive = (path) =>
+    path === '/app' ? location.pathname === '/app' : location.pathname.startsWith(path);
 
   useEffect(() => {
     const onClick = (e) => {
@@ -77,8 +83,8 @@ export default function NavBar({ view, setView }) {
     };
   }, [menuOpen]);
 
-  const go = (id) => {
-    setView(id);
+  const go = (path) => {
+    navigate(path);
     setMenuOpen(false);
     setProfileOpen(false);
   };
@@ -87,7 +93,7 @@ export default function NavBar({ view, setView }) {
     switchHousehold(id);
     setSwitcherOpen(false);
     setMenuOpen(false);
-    setView('dashboard');
+    navigate('/app');
   };
 
   const HouseholdSwitcher = ({ block }) => (
@@ -98,7 +104,7 @@ export default function NavBar({ view, setView }) {
           block ? 'w-full justify-between' : ''
         }`}
       >
-        <span className="truncate max-w-[160px]">{currentHousehold?.name || '—'}</span>
+        <span className="truncate max-w-[160px]">{currentHousehold?.name || ''}</span>
         <ChevronDown className="w-4 h-4 text-mute" />
       </button>
       {switcherOpen && (
@@ -114,7 +120,7 @@ export default function NavBar({ view, setView }) {
             </button>
           ))}
           <button
-            onClick={() => go('onboarding')}
+            onClick={() => go('/app/new')}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-fg hover:bg-panel-2 font-medium mt-1 border-t border-line"
           >
             <Plus className="w-4 h-4 text-gold" /> {t('nav.newHousehold')}
@@ -130,17 +136,17 @@ export default function NavBar({ view, setView }) {
       <nav className="hidden md:block sticky top-0 z-40 bg-paper/80 backdrop-blur-xl border-b border-line">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Brand size="sm" onClick={() => go('dashboard')} />
+            <Brand size="sm" onClick={() => go('/app')} />
             <HouseholdSwitcher />
           </div>
 
           <div className="flex items-center gap-0.5">
-            {items.map(({ id, label, icon: Icon }) => {
-              const active = view === id;
+            {items.map(({ label, icon: Icon, path }) => {
+              const active = isActive(path);
               return (
                 <button
-                  key={id}
-                  onClick={() => setView(id)}
+                  key={path}
+                  onClick={() => navigate(path)}
                   className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
                     active ? 'text-fg' : 'text-mute hover:text-fg'
                   }`}
@@ -171,9 +177,9 @@ export default function NavBar({ view, setView }) {
                     <p className="font-semibold text-fg truncate">{name}</p>
                     <p className="text-xs text-mute truncate">{currentHousehold?.name}</p>
                   </div>
-                  <MenuRow icon={User} label={t('nav.profile')} onClick={() => go('profile')} />
-                  <MenuRow icon={Settings} label={t('nav.settings')} onClick={() => go('settings')} />
-                  <MenuRow icon={HelpCircle} label={t('nav.faq')} onClick={() => go('faq')} />
+                  <MenuRow icon={User} label={t('nav.profile')} onClick={() => go('/app/profile')} />
+                  <MenuRow icon={Settings} label={t('nav.settings')} onClick={() => go('/app/settings')} />
+                  <MenuRow icon={HelpCircle} label={t('nav.faq')} onClick={() => go('/app/help')} />
                   <div className="border-t border-line mt-1 pt-1">
                     <button
                       onClick={() => {
@@ -195,7 +201,7 @@ export default function NavBar({ view, setView }) {
       {/* ===== Mobile top ===== */}
       <nav className="md:hidden sticky top-0 z-40 bg-paper/85 backdrop-blur-xl border-b border-line">
         <div className="px-4 h-14 flex items-center justify-between">
-          <Brand size="sm" onClick={() => go('dashboard')} showMark={false} />
+          <Brand size="sm" onClick={() => go('/app')} showMark={false} />
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <span className="text-sm font-medium text-mute truncate max-w-[32vw]">
@@ -209,15 +215,15 @@ export default function NavBar({ view, setView }) {
       <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-paper/95 backdrop-blur-xl border-t border-line pb-safe">
         <div className="flex items-center justify-around px-2 py-1.5">
           {[
-            { id: 'dashboard', label: t('nav.dashboard'), icon: Home },
-            { id: 'wishlist', label: t('nav.wishlist'), icon: ClipboardList },
-            { id: 'members', label: t('nav.members'), icon: Users },
-          ].map(({ id, label, icon: Icon }) => (
+            { label: t('nav.dashboard'), icon: Home, path: '/app' },
+            { label: t('nav.wishlist'), icon: ClipboardList, path: '/app/list' },
+            { label: t('nav.members'), icon: Users, path: '/app/members' },
+          ].map(({ label, icon: Icon, path }) => (
             <button
-              key={id}
-              onClick={() => setView(id)}
+              key={path}
+              onClick={() => navigate(path)}
               className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg ${
-                view === id ? 'text-fg' : 'text-mute'
+                isActive(path) ? 'text-fg' : 'text-mute'
               }`}
             >
               <Icon className="w-5 h-5" strokeWidth={1.9} />
@@ -243,7 +249,7 @@ export default function NavBar({ view, setView }) {
           />
           <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-panel rounded-t-3xl shadow-card max-h-[85vh] overflow-y-auto animate-slide-up pb-safe border-t border-line">
             <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-              <span className="font-serif text-lg font-semibold text-fg">{t('nav.menu')}</span>
+              <span className="font-serif text-lg font-medium text-fg">{t('nav.menu')}</span>
               <button onClick={() => setMenuOpen(false)} className="text-mute">
                 <X className="w-5 h-5" />
               </button>
@@ -271,12 +277,12 @@ export default function NavBar({ view, setView }) {
               </div>
 
               <div className="space-y-1">
-                {items.map(({ id, label, icon: Icon }) => (
-                  <SheetRow key={id} icon={Icon} label={label} active={view === id} onClick={() => go(id)} />
+                {items.map(({ label, icon: Icon, path }) => (
+                  <SheetRow key={path} icon={Icon} label={label} active={isActive(path)} onClick={() => go(path)} />
                 ))}
-                <SheetRow icon={User} label={t('nav.profile')} active={view === 'profile'} onClick={() => go('profile')} />
-                <SheetRow icon={Settings} label={t('nav.settings')} active={view === 'settings'} onClick={() => go('settings')} />
-                <SheetRow icon={HelpCircle} label={t('nav.faq')} active={view === 'faq'} onClick={() => go('faq')} />
+                <SheetRow icon={User} label={t('nav.profile')} active={isActive('/app/profile')} onClick={() => go('/app/profile')} />
+                <SheetRow icon={Settings} label={t('nav.settings')} active={isActive('/app/settings')} onClick={() => go('/app/settings')} />
+                <SheetRow icon={HelpCircle} label={t('nav.faq')} active={isActive('/app/help')} onClick={() => go('/app/help')} />
               </div>
 
               <button

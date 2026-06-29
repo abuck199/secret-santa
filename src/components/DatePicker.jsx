@@ -143,7 +143,7 @@ export default function DatePicker({ value, onChange, placeholder, minYear = 192
               type="button"
               onClick={() => move(-1)}
               className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
-              aria-label="Previous month"
+              aria-label={t('common.prevMonth')}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -176,7 +176,7 @@ export default function DatePicker({ value, onChange, placeholder, minYear = 192
               type="button"
               onClick={() => move(1)}
               className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
-              aria-label="Next month"
+              aria-label={t('common.nextMonth')}
             >
               <ChevronRight className="w-4 h-4" />
             </button>

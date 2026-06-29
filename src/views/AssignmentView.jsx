@@ -9,7 +9,7 @@ import PageHeader from '../components/PageHeader';
 import { InlineLoading } from '../components/Loading';
 import { hostOf } from '../lib/url';
 
-export default function AssignmentView({ setView }) {
+export default function AssignmentView() {
   const { t } = useI18n();
   const { currentHousehold, currentHouseholdId } = useAuth();
   const enabled = currentHousehold?.secret_santa_enabled;
@@ -36,7 +36,7 @@ export default function AssignmentView({ setView }) {
         api.getProfiles([assignment.receiver_id]),
         api.getHouseholdWishlists(currentHouseholdId),
       ]);
-      setReceiver({ id: assignment.receiver_id, name: profiles[0]?.display_name || '—' });
+      setReceiver({ id: assignment.receiver_id, name: profiles[0]?.display_name || '' });
       setItems((lists || []).filter((it) => it.user_id === assignment.receiver_id));
     } catch (e) {
       toast.error(t('err.generic'));

@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
+import { usePublicSeo, parsePublicPath, localizedPath } from '../lib/seo';
 import * as api from '../lib/api';
 import Brand from '../components/Brand';
 import LanguageToggle from '../components/LanguageToggle';
 import ThemeToggle from '../components/ThemeToggle';
 import DatePicker from '../components/DatePicker';
 
-export default function AuthView() {
+export default function AuthView({ initialMode = 'signin', onBack }) {
   const { t } = useI18n();
-  const [mode, setMode] = useState('signin'); // signin | signup | forgot
+  usePublicSeo();
+  const navigate = useNavigate();
+  const location = useLocation();
+  // Preserve the /fr prefix when switching between the login and signup tabs.
+  const urlLang = parsePublicPath(location.pathname).fr ? 'fr' : 'en';
+  const [mode, setMode] = useState(initialMode); // signin | signup | forgot
+
+  // Keep the form in sync with the route (/login vs /signup).
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [confirmEmail, setConfirmEmail] = useState(null);
@@ -75,7 +87,7 @@ export default function AuthView() {
 
   if (confirmEmail) {
     return (
-      <AuthShell>
+      <AuthShell onBack={onBack}>
         <div className="text-center animate-scale-in">
           <div className="mx-auto w-12 h-12 rounded-2xl bg-goldsoft text-gold grid place-items-center mb-4">
             <Mail className="w-6 h-6" />
@@ -99,7 +111,7 @@ export default function AuthView() {
   }
 
   return (
-    <AuthShell>
+    <AuthShell onBack={onBack}>
       {mode === 'forgot' ? (
         <form onSubmit={handleForgot} className="animate-scale-in">
           <button
@@ -123,7 +135,7 @@ export default function AuthView() {
               <button
                 key={m}
                 type="button"
-                onClick={() => setMode(m)}
+                onClick={() => navigate(localizedPath(m === 'signin' ? '/login' : '/signup', urlLang))}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
                   mode === m ? 'bg-panel text-fg shadow-soft' : 'text-mute'
                 }`}
@@ -195,13 +207,13 @@ export default function AuthView() {
   );
 }
 
-function AuthShell({ children }) {
+function AuthShell({ children, onBack }) {
   const { t } = useI18n();
   return (
     <div className="min-h-screen bg-paper flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-between mb-7">
-          <Brand size="md" />
+          <Brand size="md" onClick={onBack} />
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <LanguageToggle />

@@ -13,6 +13,7 @@ import {
   Check,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { useI18n } from '../i18n/I18nContext';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../lib/api';
@@ -21,8 +22,9 @@ import PageHeader from '../components/PageHeader';
 import { InlineLoading } from '../components/Loading';
 import ConfirmModal from '../components/ConfirmModal';
 
-export default function SettingsView({ setView }) {
+export default function SettingsView() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const {
     currentHousehold,
     currentHouseholdId,
@@ -120,7 +122,7 @@ export default function SettingsView({ setView }) {
   }
 
   function inviteLink(code) {
-    return `${window.location.origin}/?invite=${code}`;
+    return `${window.location.origin}/join/${code}`;
   }
 
   async function copy(text, id) {
@@ -159,12 +161,12 @@ export default function SettingsView({ setView }) {
         await api.leaveHousehold(currentHouseholdId);
         toast.success(t('settings.left'));
         await afterHouseholdChange(null);
-        setView('dashboard');
+        navigate('/app');
       } else if (c.type === 'delete') {
         await api.deleteHousehold(currentHouseholdId);
         toast.success(t('settings.deleted'));
         await afterHouseholdChange(null);
-        setView('dashboard');
+        navigate('/app');
       }
     } catch (e) {
       toast.error(e.message || t('err.generic'));

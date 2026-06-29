@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Home, Ticket, Loader2, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
@@ -12,7 +13,9 @@ import ThemeToggle from '../components/ThemeToggle';
 // the nav ("New / join household") via the `embedded` + `onDone` props.
 export default function OnboardingView({ embedded = false, onDone }) {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const { afterHouseholdChange, signOut } = useAuth();
+  const done = onDone || (() => navigate('/app'));
   const [tab, setTab] = useState('create');
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
@@ -26,7 +29,7 @@ export default function OnboardingView({ embedded = false, onDone }) {
       const hid = await api.createHousehold(name.trim());
       await afterHouseholdChange(hid);
       toast.success(t('onboard.created'));
-      onDone?.();
+      done();
     } catch (err) {
       toast.error(err.message || t('err.generic'));
     } finally {
@@ -44,7 +47,7 @@ export default function OnboardingView({ embedded = false, onDone }) {
       const list = await api.getMyHouseholds();
       const h = list.find((x) => x.id === target);
       toast.success(t('onboard.joined', { name: h?.name || '' }));
-      onDone?.();
+      done();
     } catch (err) {
       toast.error(t('onboard.invalidCode'));
     } finally {
