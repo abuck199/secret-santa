@@ -40,9 +40,6 @@ export default function LegalLayout({ title, updated, sections }) {
             {t('legal.updated')}: {updated}
           </p>
         )}
-        <p className="text-sm text-mute italic mt-4 p-3 rounded-xl bg-panel-2 border border-line">
-          {t('legal.template')}
-        </p>
 
         <div className="mt-8 space-y-8">
           {sections.map((s, i) => (
