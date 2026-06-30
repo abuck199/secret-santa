@@ -14,6 +14,9 @@ import { useI18n } from '../i18n/I18nContext';
 
 const HOUSEHOLD_KEY = 'thatwish:household';
 const PENDING_INVITE_KEY = 'thatwish:pendingInvite';
+// Remembers which users we've already shown the "email confirmed" welcome to,
+// so re-clicking the confirmation link doesn't replay the toast.
+const WELCOMED_KEY = 'thatwish:welcomed';
 
 // Capture an ?invite=CODE param as early as possible, then clean the URL.
 (function captureInvite() {
@@ -184,16 +187,42 @@ export function AuthProvider({ children }) {
   }, [lang, session?.user?.id]);
 
   // After the email-confirmation redirect, greet the user once they're signed in,
-  // then strip the `?confirmed=1` flag from the URL.
+  // then strip the `?confirmed=1` flag from the URL. We only celebrate a genuine
+  // first-time confirmation: re-clicking the link (or replaying an old one) keeps
+  // putting `?confirmed=1` back, so gate the toast on the server's confirmation
+  // timestamp being recent AND a one-time per-user marker.
   useEffect(() => {
     if (!confirmedRef.current || !session?.user) return;
     confirmedRef.current = false;
-    toast.success(t('auth.emailConfirmed'));
+
+    const stripParam = () => {
+      try {
+        const u = new URL(window.location.href);
+        u.searchParams.delete('confirmed');
+        window.history.replaceState({}, '', u.pathname + u.search + u.hash);
+      } catch (_) {}
+    };
+
+    const uid = session.user.id;
+    const confirmedAt =
+      session.user.email_confirmed_at || session.user.confirmed_at || null;
+    const isRecent =
+      !!confirmedAt &&
+      Date.now() - new Date(confirmedAt).getTime() < 10 * 60 * 1000;
+
+    let welcomed = {};
     try {
-      const u = new URL(window.location.href);
-      u.searchParams.delete('confirmed');
-      window.history.replaceState({}, '', u.pathname + u.search + u.hash);
+      welcomed = JSON.parse(localStorage.getItem(WELCOMED_KEY) || '{}');
     } catch (_) {}
+
+    if (isRecent && !welcomed[uid]) {
+      welcomed[uid] = true;
+      try {
+        localStorage.setItem(WELCOMED_KEY, JSON.stringify(welcomed));
+      } catch (_) {}
+      toast.success(t('auth.emailConfirmed'));
+    }
+    stripParam();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id]);
 
