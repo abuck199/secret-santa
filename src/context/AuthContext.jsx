@@ -12,8 +12,8 @@ import { supabase } from '../supabaseClient';
 import * as api from '../lib/api';
 import { useI18n } from '../i18n/I18nContext';
 
-const HOUSEHOLD_KEY = 'souhaity:household';
-const PENDING_INVITE_KEY = 'souhaity:pendingInvite';
+const HOUSEHOLD_KEY = 'thatwish:household';
+const PENDING_INVITE_KEY = 'thatwish:pendingInvite';
 
 // Capture an ?invite=CODE param as early as possible, then clean the URL.
 (function captureInvite() {

@@ -11,7 +11,7 @@ export default function LegalLayout({ title, updated, sections }) {
   const { t } = useI18n();
 
   useEffect(() => {
-    document.title = `${title} · Souhaity`;
+    document.title = `${title} · ThatWish`;
     window.scrollTo({ top: 0 });
   }, [title]);
 

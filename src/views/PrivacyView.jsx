@@ -4,12 +4,12 @@ import LegalLayout from '../components/LegalLayout';
 
 const UPDATED = '2026-06-29';
 
-// NOTE: Update the privacy@souhaity.com contact email to your real address before publishing.
+// NOTE: Update the privacy@thatwish.com contact email to your real address before publishing.
 const EN = [
   {
     h: 'Who we are',
     body: [
-      'Souhaity ("we", "us") is operated by the team behind Souhaity, based in Québec, Canada. This policy explains what personal information we collect, why, and your rights under Québec’s Law 25 and applicable Canadian privacy law.',
+      'ThatWish ("we", "us") is operated by the team behind ThatWish, based in Québec, Canada. This policy explains what personal information we collect, why, and your rights under Québec’s Law 25 and applicable Canadian privacy law.',
     ],
   },
   {
@@ -53,34 +53,34 @@ const EN = [
     h: 'Your rights',
     body: [
       'Under Québec’s Law 25, you may access, correct, or delete your personal information, withdraw your consent, and request a copy of your data (portability).',
-      'To exercise these rights, contact us at privacy@souhaity.com.',
+      'To exercise these rights, contact us at privacy@thatwish.com.',
       'You also have the right to file a complaint with the Commission d’accès à l’information du Québec (CAI).',
     ],
   },
   {
     h: 'Person responsible for personal information',
     body: [
-      'The person responsible for the protection of personal information at Souhaity can be reached at privacy@souhaity.com.',
+      'The person responsible for the protection of personal information at ThatWish can be reached at privacy@thatwish.com.',
     ],
   },
   {
     h: 'Children',
     body: [
-      'Souhaity is not directed to children under 14. If you believe a child has provided us personal information, contact us and we will delete it.',
+      'ThatWish is not directed to children under 14. If you believe a child has provided us personal information, contact us and we will delete it.',
     ],
   },
   {
     h: 'Changes to this policy',
     body: ['We may update this policy from time to time. The "last updated" date above reflects the latest version.'],
   },
-  { h: 'Contact', body: ['Questions? Email us at privacy@souhaity.com.'] },
+  { h: 'Contact', body: ['Questions? Email us at privacy@thatwish.com.'] },
 ];
 
 const FR = [
   {
     h: 'Qui nous sommes',
     body: [
-      'Souhaity (« nous ») est exploité par l’équipe derrière Souhaity, située au Québec, Canada. La présente politique explique quels renseignements personnels nous recueillons, pourquoi, et vos droits en vertu de la Loi 25 du Québec et des lois canadiennes applicables.',
+      'ThatWish (« nous ») est exploité par l’équipe derrière ThatWish, située au Québec, Canada. La présente politique explique quels renseignements personnels nous recueillons, pourquoi, et vos droits en vertu de la Loi 25 du Québec et des lois canadiennes applicables.',
     ],
   },
   {
@@ -124,27 +124,27 @@ const FR = [
     h: 'Vos droits',
     body: [
       'En vertu de la Loi 25, vous pouvez accéder à vos renseignements, les corriger ou les supprimer, retirer votre consentement et demander une copie de vos données (portabilité).',
-      'Pour exercer ces droits, écrivez-nous à privacy@souhaity.com.',
+      'Pour exercer ces droits, écrivez-nous à privacy@thatwish.com.',
       'Vous avez aussi le droit de porter plainte auprès de la Commission d’accès à l’information du Québec (CAI).',
     ],
   },
   {
     h: 'Responsable de la protection des renseignements personnels',
     body: [
-      'Le responsable de la protection des renseignements personnels chez Souhaity est joignable à privacy@souhaity.com.',
+      'Le responsable de la protection des renseignements personnels chez ThatWish est joignable à privacy@thatwish.com.',
     ],
   },
   {
     h: 'Enfants',
     body: [
-      'Souhaity ne s’adresse pas aux enfants de moins de 14 ans. Si vous croyez qu’un enfant nous a fourni des renseignements, contactez-nous et nous les supprimerons.',
+      'ThatWish ne s’adresse pas aux enfants de moins de 14 ans. Si vous croyez qu’un enfant nous a fourni des renseignements, contactez-nous et nous les supprimerons.',
     ],
   },
   {
     h: 'Modifications',
     body: ['Nous pouvons mettre à jour cette politique. La date de « dernière mise à jour » ci-dessus indique la version en vigueur.'],
   },
-  { h: 'Contact', body: ['Des questions ? Écrivez-nous à privacy@souhaity.com.'] },
+  { h: 'Contact', body: ['Des questions ? Écrivez-nous à privacy@thatwish.com.'] },
 ];
 
 export default function PrivacyView() {

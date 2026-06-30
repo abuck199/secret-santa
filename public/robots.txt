@@ -4,4 +4,4 @@ Disallow: /app
 Disallow: /join
 
 # TODO: replace with your real production domain
-Sitemap: https://souhaity.com/sitemap.xml
+Sitemap: https://thatwish.com/sitemap.xml

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { translations } from './translations';
 
-const STORAGE_KEY = 'souhaity:lang';
+const STORAGE_KEY = 'thatwish:lang';
 const SUPPORTED = ['en', 'fr'];
 
 function detectInitialLang() {

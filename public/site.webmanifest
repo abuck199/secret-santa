@@ -1,6 +1,6 @@
 {
-  "name": "Souhaity",
-  "short_name": "Souhaity",
+  "name": "ThatWish",
+  "short_name": "ThatWish",
   "description": "Shared wishlists for birthdays and every occasion.",
   "start_url": "/",
   "display": "standalone",

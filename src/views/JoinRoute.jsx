@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import * as api from '../lib/api';
 import Loading from '../components/Loading';
 
-const PENDING_INVITE_KEY = 'souhaity:pendingInvite';
+const PENDING_INVITE_KEY = 'thatwish:pendingInvite';
 
 // Handles /join/:code. If signed in, accept immediately and go to the app;
 // otherwise stash the code and send the visitor to sign up (AuthContext

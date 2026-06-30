@@ -22,7 +22,7 @@ export default function AppLayout() {
 
   useEffect(() => {
     const key = TITLE_KEYS[location.pathname];
-    document.title = key ? `${t(key)} · Souhaity` : 'Souhaity';
+    document.title = key ? `${t(key)} · ThatWish` : 'ThatWish';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location.pathname, t]);
 

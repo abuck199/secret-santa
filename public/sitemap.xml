@@ -5,26 +5,26 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml"
 >
   <url>
-    <loc>https://souhaity.com/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://souhaity.com/" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://souhaity.com/fr" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://souhaity.com/" />
+    <loc>https://thatwish.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thatwish.com/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://thatwish.com/fr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://thatwish.com/" />
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://souhaity.com/signup</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://souhaity.com/signup" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://souhaity.com/fr/signup" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://souhaity.com/signup" />
+    <loc>https://thatwish.com/signup</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thatwish.com/signup" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://thatwish.com/fr/signup" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://thatwish.com/signup" />
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://souhaity.com/login</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://souhaity.com/login" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://souhaity.com/fr/login" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://souhaity.com/login" />
+    <loc>https://thatwish.com/login</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thatwish.com/login" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://thatwish.com/fr/login" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://thatwish.com/login" />
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

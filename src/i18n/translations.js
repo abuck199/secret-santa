@@ -3,7 +3,7 @@
 
 export const translations = {
   en: {
-    'app.name': 'Souhaity',
+    'app.name': 'ThatWish',
     'app.tagline': 'Wishlists for birthdays & every occasion',
 
     'a11y.skip': 'Skip to content',
@@ -45,7 +45,7 @@ export const translations = {
     'lang.en': 'English',
     'lang.fr': 'Français',
 
-    'auth.welcome': 'Welcome to Souhaity',
+    'auth.welcome': 'Welcome to ThatWish',
     'auth.subtitle': 'Shared wishlists, zero duplicate gifts.',
     'auth.signin': 'Sign in',
     'auth.signup': 'Create account',
@@ -69,7 +69,7 @@ export const translations = {
     'auth.confirmPassword': 'Confirm password',
     'auth.updatePassword': 'Update password',
     'auth.passwordUpdated': 'Password updated. You are signed in.',
-    'auth.emailConfirmed': 'Email confirmed — welcome to Souhaity!',
+    'auth.emailConfirmed': 'Email confirmed — welcome to ThatWish!',
     'auth.passwordsNoMatch': 'Passwords do not match',
     'auth.passwordShort': 'Password must be at least 6 characters',
     'auth.checkEmail': 'Check your email',
@@ -83,11 +83,11 @@ export const translations = {
     'landing.hero.eyebrow': 'Wishlists for every celebration',
     'landing.hero.title': 'Give gifts they actually want, without the spoilers.',
     'landing.hero.subtitle':
-      'Souhaity lets your family or group share wishlists for birthdays and any occasion, then quietly reserve gifts so there are never duplicates and never any ruined surprises.',
+      'ThatWish lets your family or group share wishlists for birthdays and any occasion, then quietly reserve gifts so there are never duplicates and never any ruined surprises.',
     'landing.hero.cta': 'Create your household',
     'landing.hero.secondary': 'I already have an account',
     'landing.hero.free': 'Free to use · No credit card',
-    'landing.features.eyebrow': 'Why Souhaity',
+    'landing.features.eyebrow': 'Why ThatWish',
     'landing.features.title': "Everything you need, nothing you don't.",
     'landing.feature1.title': 'Shared wishlists',
     'landing.feature1.desc': "Everyone adds what they'd love to receive, with links, all in one place your whole group can see.",
@@ -252,8 +252,8 @@ export const translations = {
     'profile.language': 'Language',
 
     'faq.title': 'Help & FAQ',
-    'faq.q1': 'What is Souhaity?',
-    'faq.a1': 'Souhaity lets your family or group keep shared wishlists for birthdays and any occasion. Everyone adds what they would like, and others can quietly reserve gifts so there are no duplicates.',
+    'faq.q1': 'What is ThatWish?',
+    'faq.a1': 'ThatWish lets your family or group keep shared wishlists for birthdays and any occasion. Everyone adds what they would like, and others can quietly reserve gifts so there are no duplicates.',
     'faq.q2': 'Can I see who reserved my gifts?',
     'faq.a2': 'No. Reservations on your own list are always hidden from you, so every gift stays a surprise.',
     'faq.q3': 'How do birthdays work?',
@@ -268,7 +268,7 @@ export const translations = {
   },
 
   fr: {
-    'app.name': 'Souhaity',
+    'app.name': 'ThatWish',
     'app.tagline': 'Des listes de souhaits pour les anniversaires et toutes les occasions',
 
     'a11y.skip': 'Aller au contenu',
@@ -310,7 +310,7 @@ export const translations = {
     'lang.en': 'English',
     'lang.fr': 'Français',
 
-    'auth.welcome': 'Bienvenue sur Souhaity',
+    'auth.welcome': 'Bienvenue sur ThatWish',
     'auth.subtitle': 'Des listes partagées, zéro cadeau en double.',
     'auth.signin': 'Connexion',
     'auth.signup': 'Créer un compte',
@@ -334,7 +334,7 @@ export const translations = {
     'auth.confirmPassword': 'Confirmer le mot de passe',
     'auth.updatePassword': 'Mettre à jour',
     'auth.passwordUpdated': 'Mot de passe mis à jour. Vous êtes connecté.',
-    'auth.emailConfirmed': 'Courriel confirmé — bienvenue sur Souhaity!',
+    'auth.emailConfirmed': 'Courriel confirmé — bienvenue sur ThatWish!',
     'auth.passwordsNoMatch': 'Les mots de passe ne correspondent pas',
     'auth.passwordShort': 'Le mot de passe doit contenir au moins 6 caractères',
     'auth.checkEmail': 'Vérifiez votre courriel',
@@ -348,11 +348,11 @@ export const translations = {
     'landing.hero.eyebrow': 'Des listes pour chaque célébration',
     'landing.hero.title': 'Offrez ce qu’ils veulent vraiment, sans gâcher la surprise.',
     'landing.hero.subtitle':
-      'Souhaity permet à votre famille ou à votre groupe de partager des listes de souhaits pour les anniversaires et toute occasion, puis de réserver discrètement les cadeaux pour éviter les doublons et préserver les surprises.',
+      'ThatWish permet à votre famille ou à votre groupe de partager des listes de souhaits pour les anniversaires et toute occasion, puis de réserver discrètement les cadeaux pour éviter les doublons et préserver les surprises.',
     'landing.hero.cta': 'Créer votre foyer',
     'landing.hero.secondary': 'J’ai déjà un compte',
     'landing.hero.free': 'Gratuit · Aucune carte de crédit',
-    'landing.features.eyebrow': 'Pourquoi Souhaity',
+    'landing.features.eyebrow': 'Pourquoi ThatWish',
     'landing.features.title': 'Tout ce qu’il faut, rien de superflu.',
     'landing.feature1.title': 'Listes partagées',
     'landing.feature1.desc': 'Chacun ajoute ce qu’il aimerait recevoir, avec des liens, au même endroit, visible par tout le groupe.',
@@ -517,8 +517,8 @@ export const translations = {
     'profile.language': 'Langue',
 
     'faq.title': 'Aide et FAQ',
-    'faq.q1': "Qu'est-ce que Souhaity ?",
-    'faq.a1': "Souhaity permet à votre famille ou groupe de tenir des listes de souhaits partagées pour les anniversaires et toute occasion. Chacun ajoute ce qu'il aimerait, et les autres peuvent discrètement réserver des cadeaux pour éviter les doublons.",
+    'faq.q1': "Qu'est-ce que ThatWish ?",
+    'faq.a1': "ThatWish permet à votre famille ou groupe de tenir des listes de souhaits partagées pour les anniversaires et toute occasion. Chacun ajoute ce qu'il aimerait, et les autres peuvent discrètement réserver des cadeaux pour éviter les doublons.",
     'faq.q2': 'Puis-je voir qui a réservé mes cadeaux ?',
     'faq.a2': 'Non. Les réservations sur votre propre liste vous sont toujours cachées, pour garder la surprise.',
     'faq.q3': 'Comment fonctionnent les anniversaires ?',

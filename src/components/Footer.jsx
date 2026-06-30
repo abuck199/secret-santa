@@ -21,7 +21,7 @@ export default function Footer() {
           <LanguageToggle />
         </div>
         <div className="sm:order-2 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs text-mute">
-          <span>© {year} Souhaity</span>
+          <span>© {year} ThatWish</span>
           <span aria-hidden="true">·</span>
           <Link to="/privacy" className="hover:text-fg transition">
             {t('legal.privacy')}

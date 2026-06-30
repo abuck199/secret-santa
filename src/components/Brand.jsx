@@ -17,7 +17,7 @@ function GiftMark({ className }) {
   );
 }
 
-// Souhaity wordmark: serif display type with a minimal gift mark.
+// ThatWish wordmark: serif display type with a minimal gift mark.
 export default function Brand({ size = 'md', onClick, showMark = true, className = '' }) {
   const dims = {
     sm: { icon: 'h-7 w-7', text: 'text-lg' },
@@ -38,7 +38,7 @@ export default function Brand({ size = 'md', onClick, showMark = true, className
         />
       )}
       <span className={`${dims.text} font-serif font-medium tracking-tight leading-none`}>
-        Souhait<span className="text-gold">y</span>
+        That<span className="text-gold">Wish</span>
       </span>
     </Wrapper>
   );

@@ -113,7 +113,7 @@ body {
 }
 
 /* Shimmering skeleton placeholder */
-@keyframes souhaity-shimmer {
+@keyframes thatwish-shimmer {
   100% {
     transform: translateX(100%);
   }
@@ -129,7 +129,7 @@ body {
   inset: 0;
   transform: translateX(-100%);
   background: linear-gradient(90deg, transparent, rgb(var(--line) / 0.7), transparent);
-  animation: souhaity-shimmer 1.5s infinite;
+  animation: thatwish-shimmer 1.5s infinite;
 }
 
 /* Subtle hover lift used on featured surfaces */
