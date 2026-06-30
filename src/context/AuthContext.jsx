@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { supabase } from '../supabaseClient';
 import * as api from '../lib/api';
+import { useI18n } from '../i18n/I18nContext';
 
 const HOUSEHOLD_KEY = 'souhaity:household';
 const PENDING_INVITE_KEY = 'souhaity:pendingInvite';
@@ -47,6 +48,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [recovery, setRecovery] = useState(false);
   const initialized = useRef(false);
+  const { lang } = useI18n();
 
   const persistHousehold = useCallback((id) => {
     setCurrentHouseholdId(id);
@@ -162,6 +164,16 @@ export function AuthProvider({ children }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id]);
+
+  // Keep the email language (user_metadata.lang) in sync with the app language,
+  // so password-reset emails arrive in the language the user is actually using.
+  useEffect(() => {
+    const u = session?.user;
+    if (!u) return;
+    if ((u.user_metadata?.lang || '') === lang) return;
+    supabase.auth.updateUser({ data: { lang } }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang, session?.user?.id]);
 
   const switchHousehold = useCallback(
     (id) => {

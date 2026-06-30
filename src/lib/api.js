@@ -17,7 +17,7 @@ async function currentUserId() {
 
 /* ----------------------------- Auth ----------------------------- */
 
-export async function signUp({ email, password, displayName, birthday }) {
+export async function signUp({ email, password, displayName, birthday, lang }) {
   return unwrap(
     await supabase.auth.signUp({
       email,
@@ -27,6 +27,8 @@ export async function signUp({ email, password, displayName, birthday }) {
         data: {
           display_name: displayName || '',
           birthday: birthday || null,
+          // Drives the language of the Supabase auth emails (see docs/emails/).
+          lang: lang || 'en',
         },
       },
     })

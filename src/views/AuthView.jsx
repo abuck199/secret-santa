@@ -11,7 +11,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import DatePicker from '../components/DatePicker';
 
 export default function AuthView({ initialMode = 'signin', onBack }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   usePublicSeo();
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,6 +84,7 @@ export default function AuthView({ initialMode = 'signin', onBack }) {
         password: form.password,
         displayName: form.displayName.trim(),
         birthday: form.birthday,
+        lang,
       });
       if (!res.session) setConfirmEmail(form.email.trim());
     } catch (err) {
