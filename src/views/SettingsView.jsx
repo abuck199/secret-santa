@@ -22,6 +22,10 @@ import PageHeader from '../components/PageHeader';
 import { InlineLoading } from '../components/Loading';
 import ConfirmModal from '../components/ConfirmModal';
 
+// Max active (non-expired) invite links per household. Enforced for real by a
+// DB trigger (see docs/invite-cap.sql); this is the matching UI guard.
+const INVITE_CAP = 5;
+
 export default function SettingsView() {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -44,6 +48,7 @@ export default function SettingsView() {
   const [drawing, setDrawing] = useState(false);
   const [copied, setCopied] = useState(null);
   const [confirm, setConfirm] = useState(null);
+  const [creatingInvite, setCreatingInvite] = useState(false);
 
   useEffect(() => {
     setName(currentHousehold?.name || '');
@@ -112,12 +117,24 @@ export default function SettingsView() {
   }
 
   async function createInvite() {
+    if (creatingInvite) return; // guard against double-clicks / spam
+    const active = invites.filter((i) => !i.expires_at || new Date(i.expires_at) > new Date());
+    if (active.length >= INVITE_CAP) {
+      return toast.error(t('settings.inviteLimitHint', { max: INVITE_CAP }));
+    }
+    setCreatingInvite(true);
     try {
       const inv = await api.createInvite(currentHouseholdId);
-      setInvites((prev) => [inv, ...prev]);
+      // Shape the fresh row like getInvites() returns (it has no joiners yet).
+      setInvites((prev) => [
+        { ...inv, creatorId: inv.invited_by || user?.id || null, creatorName: '', joiners: [] },
+        ...prev,
+      ]);
       toast.success(t('settings.inviteCreated'));
     } catch (e) {
       toast.error(t('err.generic'));
+    } finally {
+      setCreatingInvite(false);
     }
   }
 
@@ -172,6 +189,11 @@ export default function SettingsView() {
       toast.error(e.message || t('err.generic'));
     }
   }
+
+  const activeInviteCount = invites.filter(
+    (i) => !i.expires_at || new Date(i.expires_at) > new Date()
+  ).length;
+  const atInviteCap = activeInviteCount >= INVITE_CAP;
 
   return (
     <Page>
@@ -274,10 +296,22 @@ export default function SettingsView() {
 
       {isAdmin && (
         <Section title={t('settings.invites')}>
-          <button className="btn-primary mb-3" onClick={createInvite}>
-            <UserPlus className="w-4 h-4" /> {t('settings.createInvite')}
+          <button
+            className="btn-primary mb-2"
+            onClick={createInvite}
+            disabled={creatingInvite || atInviteCap}
+            aria-busy={creatingInvite}
+          >
+            {creatingInvite ? (
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <UserPlus className="w-4 h-4" aria-hidden="true" />
+            )}
+            {t('settings.createInvite')}
           </button>
-          <p className="text-xs text-mute mb-3">{t('settings.inviteHint')}</p>
+          <p className="text-xs text-mute mb-3">
+            {atInviteCap ? t('settings.inviteLimitHint', { max: INVITE_CAP }) : t('settings.inviteHint')}
+          </p>
           <div className="space-y-2">
             {invites.map((inv) => (
               <div key={inv.id} className="p-2.5 rounded-xl bg-panel-2 border border-line">
@@ -307,7 +341,7 @@ export default function SettingsView() {
                       name: inv.creatorId === user?.id ? t('common.you') : inv.creatorName || t('common.member'),
                     })}
                   </span>
-                  {inv.joiners.length === 0 ? (
+                  {(inv.joiners || []).length === 0 ? (
                     <span className="chip bg-panel text-mute border border-line">{t('settings.inviteUnused')}</span>
                   ) : (
                     <>

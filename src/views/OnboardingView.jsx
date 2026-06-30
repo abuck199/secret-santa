@@ -1,6 +1,6 @@
 import React, { useState, useId } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, Ticket, Loader2, LogOut } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '../i18n/I18nContext';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,7 @@ import ThemeToggle from '../components/ThemeToggle';
 
 // Shown when a signed-in user belongs to no household yet. Also reachable from
 // the nav ("New / join household") via the `embedded` + `onDone` props.
+// Layout mirrors AuthShell (login/signup) so it feels like the same family.
 export default function OnboardingView({ embedded = false, onDone }) {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -20,12 +21,18 @@ export default function OnboardingView({ embedded = false, onDone }) {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const nameId = useId();
   const codeId = useId();
 
+  const selectTab = (key) => {
+    setTab(key);
+    setErrors({});
+  };
+
   async function handleCreate(e) {
     e.preventDefault();
-    if (!name.trim()) return toast.error(t('common.required'));
+    if (!name.trim()) return setErrors({ name: t('common.required') });
     setLoading(true);
     try {
       const hid = await api.createHousehold(name.trim());
@@ -41,7 +48,7 @@ export default function OnboardingView({ embedded = false, onDone }) {
 
   async function handleJoin(e) {
     e.preventDefault();
-    if (!code.trim()) return toast.error(t('common.required'));
+    if (!code.trim()) return setErrors({ code: t('common.required') });
     setLoading(true);
     try {
       const hid = await api.acceptInvite(code.trim());
@@ -51,32 +58,32 @@ export default function OnboardingView({ embedded = false, onDone }) {
       toast.success(t('onboard.joined', { name: h?.name || '' }));
       done();
     } catch (err) {
-      toast.error(t('onboard.invalidCode'));
+      const raw = String(err?.message || '');
+      if (raw.includes('ALREADY_MEMBER')) {
+        const who = (raw.split('ALREADY_MEMBER:')[1] || '').trim();
+        toast.error(who ? t('onboard.alreadyMember', { name: who }) : t('onboard.alreadyMemberGeneric'));
+      } else {
+        toast.error(t('onboard.invalidCode'));
+      }
     } finally {
       setLoading(false);
     }
   }
 
-  const body = (
-    <div className="card p-6 sm:p-8 animate-scale-in">
+  const tab_btn = (key, label) =>
+    `flex-1 py-2 rounded-lg text-sm font-medium transition ${
+      tab === key ? 'bg-panel text-fg shadow-soft' : 'text-mute'
+    }`;
+
+  // Segmented tabs + the active form — same building blocks as AuthShell.
+  const tabsAndForm = (
+    <>
       <div className="flex gap-1 p-1 bg-panel-2 rounded-xl mb-6">
-        <button
-          onClick={() => setTab('create')}
-          aria-pressed={tab === 'create'}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
-            tab === 'create' ? 'bg-panel text-fg shadow-soft' : 'text-mute'
-          }`}
-        >
-          <Home className="w-4 h-4" aria-hidden="true" /> {t('onboard.createTab')}
+        <button type="button" onClick={() => selectTab('create')} aria-pressed={tab === 'create'} className={tab_btn('create')}>
+          {t('onboard.createTab')}
         </button>
-        <button
-          onClick={() => setTab('join')}
-          aria-pressed={tab === 'join'}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
-            tab === 'join' ? 'bg-panel text-fg shadow-soft' : 'text-mute'
-          }`}
-        >
-          <Ticket className="w-4 h-4" aria-hidden="true" /> {t('onboard.joinTab')}
+        <button type="button" onClick={() => selectTab('join')} aria-pressed={tab === 'join'} className={tab_btn('join')}>
+          {t('onboard.joinTab')}
         </button>
       </div>
 
@@ -85,12 +92,18 @@ export default function OnboardingView({ embedded = false, onDone }) {
           <label htmlFor={nameId} className="label">{t('onboard.householdName')}</label>
           <input
             id={nameId}
-            className="input"
+            className={`input ${errors.name ? 'input-error' : ''}`}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errors.name) setErrors((p) => ({ ...p, name: undefined }));
+            }}
             placeholder={t('onboard.householdPlaceholder')}
             maxLength={60}
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? `${nameId}-err` : undefined}
           />
+          {errors.name && <p id={`${nameId}-err`} className="text-xs text-red-500 mt-1.5">{errors.name}</p>}
           <button className="btn-primary w-full mt-5" disabled={loading} aria-busy={loading} aria-label={t('onboard.createCta')}>
             {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('onboard.createCta')}
           </button>
@@ -100,19 +113,26 @@ export default function OnboardingView({ embedded = false, onDone }) {
           <label htmlFor={codeId} className="label">{t('onboard.inviteCode')}</label>
           <input
             id={codeId}
-            className="input font-mono tracking-wide"
+            className={`input font-mono tracking-wide ${errors.code ? 'input-error' : ''}`}
             value={code}
-            onChange={(e) => setCode(e.target.value)}
+            onChange={(e) => {
+              setCode(e.target.value);
+              if (errors.code) setErrors((p) => ({ ...p, code: undefined }));
+            }}
             placeholder="a1b2c3d4…"
+            aria-invalid={!!errors.code}
+            aria-describedby={errors.code ? `${codeId}-err` : undefined}
           />
+          {errors.code && <p id={`${codeId}-err`} className="text-xs text-red-500 mt-1.5">{errors.code}</p>}
           <button className="btn-primary w-full mt-5" disabled={loading} aria-busy={loading} aria-label={t('onboard.joinCta')}>
             {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('onboard.joinCta')}
           </button>
         </form>
       )}
-    </div>
+    </>
   );
 
+  // In-app variant (reached from the nav): heading above, no app chrome.
   if (embedded) {
     return (
       <div className="max-w-sm mx-auto px-4 py-10">
@@ -120,13 +140,14 @@ export default function OnboardingView({ embedded = false, onDone }) {
           {t('nav.newHousehold')}
         </h1>
         <p className="text-mute text-sm mb-6">{t('onboard.subtitle')}</p>
-        {body}
+        <div className="card p-6 sm:p-8 animate-scale-in">{tabsAndForm}</div>
       </div>
     );
   }
 
+  // Full-screen variant — same shell as login / signup.
   return (
-    <div className="min-h-screen bg-paper flex flex-col items-center justify-center px-4 py-10">
+    <div className="min-h-screen bg-paper flex flex-col items-center px-4 pt-14 sm:pt-20 pb-12">
       <main id="main-content" className="w-full max-w-sm">
         <div className="flex items-center justify-between mb-7">
           <Brand size="md" />
@@ -135,11 +156,13 @@ export default function OnboardingView({ embedded = false, onDone }) {
             <LanguageToggle />
           </div>
         </div>
-        <div className="mb-5">
-          <h1 className="font-serif text-2xl font-medium tracking-tight text-fg">{t('onboard.title')}</h1>
-          <p className="text-mute text-sm mt-1.5">{t('onboard.subtitle')}</p>
+        <div className="card p-6 sm:p-8 animate-scale-in">
+          <div className="mb-6">
+            <h1 className="font-serif text-2xl font-medium tracking-tight text-fg">{t('onboard.title')}</h1>
+            <p className="text-mute text-sm mt-1.5">{t('onboard.subtitle')}</p>
+          </div>
+          {tabsAndForm}
         </div>
-        {body}
         <button
           onClick={signOut}
           className="mx-auto mt-6 flex items-center gap-2 text-sm text-mute hover:text-fg"

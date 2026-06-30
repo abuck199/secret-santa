@@ -40,7 +40,13 @@ export default function JoinRoute() {
         const h = list.find((x) => x.id === target);
         toast.success(t('onboard.joined', { name: h?.name || '' }));
       } catch (e) {
-        toast.error(t('onboard.invalidCode'));
+        const raw = String(e?.message || '');
+        if (raw.includes('ALREADY_MEMBER')) {
+          const name = (raw.split('ALREADY_MEMBER:')[1] || '').trim();
+          toast.error(name ? t('onboard.alreadyMember', { name }) : t('onboard.alreadyMemberGeneric'));
+        } else {
+          toast.error(t('onboard.invalidCode'));
+        }
       }
       navigate('/app', { replace: true });
     })();
