@@ -2,20 +2,22 @@ import React from 'react';
 import { useI18n } from '../i18n/I18nContext';
 import LegalLayout from '../components/LegalLayout';
 
-const UPDATED = '2026-06-29';
+const UPDATED = '2026-06-30';
 
-// NOTE: Update the privacy@thatwish.com contact email to your real address before publishing.
+// Contact is a dedicated brand inbox (thatwishapp@gmail.com) — no domain email or
+// forwarding needed. Swap to an @thatwish.com address later if you ever want.
 const EN = [
   {
     h: 'Who we are',
     body: [
-      'ThatWish ("we", "us") is operated by the team behind ThatWish, based in Québec, Canada. This policy explains what personal information we collect, why, and your rights under Québec’s Law 25 and applicable Canadian privacy law.',
+      'ThatWish ("we", "us") is an application operated from Québec, Canada. This policy explains what personal information we collect, why, and your rights under Québec’s Law 25 and applicable Canadian privacy law.',
     ],
   },
   {
     h: 'Information we collect',
     body: [
       'Account information you provide: your email address, display name, and date of birth.',
+      'If you sign in with Google: we receive your name and email address from your Google account to create or access your ThatWish account. We never receive your Google password.',
       'Content you create: wishlist items and links, gift reservations, household memberships, and — if your household enables it — Secret Santa assignments.',
       'Limited technical data: privacy-friendly, aggregate, cookieless usage analytics. We do not use advertising or cross-site tracking.',
     ],
@@ -39,7 +41,7 @@ const EN = [
     h: 'Who we share it with',
     body: [
       'We do not sell your personal information.',
-      'We use trusted service providers that process data on our behalf: Supabase (database and authentication hosting) and Vercel (application hosting and analytics). They may store data outside Québec.',
+      'We use trusted service providers that process data on our behalf: Supabase (database and authentication hosting), Vercel (application hosting and analytics), Resend (sending account emails such as confirmations and password resets), and Google (only when you choose to sign in with Google). They may store data outside Québec.',
       'We may disclose information if required by law.',
     ],
   },
@@ -53,14 +55,14 @@ const EN = [
     h: 'Your rights',
     body: [
       'Under Québec’s Law 25, you may access, correct, or delete your personal information, withdraw your consent, and request a copy of your data (portability).',
-      'To exercise these rights, contact us at privacy@thatwish.com.',
+      'To exercise these rights, contact us at thatwishapp@gmail.com.',
       'You also have the right to file a complaint with the Commission d’accès à l’information du Québec (CAI).',
     ],
   },
   {
     h: 'Person responsible for personal information',
     body: [
-      'The person responsible for the protection of personal information at ThatWish can be reached at privacy@thatwish.com.',
+      'The person responsible for the protection of personal information at ThatWish can be reached at thatwishapp@gmail.com.',
     ],
   },
   {
@@ -73,20 +75,21 @@ const EN = [
     h: 'Changes to this policy',
     body: ['We may update this policy from time to time. The "last updated" date above reflects the latest version.'],
   },
-  { h: 'Contact', body: ['Questions? Email us at privacy@thatwish.com.'] },
+  { h: 'Contact', body: ['Questions? Email us at thatwishapp@gmail.com.'] },
 ];
 
 const FR = [
   {
     h: 'Qui nous sommes',
     body: [
-      'ThatWish (« nous ») est exploité par l’équipe derrière ThatWish, située au Québec, Canada. La présente politique explique quels renseignements personnels nous recueillons, pourquoi, et vos droits en vertu de la Loi 25 du Québec et des lois canadiennes applicables.',
+      'ThatWish (« nous ») est une application exploitée depuis le Québec, Canada. La présente politique explique quels renseignements personnels nous recueillons, pourquoi, et vos droits en vertu de la Loi 25 du Québec et des lois canadiennes applicables.',
     ],
   },
   {
     h: 'Renseignements que nous recueillons',
     body: [
       'Informations de compte que vous fournissez : votre adresse courriel, votre nom affiché et votre date de naissance.',
+      'Si vous vous connectez avec Google : nous recevons votre nom et votre adresse courriel de votre compte Google pour créer ou accéder à votre compte ThatWish. Nous ne recevons jamais votre mot de passe Google.',
       'Contenu que vous créez : articles et liens de liste de souhaits, réservations de cadeaux, adhésions à des foyers et — si votre foyer l’active — attributions Secret Santa.',
       'Données techniques limitées : analyses d’utilisation agrégées, sans témoin et respectueuses de la vie privée. Aucune publicité ni suivi intersites.',
     ],
@@ -110,7 +113,7 @@ const FR = [
     h: 'Avec qui nous les partageons',
     body: [
       'Nous ne vendons pas vos renseignements personnels.',
-      'Nous faisons appel à des fournisseurs de confiance qui traitent les données pour notre compte : Supabase (base de données et authentification) et Vercel (hébergement et analyses). Ils peuvent stocker des données hors du Québec.',
+      'Nous faisons appel à des fournisseurs de confiance qui traitent les données pour notre compte : Supabase (base de données et authentification), Vercel (hébergement et analyses), Resend (envoi des courriels de compte comme les confirmations et les réinitialisations de mot de passe) et Google (uniquement si vous choisissez de vous connecter avec Google). Ils peuvent stocker des données hors du Québec.',
       'Nous pouvons divulguer des renseignements si la loi l’exige.',
     ],
   },
@@ -124,14 +127,14 @@ const FR = [
     h: 'Vos droits',
     body: [
       'En vertu de la Loi 25, vous pouvez accéder à vos renseignements, les corriger ou les supprimer, retirer votre consentement et demander une copie de vos données (portabilité).',
-      'Pour exercer ces droits, écrivez-nous à privacy@thatwish.com.',
+      'Pour exercer ces droits, écrivez-nous à thatwishapp@gmail.com.',
       'Vous avez aussi le droit de porter plainte auprès de la Commission d’accès à l’information du Québec (CAI).',
     ],
   },
   {
     h: 'Responsable de la protection des renseignements personnels',
     body: [
-      'Le responsable de la protection des renseignements personnels chez ThatWish est joignable à privacy@thatwish.com.',
+      'Le responsable de la protection des renseignements personnels chez ThatWish est joignable à thatwishapp@gmail.com.',
     ],
   },
   {
@@ -144,7 +147,7 @@ const FR = [
     h: 'Modifications',
     body: ['Nous pouvons mettre à jour cette politique. La date de « dernière mise à jour » ci-dessus indique la version en vigueur.'],
   },
-  { h: 'Contact', body: ['Des questions ? Écrivez-nous à privacy@thatwish.com.'] },
+  { h: 'Contact', body: ['Des questions ? Écrivez-nous à thatwishapp@gmail.com.'] },
 ];
 
 export default function PrivacyView() {

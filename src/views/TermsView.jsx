@@ -2,7 +2,7 @@ import React from 'react';
 import { useI18n } from '../i18n/I18nContext';
 import LegalLayout from '../components/LegalLayout';
 
-const UPDATED = '2026-06-29';
+const UPDATED = '2026-06-30';
 
 const EN = [
   {
@@ -63,7 +63,7 @@ const EN = [
     h: 'Changes to these terms',
     body: ['We may update these terms; continued use after changes means you accept them.'],
   },
-  { h: 'Contact', body: ['Questions about these terms? Email privacy@thatwish.com.'] },
+  { h: 'Contact', body: ['Questions about these terms? Email thatwishapp@gmail.com.'] },
 ];
 
 const FR = [
@@ -125,7 +125,7 @@ const FR = [
     h: 'Modifications',
     body: ['Nous pouvons mettre à jour ces conditions ; toute utilisation continue après modification vaut acceptation.'],
   },
-  { h: 'Contact', body: ['Des questions sur ces conditions ? Écrivez à privacy@thatwish.com.'] },
+  { h: 'Contact', body: ['Des questions sur ces conditions ? Écrivez à thatwishapp@gmail.com.'] },
 ];
 
 export default function TermsView() {
