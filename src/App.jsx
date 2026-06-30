@@ -13,6 +13,7 @@ import TermsView from './views/TermsView';
 import AuthView from './views/AuthView';
 import ResetPasswordView from './views/ResetPasswordView';
 import OnboardingView from './views/OnboardingView';
+import CompleteProfileView from './views/CompleteProfileView';
 import JoinRoute from './views/JoinRoute';
 import DashboardView from './views/DashboardView';
 import WishlistView from './views/WishlistView';
@@ -49,10 +50,13 @@ function Localized({ lang, children }) {
   return children;
 }
 
-// Authenticated boundary: send users with no household to onboarding,
-// otherwise render the app chrome with nested routes.
+// Authenticated boundary. Order matters:
+//   1. No birthday yet (e.g. Google sign-ups) → finish the profile first.
+//   2. No household yet → onboarding.
+//   3. Otherwise → the app chrome with nested routes.
 function AppGuard() {
-  const { hasHouseholds } = useAuth();
+  const { profile, hasHouseholds } = useAuth();
+  if (profile && !profile.birthday) return <CompleteProfileView />;
   if (!hasHouseholds) return <OnboardingView />;
   return <AppLayout />;
 }
