@@ -23,7 +23,9 @@ export async function signUp({ email, password, displayName, birthday, lang }) {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}`,
+        // `?confirmed=1` lets the app show an "email confirmed" message after the
+        // user clicks the confirmation link and is redirected back.
+        emailRedirectTo: `${window.location.origin}/?confirmed=1`,
         data: {
           display_name: displayName || '',
           birthday: birthday || null,

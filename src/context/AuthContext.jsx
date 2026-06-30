@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import toast from 'react-hot-toast';
 import { supabase } from '../supabaseClient';
 import * as api from '../lib/api';
 import { useI18n } from '../i18n/I18nContext';
@@ -32,6 +33,12 @@ const PENDING_INVITE_KEY = 'souhaity:pendingInvite';
   } catch (_) {}
 })();
 
+// Captured at module load (before Supabase strips auth params from the URL):
+// did the user just arrive from clicking the email-confirmation link?
+const SIGNUP_CONFIRMED_ON_LOAD =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('confirmed') === '1';
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -48,7 +55,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [recovery, setRecovery] = useState(false);
   const initialized = useRef(false);
-  const { lang } = useI18n();
+  const confirmedRef = useRef(SIGNUP_CONFIRMED_ON_LOAD);
+  const { t, lang } = useI18n();
 
   const persistHousehold = useCallback((id) => {
     setCurrentHouseholdId(id);
@@ -174,6 +182,20 @@ export function AuthProvider({ children }) {
     supabase.auth.updateUser({ data: { lang } }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang, session?.user?.id]);
+
+  // After the email-confirmation redirect, greet the user once they're signed in,
+  // then strip the `?confirmed=1` flag from the URL.
+  useEffect(() => {
+    if (!confirmedRef.current || !session?.user) return;
+    confirmedRef.current = false;
+    toast.success(t('auth.emailConfirmed'));
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.delete('confirmed');
+      window.history.replaceState({}, '', u.pathname + u.search + u.hash);
+    } catch (_) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id]);
 
   const switchHousehold = useCallback(
     (id) => {
