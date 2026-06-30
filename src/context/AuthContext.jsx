@@ -216,11 +216,16 @@ export function AuthProvider({ children }) {
     } catch (_) {}
 
     if (isRecent && !welcomed[uid]) {
+      // Genuine first-time confirmation — celebrate.
       welcomed[uid] = true;
       try {
         localStorage.setItem(WELCOMED_KEY, JSON.stringify(welcomed));
       } catch (_) {}
       toast.success(t('auth.emailConfirmed'));
+    } else {
+      // Re-clicking an already-used link: acknowledge neutrally rather than
+      // re-celebrating or doing nothing (which feels like a broken link).
+      toast(t('auth.emailAlreadyConfirmed'), { icon: '✓' });
     }
     stripParam();
     // eslint-disable-next-line react-hooks/exhaustive-deps
