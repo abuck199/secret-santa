@@ -216,7 +216,7 @@ export function AuthProvider({ children }) {
     } catch (_) {}
 
     if (isRecent && !welcomed[uid]) {
-      // Genuine first-time confirmation — celebrate.
+      // Genuine first-time confirmation - celebrate.
       welcomed[uid] = true;
       try {
         localStorage.setItem(WELCOMED_KEY, JSON.stringify(welcomed));

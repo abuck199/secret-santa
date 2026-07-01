@@ -4,7 +4,7 @@ import LegalLayout from '../components/LegalLayout';
 
 const UPDATED = '2026-06-30';
 
-// Contact is a dedicated brand inbox (thatwishapp@gmail.com) — no domain email or
+// Contact is a dedicated brand inbox (thatwishapp@gmail.com) - no domain email or
 // forwarding needed. Swap to an @thatwish.com address later if you ever want.
 const EN = [
   {
@@ -18,7 +18,7 @@ const EN = [
     body: [
       'Account information you provide: your email address, display name, and date of birth.',
       'If you sign in with Google: we receive your name and email address from your Google account to create or access your ThatWish account. We never receive your Google password.',
-      'Content you create: wishlist items and links, gift reservations, household memberships, and — if your household enables it — Secret Santa assignments.',
+      'Content you create: wishlist items and links, gift reservations, household memberships, and - if your household enables it - Secret Santa assignments.',
       'Limited technical data: privacy-friendly, aggregate, cookieless usage analytics. We do not use advertising or cross-site tracking.',
     ],
   },
@@ -90,7 +90,7 @@ const FR = [
     body: [
       'Informations de compte que vous fournissez : votre adresse courriel, votre nom affiché et votre date de naissance.',
       'Si vous vous connectez avec Google : nous recevons votre nom et votre adresse courriel de votre compte Google pour créer ou accéder à votre compte ThatWish. Nous ne recevons jamais votre mot de passe Google.',
-      'Contenu que vous créez : articles et liens de liste de souhaits, réservations de cadeaux, adhésions à des foyers et — si votre foyer l’active — attributions Secret Santa.',
+      'Contenu que vous créez : articles et liens de liste de souhaits, réservations de cadeaux, adhésions à des foyers et - si votre foyer l’active - attributions Secret Santa.',
       'Données techniques limitées : analyses d’utilisation agrégées, sans témoin et respectueuses de la vie privée. Aucune publicité ni suivi intersites.',
     ],
   },

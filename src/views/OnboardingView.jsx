@@ -75,7 +75,7 @@ export default function OnboardingView({ embedded = false, onDone }) {
       tab === key ? 'bg-panel text-fg shadow-soft' : 'text-mute'
     }`;
 
-  // Segmented tabs + the active form — same building blocks as AuthShell.
+  // Segmented tabs + the active form - same building blocks as AuthShell.
   const tabsAndForm = (
     <>
       <div className="flex gap-1 p-1 bg-panel-2 rounded-xl mb-6">
@@ -145,7 +145,7 @@ export default function OnboardingView({ embedded = false, onDone }) {
     );
   }
 
-  // Full-screen variant — same shell as login / signup.
+  // Full-screen variant - same shell as login / signup.
   return (
     <div className="min-h-screen bg-paper flex flex-col items-center px-4 pt-14 sm:pt-20 pb-12">
       <main id="main-content" className="w-full max-w-sm">

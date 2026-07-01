@@ -2,15 +2,15 @@
 
 Shared wishlists for birthdays and every occasion. Family or group members add
 what they'd love to receive, and others can quietly **reserve** gifts so there
-are never duplicates — and never any spoilers for the recipient. An optional
+are never duplicates - and never any spoilers for the recipient. An optional
 **Secret Santa** draw is built in per household.
 
-- 🏠 **Multi-tenant households** — create or join with an invite link
-- 🎂 **Birthdays** — upcoming birthdays surface on the home page
+- 🏠 **Multi-tenant households** - create or join with an invite link
+- 🎂 **Birthdays** - upcoming birthdays surface on the home page
 - 📝 **Wishlists** with drag-and-drop ordering and optional links
-- 🤫 **Anonymous reservations** — recipients never see what's reserved
+- 🤫 **Anonymous reservations** - recipients never see what's reserved
 - 🎲 **Optional Secret Santa** draw (admin-controlled, per household)
-- 🌍 **Bilingual** — English / French toggle
+- 🌍 **Bilingual** - English / French toggle
 - 🔐 **Supabase Auth** (email + password) with Row-Level Security; the browser
   only ever uses the public anon key
 
@@ -58,11 +58,11 @@ There is **no service key in the browser**. Every read is constrained by RLS and
 every privileged write goes through a SECURITY DEFINER RPC:
 
 - `create_household`, `accept_invite`
-- `get_household_wishlists` (masks the reserver — only `is_reserved` /
+- `get_household_wishlists` (masks the reserver - only `is_reserved` /
   `reserved_by_me` are ever exposed)
 - `reserve_item`, `cancel_reservation`, `set_purchased`, `get_my_reservations`
 - `shuffle_assignments` (admin only)
 
 ---
 
-Made with 🎁 — ThatWish
+Made with 🎁 - ThatWish

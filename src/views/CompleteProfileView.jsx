@@ -9,7 +9,7 @@ import LanguageToggle from '../components/LanguageToggle';
 import ThemeToggle from '../components/ThemeToggle';
 import DatePicker from '../components/DatePicker';
 
-// Shown to signed-in users who don't have a birthday yet — chiefly people who
+// Shown to signed-in users who don't have a birthday yet - chiefly people who
 // signed up with Google (which never gives us a birthday). Keeps the mandatory
 // birthday rule for everyone without blocking social sign-up at the database.
 // Layout mirrors the onboarding / auth shell so it feels like the same family.

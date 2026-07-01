@@ -41,7 +41,7 @@ export async function signIn({ email, password }) {
   return unwrap(await supabase.auth.signInWithPassword({ email, password }));
 }
 
-// Kicks off the Google OAuth redirect. Returns nothing useful — the browser
+// Kicks off the Google OAuth redirect. Returns nothing useful - the browser
 // navigates away to Google, then back to `redirectTo`, where supabase-js
 // exchanges the code for a session (detectSessionInUrl). Social sign-ups arrive
 // without a birthday, so the app routes them through the "complete profile" gate.
@@ -52,7 +52,7 @@ export async function signInWithGoogle() {
       options: {
         redirectTo: `${window.location.origin}/app`,
         // Always let the user pick which Google account, even if only one is
-        // signed in — avoids silently reusing the wrong one.
+        // signed in - avoids silently reusing the wrong one.
         queryParams: { prompt: 'select_account' },
       },
     })
