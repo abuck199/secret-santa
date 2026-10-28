@@ -241,14 +241,38 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
      included, can see the full draw).
    Tested end to end with temporary `dev-login` / `dev-call` routes (deleted afterwards):
    `auth.api.createVerificationOTP` signs test users in without sending email.
-5. Port UI: 5a foundations (Tailwind 3→4 `@theme`, Fraunces/Inter, dark mode, i18n with `/fr`
-   routes, layout, toasts) → 5b public pages (landing, FAQ, privacy/terms updated for Neon + OTP,
+5. Port UI: 5a foundations *(done, see below)* → 5b public pages (landing, FAQ, privacy/terms updated for Neon + OTP,
    no Google; metadata/sitemap) → 5c auth (`/login` email→code, onboarding name+birthday,
    `/signup` → `/login`, signed-in redirects) → 5d app (`/app`, list with dnd-kit, members,
    reservations, match, settings, profile, help, new, `/join/[code]`) → 5e Vercel Analytics.
+   **5a foundations:**
+   - **Language routing:** every page lives under `src/app/[lang]/` (root layout there, with
+     `generateStaticParams` en/fr). URLs: English unprefixed (`/app/list`), French `/fr/...`.
+     `src/proxy.ts` rewrites unprefixed URLs to `/en/...`, redirects `/en/...` to the unprefixed
+     URL, and redirects to `/fr` when the `lang` cookie is `fr`, or on a first visit from a
+     non-English browser (old app's rule; no Accept-Language = English, for crawlers). API routes
+     and files in `public/` are skipped. Unknown locale → 404.
+   - **i18n:** `src/i18n/translations.ts` is the old file as-is (same flat keys, `{placeholders}`).
+     Server Components: `const t = await getT()` (`src/i18n/server.ts`, reads `next/root-params`).
+     Client Components: `const { t, lang } = useI18n()` (`src/i18n/client.tsx`). Links: build
+     hrefs with `localizedPath(path, lang)`. The toggle sets the `lang` cookie (also used for the
+     OTP email language) and navigates to the other-language URL.
+   - **Styles:** `src/app/globals.css` = old `index.css` + `tailwind.config.js` in Tailwind 4 form:
+     tokens in `@theme inline`, component classes (`card`, `input`, `btn-*`, `chip`, `link`, …)
+     as `@utility`, `.dark` class variant. Fonts via `next/font/google` (self-hosted at build).
+   - **Theme:** inline script in `<head>` applies `.dark` before paint (localStorage
+     `thatwish:theme`, else OS); `ThemeToggle` reads the class on `<html>`.
+   - Ported: `Brand`, `ThemeToggle`, `LanguageToggle`, `Toaster` (react-hot-toast), lucide icons.
+   - `src/app/[lang]/page.tsx` + `toast-demo.tsx` are a temporary style-check page, replaced by
+     the landing page in 5b.
 6. Hardening: Better Auth rate limit in DB storage (memory is per-instance on Vercel), Neon
    pooled URL for prod, security review of actions (anonymity!), a few automated tests on the
-   critical paths, error/404 pages.
+   critical paths, error/404 pages. Deferred from step 4:
+   - Run the untested success paths: delete own item, `setPurchased(false)`, clear an item's
+     link, demote an admin to member.
+   - `addItem` cap isn't locked (a very fast double submit could make a 51st item); lock like
+     `createInvite` does.
+   - `reorderItems` doesn't dedupe ids in the payload (harmless, odd ordering); dedupe them.
 7. Data migration from Supabase (if real users): keep the same UUIDs; users just sign in with
    their email (OTP), no password reset. Rehearse on a Neon branch first.
 8. Cutover: Vercel prod env vars (`BETTER_AUTH_URL=https://thatwish.com`), framework preset →
