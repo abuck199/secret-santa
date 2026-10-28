@@ -15,6 +15,22 @@ const eslintConfig = defineConfig([
     // Old Vite app, kept as reference during the rebuild.
     "legacy/**",
   ]),
+  // Data Access Layer: only src/server may touch the DB or the raw auth API, so
+  // every read and mutation goes through its session + membership checks.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/server/**", "src/db/**", "src/lib/auth.ts", "src/app/api/auth/**"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        paths: [
+          { name: "@/lib/auth", message: "Use src/server (getSessionUser/requireUser) instead." },
+        ],
+        patterns: [
+          { group: ["@/db", "@/db/*"], message: "Query the DB from src/server only." },
+        ],
+      }],
+    },
+  },
 ]);
 
 export default eslintConfig;

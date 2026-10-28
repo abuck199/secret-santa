@@ -189,7 +189,16 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
    a `server-only` config). OTPs are stored hashed; the email is sent via `after()`. Email
    language comes from `Accept-Language` until the i18n port provides an explicit one. For
    reading the session in pages, follow `node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md`.)*
-3. `isMember` / `isAdmin` helpers.
+3. `isMember` / `isAdmin` helpers. *(done: Data Access Layer in `src/server/`)*
+   - `session.ts`: `getSessionUser()` (narrow `{ id, email }`, deduped per request with React
+     `cache`) and `requireUser()` (redirects to `/login`).
+   - `authz.ts`: `isMember`, `isAdmin` (reject malformed UUIDs instead of letting Postgres 500),
+     `requireMember(householdId)` / `requireAdmin(householdId)` throwing `ForbiddenError`.
+   - **Rule, enforced by ESLint `no-restricted-imports`:** only `src/server/**` (plus `src/db`,
+     `src/lib/auth.ts` and the auth route) may import `@/db` or `@/lib/auth`. Pages, components
+     and actions call `src/server` functions.
+   - Not using `'use cache: private'` for the session yet (React `cache` works the same in
+     Server Actions); revisit when tuning prefetching.
 4. Server Actions: households → invites → wishlist → reservations → secret santa.
 5. Port UI components, routes, and i18n from the old repo.
 6. Data migration from the old Supabase DB if real households must be preserved.
