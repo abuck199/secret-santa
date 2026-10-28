@@ -219,8 +219,28 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
      household and voids draw pairings involving them. Gifts they reserved but had not bought
      go back to the pool; gifts already bought stay taken (`reserved_by` cleared) so nobody
      buys a duplicate.
-   - 4d invites, 4e wishlist, 4f reservations, 4g secret santa: to do. Invites are multi-use
-     links valid 30 days, max 5 active per household (see old `settings.inviteHint`).
+   - 4d invites *(done)*: `createInvite` (admin; 16-hex code from `crypto.randomBytes`, valid 30
+     days, multi-use; max 5 non-expired per household, enforced under a `FOR UPDATE` lock on the
+     household → `invite_cap` with `{max}`), `deleteInvite` (admin), `getInvites` (admin; creator
+     name + joiners, replaces `get_invite_redemptions`), `acceptInvite(code)` (any signed-in user;
+     unknown and expired both → `invite_invalid`; `already_member` with `{name}`; records the
+     redemption, `accepted_by` = first user). A removed member can rejoin while the link is valid.
+     Errors may carry `params` for the translated message (`ActionError(code, params)`).
+   - 4e wishlist *(done)*: `getMyItems`, `addItem` (member; max 50 per person per household →
+     `wishlist_full`; item 1–200 chars; link ≤500, re-normalized server-side with
+     `src/lib/url.ts` → `invalid_link`; appended at the bottom), `updateItem` / `deleteItem`
+     (owner only, `user_id = me` in the WHERE → `not_found`), `reorderItems(householdId, ids)`
+     (ignores ids that aren't yours).
+   - 4f reservations *(done)*: `getHouseholdWishlists` (builds each row field by field: never
+     `reserved_by`; `isReserved` forced false on your own items), `getMyReservations(householdId)`,
+     `reserveItem` (single conditional UPDATE `where claimed = false` → `already_reserved`;
+     `own_item`), `cancelReservation` / `setPurchased` (`where reserved_by = me`).
+   - 4g secret santa *(done)*: `shuffleAssignments` (admin, Secret Santa on → `santa_disabled`,
+     ≥3 members → `santa_min_members`; crypto Fisher-Yates, cyclic pairing, household row locked),
+     `getMyAssignment` (only your own pairing, only while Secret Santa is on; nobody, admins
+     included, can see the full draw).
+   Tested end to end with temporary `dev-login` / `dev-call` routes (deleted afterwards):
+   `auth.api.createVerificationOTP` signs test users in without sending email.
 5. Port UI: 5a foundations (Tailwind 3→4 `@theme`, Fraunces/Inter, dark mode, i18n with `/fr`
    routes, layout, toasts) → 5b public pages (landing, FAQ, privacy/terms updated for Neon + OTP,
    no Google; metadata/sitemap) → 5c auth (`/login` email→code, onboarding name+birthday,
