@@ -241,10 +241,7 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
      included, can see the full draw).
    Tested end to end with temporary `dev-login` / `dev-call` routes (deleted afterwards):
    `auth.api.createVerificationOTP` signs test users in without sending email.
-5. Port UI: 5a foundations *(done, see below)* → 5b public pages (landing, FAQ, privacy/terms updated for Neon + OTP,
-   no Google; metadata/sitemap) → 5c auth (`/login` email→code, onboarding name+birthday,
-   `/signup` → `/login`, signed-in redirects) → 5d app (`/app`, list with dnd-kit, members,
-   reservations, match, settings, profile, help, new, `/join/[code]`) → 5e Vercel Analytics.
+5. Port UI *(done: 5a foundations, 5b public pages, 5c auth, 5d app, 5e analytics; see below)*.
    **5a foundations:**
    - **Language routing (hybrid, decided with the user):** every page lives under
      `src/app/[lang]/` (root layout there, `generateStaticParams` en/fr, pages stay prerendered).
@@ -262,12 +259,15 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
      Server Components: `const t = await getT()` (`src/i18n/server.ts`, reads `next/root-params`).
      Client Components: `const { t, lang } = useI18n()` (`src/i18n/client.tsx`). Links: build
      hrefs with `localizedPath(path, lang)`. The toggle sets the `lang` cookie (also used for the
-     OTP email language) and refreshes the same URL (or leaves a `/fr` page for the plain URL).
+     OTP email language) and does a **full page load** of the same URL (or the plain URL from a
+     `/fr` page). Not `router.refresh()`: lang is the root param, and client-rendering a new
+     root layout re-creates `<html>` and makes React warn about the theme `<script>`.
    - **Styles:** `src/app/globals.css` = old `index.css` + `tailwind.config.js` in Tailwind 4 form:
      tokens in `@theme inline`, component classes (`card`, `input`, `btn-*`, `chip`, `link`, …)
      as `@utility`, `.dark` class variant. Fonts via `next/font/google` (self-hosted at build).
    - **Theme:** inline script in `<head>` applies `.dark` before paint (localStorage
-     `thatwish:theme`, else OS); `ThemeToggle` reads the class on `<html>`.
+     `thatwish:theme`, else OS); `ThemeToggle` reads the class on `<html>`. Keep it a plain
+     `<script>`: `next/script` `beforeInteractive` queues inline code until Next's JS loads (flash).
    - Ported: `Brand`, `ThemeToggle`, `LanguageToggle`, `Toaster` (react-hot-toast), lucide icons.
    **5b public pages *(done)*:** landing (`src/app/[lang]/page.tsx`, all CTAs → `/login` since
    sign-up and sign-in are one OTP flow), `/privacy` and `/terms` (`LegalLayout`, content updated:
@@ -278,11 +278,38 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
    `robots.txt` also disallows `/fr/app`, `/fr/join`.
    - Gotcha: Cache Components rejects `new Date()` during prerender, even in Client Components
      (the footer year is read with `useSyncExternalStore`, browser only).
-   - Left for 5c: redirect signed-in visitors from the landing page to `/app`; prune the dead
-     translation keys (passwords, Google, reset) — the whole dictionary ships to the client.
-   - **Gap found:** the privacy policy and terms promise "delete your account at any time", but
-     neither the old app nor the new one has that feature. Needed for Law 25; add a
-     `deleteAccount` action (decide what happens to households the user owns) before cutover.
+   **5c auth:** `/login` (`login-form.tsx`): email → `authClient.emailOtp.sendVerificationOtp` →
+   6-digit code (auto-submits, one-time-code autofill, 30 s resend cooldown) →
+   `authClient.signIn.emailOtp` → `?next=` (same-site paths only) or `/app`. New emails get an
+   account on the spot. `/signup` → `/login` (next.config redirects). Proxy: optimistic
+   redirects on session-cookie presence only (`/` → `/app` when signed in; `/app/*`, `/join/*` →
+   `/login?next=…` when not); the real check stays in `src/server`. Dead translation keys
+   (passwords, Google, reset, email confirmation) removed; new `auth.*`, `profile.*` and `err.*`
+   keys added. **5d app:** `src/app/[lang]/app/layout.tsx` = the old AppGuard inside Suspense:
+   no name/birthday → `redirect('/welcome')` (`CompleteProfile`), no household →
+   `redirect('/start')` (`Onboarding`), else NavBar + page + Footer. The gates are their own
+   routes (not swapped in place) because a layout that drops its page breaks Next's instant
+   navigation validation. Known dev-only noise: the request that triggers a gate redirect logs
+   "Could not validate `instant` … NEXT_REDIRECT" (`instant = false` doesn't silence it); harmless;
+   every data page has a `loading.tsx` (Cache Components wants a boundary per segment for instant
+   navigation). Pattern: server `page.tsx` reads via `src/server/queries` and passes plain props
+   to a client component that calls Server Actions, shows `actionErrorMessage(t, res)` toasts,
+   updates local state, and calls `router.refresh()` when the nav/household changes.
+   Current household = `household` cookie (httpOnly, set by `switchHousehold`, `createHousehold`,
+   `acceptInvite`; `getCurrentHousehold()` validates it against memberships, falls back to the
+   first). `/join/[code]`: signed in → `JoinInvite` accepts on mount (a POST, not during render).
+   Settings hides "leave" for the owner and role/remove buttons on the owner and yourself.
+   **Account deletion** (Law 25, promised by the privacy policy; decided with the user):
+   `deleteAccount` in `src/server/actions/account.ts`, button in Profile. Owned households go to
+   another admin, else the longest-standing member (made admin); empty ones are deleted. Then
+   the usual leave cleanup in every household, then the user row (cascades). Signs out first.
+   **5e:** `<Analytics />` from `@vercel/analytics/next` in the root layout.
+   **Activity gotcha (Cache Components):** Next keeps the last ~3 visited routes mounted but
+   hidden, with their React state. So: sign-out and account deletion do a full page load
+   (`window.location.href = '/'`, per Next's "State and authentication" guide) so no hidden
+   route keeps the previous user's data; the login form resets to the email step in a
+   `useLayoutEffect` cleanup (a stale one-time code would auto-submit). Reset any other
+   transient state the same way (`node_modules/next/dist/docs/01-app/02-guides/preserving-ui-state.md`).
 6. Hardening: Better Auth rate limit in DB storage (memory is per-instance on Vercel), Neon
    pooled URL for prod, security review of actions (anonymity!), a few automated tests on the
    critical paths, error/404 pages. Deferred from step 4:

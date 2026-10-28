@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 import { assignments, households, memberships } from '@/db/schema';
 import { requireAdmin, requireMember } from '../authz';
-import { removeFromHousehold } from '../memberships';
+import { rememberHousehold, removeFromHousehold } from '../memberships';
 import { ActionError, runAction, type ActionResult } from '../result';
 import { requireUser } from '../session';
 
@@ -46,7 +46,7 @@ export async function createHousehold(name: string): Promise<ActionResult<{ id: 
   return runAction(async () => {
     const user = await requireUser();
     const cleanName = Name.parse(name);
-    return db.transaction(async (tx) => {
+    const created = await db.transaction(async (tx) => {
       const [h] = await tx
         .insert(households)
         .values({ name: cleanName, ownerId: user.id })
@@ -54,6 +54,18 @@ export async function createHousehold(name: string): Promise<ActionResult<{ id: 
       await tx.insert(memberships).values({ householdId: h.id, userId: user.id, role: 'admin' });
       return { id: h.id };
     });
+    await rememberHousehold(created.id);
+    return created;
+  });
+}
+
+// The household switcher. A stale or foreign id just falls back to the first
+// household on the next read, but refuse it here so the UI can tell.
+export async function switchHousehold(householdId: string): Promise<ActionResult> {
+  return runAction(async () => {
+    const id = Id.parse(householdId);
+    await requireMember(id);
+    await rememberHousehold(id);
   });
 }
 

@@ -8,6 +8,7 @@
 // Arriving through any /fr URL without a cookie remembers French, so the
 // visitor stays in French as they click around.
 
+import { getSessionCookie } from 'better-auth/cookies';
 import { NextResponse, type NextRequest } from 'next/server';
 import {
   LANG_COOKIE,
@@ -33,6 +34,20 @@ export function proxy(req: NextRequest) {
       res.cookies.set(LANG_COOKIE, 'fr', { path: '/', maxAge: ONE_YEAR, sameSite: 'lax' });
     }
     return res;
+  }
+
+  // Optimistic auth redirects on cookie presence only (the real check is in
+  // src/server): signed-in visitors skip the landing page, signed-out ones go
+  // straight to /login instead of streaming the app shell first. A stale
+  // cookie still reaches /app, whose session check sends them to /login.
+  const hasSession = !!getSessionCookie(req);
+  if (pathname === '/' && hasSession) {
+    return NextResponse.redirect(new URL('/app', req.url));
+  }
+  if (!hasSession && /^\/(app|join|welcome|start)(\/|$)/.test(pathname)) {
+    const login = new URL('/login', req.url);
+    login.searchParams.set('next', pathname + search);
+    return NextResponse.redirect(login);
   }
 
   const lang = isLocale(cookie) ? cookie : localeFromAcceptLanguage(req.headers.get('accept-language'));

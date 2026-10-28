@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import { Fraunces, Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { lang as langParam } from 'next/root-params';
@@ -69,6 +70,11 @@ export default async function RootLayout({ children }: LayoutProps<'/[lang]'>) {
     // The theme script changes <html>'s class before React hydrates.
     <html lang={lang} className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
       <head>
+        {/* Runs while the HTML is parsed, so the right theme is on <html>
+            before the first paint. Plain <script> on purpose: next/script's
+            beforeInteractive waits for Next's JS and would flash. React only
+            warns if it client-renders this layout, which the language toggle
+            avoids by doing a full page load. */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-dvh">
@@ -76,6 +82,8 @@ export default async function RootLayout({ children }: LayoutProps<'/[lang]'>) {
           {children}
           <Toaster />
         </I18nProvider>
+        {/* Cookieless, privacy-friendly analytics (no consent banner needed). */}
+        <Analytics />
       </body>
     </html>
   );

@@ -12,19 +12,21 @@ export type Invite = {
   createdAt: Date;
   expiresAt: Date;
   isExpired: boolean;
+  createdByMe: boolean;
   creatorName: string;
   joiners: { userId: string; name: string; joinedAt: Date }[];
 };
 
 // Admin only (was the `get_invite_redemptions` RPC + a plain select).
 export async function getInvites(householdId: string): Promise<Invite[]> {
-  await requireAdmin(householdId);
+  const user = await requireAdmin(householdId);
   const rows = await db
     .select({
       id: invites.id,
       code: invites.code,
       createdAt: invites.createdAt,
       expiresAt: invites.expiresAt,
+      invitedBy: invites.invitedBy,
       creatorName: profiles.displayName,
     })
     .from(invites)
@@ -46,9 +48,10 @@ export async function getInvites(householdId: string): Promise<Invite[]> {
     .orderBy(inviteRedemptions.joinedAt);
 
   const now = new Date();
-  return rows.map((r) => ({
+  return rows.map(({ invitedBy, ...r }) => ({
     ...r,
     isExpired: r.expiresAt <= now,
+    createdByMe: invitedBy === user.id,
     creatorName: r.creatorName ?? '',
     joiners: redemptions
       .filter((j) => j.inviteId === r.id)

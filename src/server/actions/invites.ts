@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 import { households, inviteRedemptions, invites, memberships } from '@/db/schema';
 import { requireAdmin } from '../authz';
+import { rememberHousehold } from '../memberships';
 import { ActionError, runAction, type ActionResult } from '../result';
 import { requireUser } from '../session';
 
@@ -86,7 +87,7 @@ export async function acceptInvite(
     // Same answer for unknown and expired codes: don't help anyone guess.
     if (!invite) throw new ActionError('invite_invalid');
 
-    return db.transaction(async (tx) => {
+    const joined = await db.transaction(async (tx) => {
       // The unique (household, user) constraint makes this safe against a
       // double submit; no row back means they were already in.
       const [joined] = await tx
@@ -105,5 +106,7 @@ export async function acceptInvite(
         .where(and(eq(invites.id, invite.id), isNull(invites.acceptedBy)));
       return { householdId: invite.householdId, householdName: invite.householdName };
     });
+    await rememberHousehold(joined.householdId);
+    return joined;
   });
 }

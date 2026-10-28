@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { LANG_COOKIE, stripLocale, type Locale } from '@/i18n/config';
 import { useI18n } from '@/i18n/client';
 
@@ -14,19 +14,18 @@ function rememberLang(code: Locale) {
 }
 
 // Compact EN / FR segmented toggle. Saves the choice in a cookie (the proxy and
-// the OTP email read it) and re-renders the same URL in that language. On a
-// crawlable /fr page it moves to the plain URL.
+// the OTP email read it) and reloads the same URL in that language (on a
+// crawlable /fr page, the plain URL). A full page load, not router.refresh():
+// the language is the root layout's param, and client-rendering a new root
+// layout would re-create <html> and its theme script.
 export default function LanguageToggle({ className = '' }: { className?: string }) {
   const { lang, t } = useI18n();
-  const router = useRouter();
   const pathname = usePathname();
 
   function change(code: Locale) {
     if (code === lang) return;
     rememberLang(code);
-    const plain = stripLocale(pathname);
-    if (plain !== pathname) router.push(plain + window.location.search);
-    else router.refresh();
+    window.location.assign(stripLocale(pathname) + window.location.search);
   }
 
   return (

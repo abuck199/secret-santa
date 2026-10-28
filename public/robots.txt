@@ -2,7 +2,7 @@
 User-agent: *
 Disallow: /app
 Disallow: /join
-Disallow: /fr/app
-Disallow: /fr/join
+Disallow: /welcome
+Disallow: /start
 
 Sitemap: https://thatwish.com/sitemap.xml

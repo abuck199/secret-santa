@@ -3,10 +3,23 @@
 
 import 'server-only';
 import { and, eq, or } from 'drizzle-orm';
+import { cookies } from 'next/headers';
 import { db } from '@/db';
 import { assignments, memberships, wishlistItems } from '@/db/schema';
+import { HOUSEHOLD_COOKIE } from './queries/households';
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+// Make `householdId` the one the app shows (after create, join or switch).
+export async function rememberHousehold(householdId: string) {
+  (await cookies()).set(HOUSEHOLD_COOKIE, householdId, {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: 'lax',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  });
+}
 
 // Someone leaves (or is removed from) a household: drop their membership and
 // their list there, and void any Secret Santa pairing involving them (an admin

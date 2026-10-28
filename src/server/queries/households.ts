@@ -1,11 +1,17 @@
 // Reads for Server Components: the caller's households and their members.
 
 import 'server-only';
+import { cache } from 'react';
 import { eq } from 'drizzle-orm';
+import { cookies } from 'next/headers';
 import { db } from '@/db';
 import { households, memberships, profiles } from '@/db/schema';
 import { requireMember } from '../authz';
 import { requireUser } from '../session';
+
+// Which household the app shows (old app: localStorage `thatwish:household`).
+// Only a preference: it's always checked against the caller's memberships.
+export const HOUSEHOLD_COOKIE = 'household';
 
 export type MyHousehold = {
   id: string;
@@ -15,7 +21,8 @@ export type MyHousehold = {
   isOwner: boolean;
 };
 
-export async function getMyHouseholds(): Promise<MyHousehold[]> {
+// `cache`: the layout, the nav and the page all ask within one request.
+export const getMyHouseholds = cache(async (): Promise<MyHousehold[]> => {
   const user = await requireUser();
   const rows = await db
     .select({
@@ -31,7 +38,15 @@ export async function getMyHouseholds(): Promise<MyHousehold[]> {
   return rows
     .map(({ ownerId, ...h }) => ({ ...h, isOwner: ownerId === user.id }))
     .sort((a, b) => a.name.localeCompare(b.name));
-}
+});
+
+// The household picked in the switcher, or the first one; null when the user
+// belongs to none yet (onboarding).
+export const getCurrentHousehold = cache(async (): Promise<MyHousehold | null> => {
+  const list = await getMyHouseholds();
+  const wanted = (await cookies()).get(HOUSEHOLD_COOKIE)?.value;
+  return list.find((h) => h.id === wanted) ?? list[0] ?? null;
+});
 
 export type Member = {
   membershipId: string;
