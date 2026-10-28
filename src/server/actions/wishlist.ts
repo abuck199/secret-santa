@@ -3,7 +3,7 @@
 // The caller's own wishlist items. Every export here is a public POST endpoint:
 // ownership is always `user_id = me` in the WHERE clause, never a client claim.
 
-import { and, count, eq, inArray, max } from 'drizzle-orm';
+import { and, count, eq, inArray, max, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/db';
 import { wishlistItems } from '@/db/schema';
@@ -42,25 +42,31 @@ export async function addItem(
     const hid = Id.parse(householdId);
     const { item, link } = ItemInput.parse(input);
     const user = await requireMember(hid);
+    const cleanedLink = cleanLink(link);
     const mine = and(eq(wishlistItems.householdId, hid), eq(wishlistItems.userId, user.id));
 
-    const [{ n, last }] = await db
-      .select({ n: count(), last: max(wishlistItems.displayOrder) })
-      .from(wishlistItems)
-      .where(mine);
-    if (n >= MAX_ITEMS) throw new ActionError('wishlist_full', { max: String(MAX_ITEMS) });
+    return db.transaction(async (tx) => {
+      // One add at a time per person and household, so a double submit can't
+      // slip past the cap (the lock is released at commit).
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${`wishlist:${hid}:${user.id}`}, 0))`);
+      const [{ n, last }] = await tx
+        .select({ n: count(), last: max(wishlistItems.displayOrder) })
+        .from(wishlistItems)
+        .where(mine);
+      if (n >= MAX_ITEMS) throw new ActionError('wishlist_full', { max: String(MAX_ITEMS) });
 
-    const [created] = await db
-      .insert(wishlistItems)
-      .values({
-        householdId: hid,
-        userId: user.id,
-        item,
-        link: cleanLink(link),
-        displayOrder: (last ?? -1) + 1, // new items go to the bottom
-      })
-      .returning(itemColumns);
-    return created;
+      const [created] = await tx
+        .insert(wishlistItems)
+        .values({
+          householdId: hid,
+          userId: user.id,
+          item,
+          link: cleanedLink,
+          displayOrder: (last ?? -1) + 1, // new items go to the bottom
+        })
+        .returning(itemColumns);
+      return created;
+    });
   });
 }
 
@@ -95,11 +101,11 @@ export async function deleteItem(itemId: string): Promise<ActionResult> {
 }
 
 // `orderedIds` is the caller's full list in the new order. Ids that aren't
-// theirs (or not in this household) are simply not touched.
+// theirs (or not in this household) are simply not touched; repeats count once.
 export async function reorderItems(householdId: string, orderedIds: string[]): Promise<ActionResult> {
   return runAction(async () => {
     const hid = Id.parse(householdId);
-    const ids = z.array(Id).max(MAX_ITEMS).parse(orderedIds);
+    const ids = [...new Set(z.array(Id).max(MAX_ITEMS).parse(orderedIds))];
     const user = await requireMember(hid);
     if (ids.length === 0) return;
     await db.transaction(async (tx) => {

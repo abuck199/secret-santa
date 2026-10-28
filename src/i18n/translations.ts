@@ -277,6 +277,12 @@ export const translations = {
     'err.already_member': 'You are already a member of {name}.',
     'err.wishlist_full': 'You reached the maximum of {max} items',
     'err.already_reserved': 'Sorry, that one was just reserved by someone else',
+    'err.notFoundTitle': 'Page not found',
+    'err.notFoundText': "This page doesn't exist, or it has moved.",
+    'err.crashTitle': 'Something went wrong',
+    'err.crashText': 'An unexpected error happened on our side. Try again in a moment.',
+    'err.retry': 'Try again',
+    'err.home': 'Back to home',
   },
 
   fr: {
@@ -554,6 +560,12 @@ export const translations = {
     'err.already_member': 'Vous faites déjà partie de {name}.',
     'err.wishlist_full': 'Vous avez atteint la limite de {max} articles',
     'err.already_reserved': "Désolé, celui-ci vient d'être réservé par quelqu'un d'autre",
+    'err.notFoundTitle': 'Page introuvable',
+    'err.notFoundText': 'Cette page n’existe pas ou a été déplacée.',
+    'err.crashTitle': 'Une erreur s’est produite',
+    'err.crashText': 'Une erreur inattendue s’est produite de notre côté. Réessayez dans un instant.',
+    'err.retry': 'Réessayer',
+    'err.home': 'Retour à l’accueil',
   },
 };
 

@@ -1,5 +1,5 @@
 import {
-  pgTable, pgEnum, uuid, text, boolean, integer, timestamp, date, unique, index,
+  pgTable, pgEnum, uuid, text, boolean, integer, bigint, timestamp, date, unique, index,
 } from 'drizzle-orm/pg-core';
 
 export const memberRole = pgEnum('member_role', ['admin', 'member']);
@@ -58,6 +58,16 @@ export const verifications = pgTable('verification', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [index('verification_identifier_idx').on(t.identifier)]);
+
+// Request counters, shared by every server instance (in-memory counters would
+// be per Vercel instance). Better Auth keys rows by IP + path; our own OTP
+// email throttle uses `otp-email:<sha256(email)>` keys.
+export const rateLimits = pgTable('rate_limit', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  key: text('key').notNull().unique(),
+  count: integer('count').notNull(),
+  lastRequest: bigint('last_request', { mode: 'number' }).notNull(),
+});
 
 /* ---------------------------- Domain ---------------------------- */
 

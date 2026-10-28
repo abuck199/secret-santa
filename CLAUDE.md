@@ -310,18 +310,47 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
    route keeps the previous user's data; the login form resets to the email step in a
    `useLayoutEffect` cleanup (a stale one-time code would auto-submit). Reset any other
    transient state the same way (`node_modules/next/dist/docs/01-app/02-guides/preserving-ui-state.md`).
-6. Hardening: Better Auth rate limit in DB storage (memory is per-instance on Vercel), Neon
-   pooled URL for prod, security review of actions (anonymity!), a few automated tests on the
-   critical paths, error/404 pages. Deferred from step 4:
-   - Run the untested success paths: delete own item, `setPurchased(false)`, clear an item's
-     link, demote an admin to member.
-   - `addItem` cap isn't locked (a very fast double submit could make a 51st item); lock like
-     `createInvite` does.
-   - `reorderItems` doesn't dedupe ids in the payload (harmless, odd ordering); dedupe them.
+6. Hardening *(done)*:
+   - **Rate limiting:** Better Auth `rateLimit: { storage: 'database' }` (table `rate_limit`;
+     the OTP plugin's own rule is 3 requests/min per IP; on in production only). Plus our own
+     per-address cap, `src/server/otp-throttle.ts`: 5 code emails/hour per email (sha256 key in
+     the same table), checked in `sendVerificationOTP` and silently skipped when hit, so the
+     Resend quota can't be burned and addresses can't be probed.
+   - **Step 4 leftovers fixed:** `addItem` takes a `pg_advisory_xact_lock` per person+household
+     (cap holds under racing adds); `reorderItems` dedupes ids.
+   - **Migrations:** schema changes now go through `pnpm db:generate` (versioned SQL in
+     `drizzle/`, baseline `0000_*`) + `pnpm db:migrate`. The current Neon DB was built with
+     `push`, so before the first `migrate` on it, mark the baseline as applied (or migrate a
+     fresh branch). Don't `push` to production.
+   - **Tests:** `pnpm test` (Vitest + PGlite in-memory Postgres built from `drizzle/`; never
+     touches Neon). `tests/setup.ts` mocks `@/db`, `@/server/session` (`signInAs()`),
+     `next/headers`, `next/navigation`, `@/lib/auth`; everything in `src/server` runs for real.
+     31 tests: anonymity, reservations (incl. concurrent), wishlist caps/ownership/reorder,
+     household/member rules, leave cleanup, invites, draw validity, account deletion, OTP cap.
+     Add a test with every new action or rule.
+   - **Error pages:** `src/app/global-not-found.tsx` (experimental `globalNotFound`; our root
+     layout is under `[lang]`, so unmatched URLs can't use a normal `not-found.tsx`; it carries
+     its own CSS/fonts/theme script and picks the language in the browser), `[lang]/not-found.tsx`
+     for `notFound()` in pages, `[lang]/error.tsx` (retry), `app/global-error.tsx` (bilingual,
+     inline styles). A `[lang]/[...missing]` catch-all does NOT work in production (its
+     prerendered shell becomes Next's empty error shell).
+   - **Security review:** every `'use server'` export validates (zod) and authorizes before
+     writing; only actions are exported; `reserved_by` never leaves queries; emails only reach
+     their owner. Security headers in `next.config.ts` (X-Frame-Options DENY, nosniff,
+     Referrer-Policy, Permissions-Policy, HSTS). Not done (judgment calls, revisit if needed):
+     CSP (needs a nonce/hash for the inline theme script), re-auth before account deletion,
+     a cap on households created per user.
 7. Data migration from Supabase (if real users): keep the same UUIDs; users just sign in with
    their email (OTP), no password reset. Rehearse on a Neon branch first.
 8. Cutover: Vercel prod env vars (`BETTER_AUTH_URL=https://thatwish.com`), framework preset →
-   Next.js, short freeze + final data sync, merge `next-rebuild` → `main`.
+   Next.js, short freeze + final data sync, merge `next-rebuild` → `main`. Also:
+   - Neon pooled URL (`-pooler` host) for Vercel; check postgres.js against it.
+   - Better Auth rejects other origins (`INVALID_ORIGIN`): preview deployments need their own
+     `BETTER_AUTH_URL` (or `trustedOrigins`), or sign-in fails there.
+   - Confirm Better Auth sees real client IPs on Vercel (`rate_limit` keys must not all be the
+     same, or every visitor shares one bucket).
+   - Separate databases: a Neon branch for local dev, `production` only for Vercel.
+   - Legal pages' `UPDATED` date = go-live date.
 9. Cleanup: delete `legacy/`, update README; after a few quiet weeks delete the Supabase project
    and its Resend key.
 
