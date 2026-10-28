@@ -12,7 +12,9 @@ if (!url) throw new Error('DATABASE_URL is not set (see .env.sample)');
 // Reuse one connection pool across hot reloads in dev, otherwise every edit
 // opens a new pool and Neon runs out of connections.
 const globalForDb = globalThis as unknown as { pgClient?: postgres.Sql };
-const client = globalForDb.pgClient ?? postgres(url);
+// On Vercel we connect through Neon's pooler (PgBouncer, transaction mode,
+// `-pooler` in the host): skip named prepared statements there to be safe.
+const client = globalForDb.pgClient ?? postgres(url, { prepare: !url.includes('-pooler') });
 if (process.env.NODE_ENV !== 'production') globalForDb.pgClient = client;
 
 export const db = drizzle(client, { schema });

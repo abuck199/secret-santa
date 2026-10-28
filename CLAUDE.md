@@ -32,9 +32,10 @@ delete `legacy/` once everything is ported. `public/` is shared by both.
 - **Authorization moves to the app layer.** On Neon we connect with a single DB role, so
   Supabase RLS + `auth.uid()` no longer apply. Every mutation is a Server Action that reads
   the Better Auth session and checks membership/ownership explicitly in TypeScript.
-- **Hosting:** Vercel free tier (unchanged). App server runtime = Node. The old `vercel.json`
-  (Vite rewrites) moved to `legacy/`; switch the Vercel project's framework preset to Next.js
-  before merging to `main`.
+- **Hosting:** Vercel free tier, same `thatwish` project and domain (unchanged). App server
+  runtime = Node 24 (`engines` in package.json). The root `vercel.json` sets
+  `"framework": "nextjs"` (the old Vite one moved to `legacy/`), so no dashboard preset change
+  is needed: until the merge, `main` still builds as Vite from its own `vercel.json`.
 ## Dev environment
  
 - Windows 11 + WSL2 (Ubuntu), Node 24 via fnm, pnpm.
@@ -319,9 +320,10 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
    - **Step 4 leftovers fixed:** `addItem` takes a `pg_advisory_xact_lock` per person+household
      (cap holds under racing adds); `reorderItems` dedupes ids.
    - **Migrations:** schema changes now go through `pnpm db:generate` (versioned SQL in
-     `drizzle/`, baseline `0000_*`) + `pnpm db:migrate`. The current Neon DB was built with
-     `push`, so before the first `migrate` on it, mark the baseline as applied (or migrate a
-     fresh branch). Don't `push` to production.
+     `drizzle/`, baseline `0000_*`) + `pnpm db:migrate`. The Neon `production` branch was built
+     with `push`; `pnpm db:baseline` (`scripts/db-baseline.mjs`) recorded `0000_*` as applied
+     on it (2026-10-28), so branches created from it after that inherit the baseline. Never
+     `push` again.
    - **Tests:** `pnpm test` (Vitest + PGlite in-memory Postgres built from `drizzle/`; never
      touches Neon). `tests/setup.ts` mocks `@/db`, `@/server/session` (`signInAs()`),
      `next/headers`, `next/navigation`, `@/lib/auth`; everything in `src/server` runs for real.
@@ -340,16 +342,20 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
      Referrer-Policy, Permissions-Policy, HSTS). Not done (judgment calls, revisit if needed):
      CSP (needs a nonce/hash for the inline theme script), re-auth before account deletion,
      a cap on households created per user.
-7. Data migration from Supabase (if real users): keep the same UUIDs; users just sign in with
-   their email (OTP), no password reset. Rehearse on a Neon branch first.
+7. Data migration from Supabase: *skipped, the old app had no real users or households
+   (confirmed by the user).*
 8. Cutover: Vercel prod env vars (`BETTER_AUTH_URL=https://thatwish.com`), framework preset →
    Next.js, short freeze + final data sync, merge `next-rebuild` → `main`. Also:
-   - Neon pooled URL (`-pooler` host) for Vercel; check postgres.js against it.
-   - Better Auth rejects other origins (`INVALID_ORIGIN`): preview deployments need their own
-     `BETTER_AUTH_URL` (or `trustedOrigins`), or sign-in fails there.
+   - Neon pooled URL (`-pooler` host) for Vercel; `src/db/index.ts` turns off postgres.js
+     prepared statements for pooler URLs.
+   - `BETTER_AUTH_URL` is set for **Production only**. Without it Better Auth infers the base
+     URL from the request (`better-auth/dist/utils/url.mjs`), so preview deployments work on
+     their own *.vercel.app URLs; a wrong value there means `INVALID_ORIGIN` on sign-in.
    - Confirm Better Auth sees real client IPs on Vercel (`rate_limit` keys must not all be the
      same, or every visitor shares one bucket).
-   - Separate databases: a Neon branch for local dev, `production` only for Vercel.
+   - Separate databases *(done 2026-10-28)*: Neon branch `dev` (child of `production`, no
+     auto-delete) is what `.env.local` and Vercel **Preview** use; `production` is for Vercel
+     **Production** only.
    - Legal pages' `UPDATED` date = go-live date.
 9. Cleanup: delete `legacy/`, update README; after a few quiet weeks delete the Supabase project
    and its Resend key.

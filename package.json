@@ -11,7 +11,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:baseline": "node scripts/db-baseline.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -44,5 +45,8 @@
     "typescript": "^5",
     "vitest": "^5.0.5"
   },
-  "packageManager": "pnpm@12.16.1"
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": "24.x"
+  }
 }
