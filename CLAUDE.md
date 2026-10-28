@@ -246,25 +246,43 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
    `/signup` → `/login`, signed-in redirects) → 5d app (`/app`, list with dnd-kit, members,
    reservations, match, settings, profile, help, new, `/join/[code]`) → 5e Vercel Analytics.
    **5a foundations:**
-   - **Language routing:** every page lives under `src/app/[lang]/` (root layout there, with
-     `generateStaticParams` en/fr). URLs: English unprefixed (`/app/list`), French `/fr/...`.
-     `src/proxy.ts` rewrites unprefixed URLs to `/en/...`, redirects `/en/...` to the unprefixed
-     URL, and redirects to `/fr` when the `lang` cookie is `fr`, or on a first visit from a
-     non-English browser (old app's rule; no Accept-Language = English, for crawlers). API routes
-     and files in `public/` are skipped. Unknown locale → 404.
+   - **Language routing (hybrid, decided with the user):** every page lives under
+     `src/app/[lang]/` (root layout there, `generateStaticParams` en/fr, pages stay prerendered).
+     Visible URLs carry **no language** (`/app/list`, `/join/abc`): `src/proxy.ts` rewrites them
+     internally to `/{lang}/...`, with lang = `lang` cookie, else the browser's best supported
+     Accept-Language (`localeFromAcceptLanguage` honors q-weights; other languages and crawlers
+     → English). Public pages (`PUBLIC_PATHS`: `/`, `/login`, `/privacy`, `/terms`) also have a
+     crawlable `/fr/...` twin for Google (sitemap + hreflang); visiting any `/fr` URL without a
+     cookie sets `lang=fr`. `/fr/<non-public>` (old links) and `/en/...` redirect to the plain
+     URL. In-app links use plain paths; `localizedPath()` is for SEO only. API routes and
+     `public/` files skip the proxy. Unknown locale → 404.
+     Check at cutover: on Vercel, `/` from a French vs English browser must return the right
+     language (the CDN should cache per rewritten path; Next overrides our `Vary` header).
    - **i18n:** `src/i18n/translations.ts` is the old file as-is (same flat keys, `{placeholders}`).
      Server Components: `const t = await getT()` (`src/i18n/server.ts`, reads `next/root-params`).
      Client Components: `const { t, lang } = useI18n()` (`src/i18n/client.tsx`). Links: build
      hrefs with `localizedPath(path, lang)`. The toggle sets the `lang` cookie (also used for the
-     OTP email language) and navigates to the other-language URL.
+     OTP email language) and refreshes the same URL (or leaves a `/fr` page for the plain URL).
    - **Styles:** `src/app/globals.css` = old `index.css` + `tailwind.config.js` in Tailwind 4 form:
      tokens in `@theme inline`, component classes (`card`, `input`, `btn-*`, `chip`, `link`, …)
      as `@utility`, `.dark` class variant. Fonts via `next/font/google` (self-hosted at build).
    - **Theme:** inline script in `<head>` applies `.dark` before paint (localStorage
      `thatwish:theme`, else OS); `ThemeToggle` reads the class on `<html>`.
    - Ported: `Brand`, `ThemeToggle`, `LanguageToggle`, `Toaster` (react-hot-toast), lucide icons.
-   - `src/app/[lang]/page.tsx` + `toast-demo.tsx` are a temporary style-check page, replaced by
-     the landing page in 5b.
+   **5b public pages *(done)*:** landing (`src/app/[lang]/page.tsx`, all CTAs → `/login` since
+   sign-up and sign-in are one OTP flow), `/privacy` and `/terms` (`LegalLayout`, content updated:
+   Neon instead of Supabase, no Google, sign-in codes instead of passwords, session cookie + `lang`
+   cookie described; `UPDATED` = 2026-10-28, set it to the go-live date at cutover), `Footer`.
+   SEO: each page's `generateMetadata` uses `alternates(path, lang)` from `src/lib/seo.ts`
+   (canonical + hreflang en/fr/x-default); `src/app/sitemap.ts` replaces `public/sitemap.xml`;
+   `robots.txt` also disallows `/fr/app`, `/fr/join`.
+   - Gotcha: Cache Components rejects `new Date()` during prerender, even in Client Components
+     (the footer year is read with `useSyncExternalStore`, browser only).
+   - Left for 5c: redirect signed-in visitors from the landing page to `/app`; prune the dead
+     translation keys (passwords, Google, reset) — the whole dictionary ships to the client.
+   - **Gap found:** the privacy policy and terms promise "delete your account at any time", but
+     neither the old app nor the new one has that feature. Needed for Law 25; add a
+     `deleteAccount` action (decide what happens to households the user owns) before cutover.
 6. Hardening: Better Auth rate limit in DB storage (memory is per-instance on Vercel), Neon
    pooled URL for prod, security review of actions (anonymity!), a few automated tests on the
    critical paths, error/404 pages. Deferred from step 4:

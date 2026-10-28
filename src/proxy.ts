@@ -1,36 +1,45 @@
 // Language routing only (auth is checked in src/server, never here).
 //
-//  /fr/...  -> served as is (the `[lang]` segment is `fr`)
-//  /en/...  -> redirected to the unprefixed URL (one canonical English URL)
-//  /...     -> French if the `lang` cookie says so, or on a first visit from a
-//              browser that isn't set to English (old app's rule: Quebec
-//              audience, French by default); otherwise rewritten to /en/...
-//              Requests without Accept-Language (crawlers) get English.
+//  /...            -> served in the `lang` cookie's language, else the browser's
+//                     (rewritten to /en/... or /fr/...; the URL doesn't change)
+//  /fr/<public>    -> the crawlable French twin of a public page, served as is
+//  /fr/<other>     -> redirected to the plain URL (old /fr/... app links)
+//  /en/...         -> redirected to the plain URL
+// Arriving through any /fr URL without a cookie remembers French, so the
+// visitor stays in French as they click around.
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { LANG_COOKIE, isLocale, localizedPath } from '@/i18n/config';
+import {
+  LANG_COOKIE,
+  PUBLIC_PATHS,
+  isLocale,
+  localeFromAcceptLanguage,
+  stripLocale,
+} from '@/i18n/config';
 
-function preferredLang(req: NextRequest) {
-  const cookie = req.cookies.get(LANG_COOKIE)?.value;
-  if (isLocale(cookie)) return cookie;
-  const header = req.headers.get('accept-language');
-  if (!header) return 'en';
-  return header.toLowerCase().startsWith('en') ? 'en' : 'fr';
-}
+const ONE_YEAR = 60 * 60 * 24 * 365;
 
 export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
+  const cookie = req.cookies.get(LANG_COOKIE)?.value;
+  const prefix = pathname.match(/^\/(en|fr)(?:\/|$)/)?.[1];
 
-  if (pathname === '/fr' || pathname.startsWith('/fr/')) return NextResponse.next();
-
-  if (pathname === '/en' || pathname.startsWith('/en/')) {
-    return NextResponse.redirect(new URL(localizedPath(pathname, 'en') + search, req.url));
+  if (prefix) {
+    const plain = stripLocale(pathname);
+    const res = prefix === 'fr' && PUBLIC_PATHS.includes(plain)
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL(plain + search, req.url));
+    if (prefix === 'fr' && !isLocale(cookie)) {
+      res.cookies.set(LANG_COOKIE, 'fr', { path: '/', maxAge: ONE_YEAR, sameSite: 'lax' });
+    }
+    return res;
   }
 
-  if (preferredLang(req) === 'fr') {
-    return NextResponse.redirect(new URL(localizedPath(pathname, 'fr') + search, req.url));
-  }
-  return NextResponse.rewrite(new URL(`/en${pathname === '/' ? '' : pathname}${search}`, req.url));
+  const lang = isLocale(cookie) ? cookie : localeFromAcceptLanguage(req.headers.get('accept-language'));
+  const res = NextResponse.rewrite(new URL(`/${lang}${pathname === '/' ? '' : pathname}${search}`, req.url));
+  // Same URL, different content per language: keep shared caches honest.
+  res.headers.set('Vary', 'Cookie, Accept-Language');
+  return res;
 }
 
 export const config = {

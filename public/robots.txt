@@ -2,6 +2,7 @@
 User-agent: *
 Disallow: /app
 Disallow: /join
+Disallow: /fr/app
+Disallow: /fr/join
 
-# TODO: replace with your real production domain
 Sitemap: https://thatwish.com/sitemap.xml

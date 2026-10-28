@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { LANG_COOKIE, localizedPath, type Locale } from '@/i18n/config';
+import { LANG_COOKIE, stripLocale, type Locale } from '@/i18n/config';
 import { useI18n } from '@/i18n/client';
 
 const LANGS: { code: Locale; label: string }[] = [
@@ -13,8 +13,9 @@ function rememberLang(code: Locale) {
   document.cookie = `${LANG_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`;
 }
 
-// Compact EN / FR segmented toggle. Remembers the choice in a cookie (the
-// proxy and the OTP email read it) and moves to the same page in that language.
+// Compact EN / FR segmented toggle. Saves the choice in a cookie (the proxy and
+// the OTP email read it) and re-renders the same URL in that language. On a
+// crawlable /fr page it moves to the plain URL.
 export default function LanguageToggle({ className = '' }: { className?: string }) {
   const { lang, t } = useI18n();
   const router = useRouter();
@@ -23,7 +24,9 @@ export default function LanguageToggle({ className = '' }: { className?: string 
   function change(code: Locale) {
     if (code === lang) return;
     rememberLang(code);
-    router.push(localizedPath(pathname, code) + window.location.search);
+    const plain = stripLocale(pathname);
+    if (plain !== pathname) router.push(plain + window.location.search);
+    else router.refresh();
   }
 
   return (

@@ -9,17 +9,15 @@ import { emailOTP } from 'better-auth/plugins';
 import { after } from 'next/server';
 import { db } from '@/db';
 import { users, sessions, accounts, verifications, profiles } from '@/db/schema';
-import { LANG_COOKIE, isLocale } from '@/i18n/config';
+import { LANG_COOKIE, isLocale, localeFromAcceptLanguage } from '@/i18n/config';
 import { sendOtpEmail, type EmailLang } from '@/lib/email';
 
-// The language picked with the toggle (cookie), else the browser's, using the
-// same rule as the proxy: French unless the browser is set to English.
+// Same rule as the proxy: the language picked with the toggle (cookie), else
+// the browser's.
 function langFrom(request?: Request): EmailLang {
   const cookie = request?.headers.get('cookie')?.match(new RegExp(`(?:^|; )${LANG_COOKIE}=(\\w+)`))?.[1];
   if (isLocale(cookie)) return cookie;
-  const header = request?.headers.get('accept-language');
-  if (!header) return 'en';
-  return header.toLowerCase().startsWith('en') ? 'en' : 'fr';
+  return localeFromAcceptLanguage(request?.headers.get('accept-language'));
 }
 
 export const auth = betterAuth({
