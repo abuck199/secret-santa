@@ -184,6 +184,11 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
  
 1. Drizzle schema + client, push to an empty DB. *(done: Neon project, Postgres 18, us-east-1)*
 2. Better Auth (email OTP) wired to Resend; run its CLI to generate auth tables; profile-creation hook.
+   *(done: `src/lib/auth.ts`, `src/lib/email.ts`, `src/lib/auth-client.ts`, route
+   `src/app/api/auth/[...all]`. Auth tables are hand-written in `schema.ts` (the CLI can't load
+   a `server-only` config). OTPs are stored hashed; the email is sent via `after()`. Email
+   language comes from `Accept-Language` until the i18n port provides an explicit one. For
+   reading the session in pages, follow `node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md`.)*
 3. `isMember` / `isAdmin` helpers.
 4. Server Actions: households → invites → wishlist → reservations → secret santa.
 5. Port UI components, routes, and i18n from the old repo.
