@@ -6,14 +6,8 @@ import 'server-only';
 import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { memberships } from '@/db/schema';
+import { ActionError } from './result';
 import { requireUser, type SessionUser } from './session';
-
-export class ForbiddenError extends Error {
-  constructor() {
-    super('Forbidden');
-    this.name = 'ForbiddenError';
-  }
-}
 
 // Ids arrive from the client; a malformed one would make Postgres throw a
 // 500 instead of a clean "no access".
@@ -50,12 +44,12 @@ export async function isAdmin(householdId: string, userId: string): Promise<bool
 // Session + membership in one call, for the top of every household action.
 export async function requireMember(householdId: string): Promise<SessionUser> {
   const user = await requireUser();
-  if (!(await isMember(householdId, user.id))) throw new ForbiddenError();
+  if (!(await isMember(householdId, user.id))) throw new ActionError('forbidden');
   return user;
 }
 
 export async function requireAdmin(householdId: string): Promise<SessionUser> {
   const user = await requireUser();
-  if (!(await isAdmin(householdId, user.id))) throw new ForbiddenError();
+  if (!(await isAdmin(householdId, user.id))) throw new ActionError('forbidden');
   return user;
 }

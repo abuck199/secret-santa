@@ -193,13 +193,52 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
    - `session.ts`: `getSessionUser()` (narrow `{ id, email }`, deduped per request with React
      `cache`) and `requireUser()` (redirects to `/login`).
    - `authz.ts`: `isMember`, `isAdmin` (reject malformed UUIDs instead of letting Postgres 500),
-     `requireMember(householdId)` / `requireAdmin(householdId)` throwing `ForbiddenError`.
+     `requireMember(householdId)` / `requireAdmin(householdId)` throwing `ActionError('forbidden')`.
    - **Rule, enforced by ESLint `no-restricted-imports`:** only `src/server/**` (plus `src/db`,
      `src/lib/auth.ts` and the auth route) may import `@/db` or `@/lib/auth`. Pages, components
      and actions call `src/server` functions.
    - Not using `'use cache: private'` for the session yet (React `cache` works the same in
      Server Actions); revisit when tuning prefetching.
 4. Server Actions: households → invites → wishlist → reservations → secret santa.
-5. Port UI components, routes, and i18n from the old repo.
-6. Data migration from the old Supabase DB if real households must be preserved.
+   **Layout:** `src/server/queries/*` = server-only reads for Server Components (throw
+   `ActionError`/redirect); `src/server/actions/*` = `'use server'` mutations returning
+   `ActionResult` (`{ ok: true, data } | { ok: false, error: ErrorCode }`) via `runAction()` in
+   `result.ts`. The UI translates `error` as `err.<code>`. Validate every input with zod (v4).
+   **Never export a helper from a `'use server'` file** (every export is a public endpoint);
+   shared internals go in plain server-only modules like `memberships.ts`.
+   - 4a profile *(done)*: `getMyProfile`, `updateProfile`. The old generic `getProfiles(ids)` is
+     dropped; names come from purpose-built queries (members, reservations, assignment).
+   - 4b households *(done)*: create (tx: household + admin membership), rename / Secret Santa
+     toggle (admin), delete (owner only), leave (anyone but the owner → `owner_cannot_leave`,
+     and not while Secret Santa is on and they give/receive in the draw → `in_active_draw`;
+     the admin turns Secret Santa off when the season ends, which frees everyone).
+   - 4c members *(done)*: `getMembers` (member), `setMemberRole` / `removeMember` (admin; not
+     yourself → `cannot_change_self`, never the owner → `cannot_change_owner`). Admin removal
+     works even during an active draw (deliberate override; the admin re-draws).
+     Leaving or being removed (`removeFromHousehold`) deletes that person's items in the
+     household and voids draw pairings involving them. Gifts they reserved but had not bought
+     go back to the pool; gifts already bought stay taken (`reserved_by` cleared) so nobody
+     buys a duplicate.
+   - 4d invites, 4e wishlist, 4f reservations, 4g secret santa: to do. Invites are multi-use
+     links valid 30 days, max 5 active per household (see old `settings.inviteHint`).
+5. Port UI: 5a foundations (Tailwind 3→4 `@theme`, Fraunces/Inter, dark mode, i18n with `/fr`
+   routes, layout, toasts) → 5b public pages (landing, FAQ, privacy/terms updated for Neon + OTP,
+   no Google; metadata/sitemap) → 5c auth (`/login` email→code, onboarding name+birthday,
+   `/signup` → `/login`, signed-in redirects) → 5d app (`/app`, list with dnd-kit, members,
+   reservations, match, settings, profile, help, new, `/join/[code]`) → 5e Vercel Analytics.
+6. Hardening: Better Auth rate limit in DB storage (memory is per-instance on Vercel), Neon
+   pooled URL for prod, security review of actions (anonymity!), a few automated tests on the
+   critical paths, error/404 pages.
+7. Data migration from Supabase (if real users): keep the same UUIDs; users just sign in with
+   their email (OTP), no password reset. Rehearse on a Neon branch first.
+8. Cutover: Vercel prod env vars (`BETTER_AUTH_URL=https://thatwish.com`), framework preset →
+   Next.js, short freeze + final data sync, merge `next-rebuild` → `main`.
+9. Cleanup: delete `legacy/`, update README; after a few quiet weeks delete the Supabase project
+   and its Resend key.
+
+## Dev gotchas
+
+- Files edited from Windows through `\\wsl.localhost\...` may not trigger Next's file watcher in
+  WSL; if the dev server serves stale code, restart `pnpm dev`. Opening the folder with VS Code's
+  WSL extension (`code .` from Ubuntu) avoids it.
  

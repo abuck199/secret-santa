@@ -1,5 +1,5 @@
 import {
-  pgTable, pgEnum, uuid, text, boolean, integer, timestamp, unique, index,
+  pgTable, pgEnum, uuid, text, boolean, integer, timestamp, date, unique, index,
 } from 'drizzle-orm/pg-core';
 
 export const memberRole = pgEnum('member_role', ['admin', 'member']);
@@ -64,7 +64,8 @@ export const verifications = pgTable('verification', {
 export const profiles = pgTable('profiles', {
   id: uuid('id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
   displayName: text('display_name').notNull().default(''),
-  birthday: timestamp('birthday', { mode: 'date' }),
+  // Plain 'YYYY-MM-DD': a timestamp would drift a day across timezones.
+  birthday: date('birthday', { mode: 'string' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
