@@ -185,9 +185,9 @@ account deletion and the OTP cap. **Add a test with every new action or rule.**
 ## Open items
 
 - Old-stack teardown *(done 2026-10-29)*: Supabase project deleted, Google OAuth client deleted,
-  Supabase-only Resend key revoked; production code emails confirmed delivered afterwards.
-  Still to confirm: `VITE_*` env vars removed from Vercel, and link previews (Messenger,
-  WhatsApp) work despite Vercel's bot checkpoint.
+  Supabase-only Resend key revoked; production code emails confirmed delivered afterwards;
+  `VITE_*` env vars removed from Vercel; link previews (Messenger, WhatsApp) confirmed working
+  through Vercel's bot checkpoint.
 - Google Search Console *(2026-10-29)*: domain property verified (TXT record at Namecheap, which
   hosts the DNS), sitemap submitted, live URL test passed: Vercel's bot checkpoint lets
   Googlebot through.
