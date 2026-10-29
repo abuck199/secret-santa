@@ -12,6 +12,7 @@ import {
   Save,
   Shield,
   ShieldOff,
+  QrCode,
   Share2,
   Shuffle,
   Trash2,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
+import InviteQr from '@/components/InviteQr';
 import PageHeader, { Page } from '@/components/PageHeader';
 import { useI18n } from '@/i18n/client';
 import { actionErrorMessage } from '@/lib/action-error';
@@ -75,6 +77,7 @@ export default function HouseholdSettings({
   const [drawing, setDrawing] = useState(false);
   const [creatingInvite, setCreatingInvite] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const [qrFor, setQrFor] = useState<string | null>(null); // invite whose QR code is open
   const [confirm, setConfirm] = useState<Confirm | null>(null);
 
   const fail = (res: Parameters<typeof actionErrorMessage>[1]) => toast.error(actionErrorMessage(t, res));
@@ -370,6 +373,16 @@ export default function HouseholdSettings({
                       {copied === inv.id ? t('common.copied') : t('settings.copyLink')}
                     </button>
                   )}
+                  {!inv.isExpired && (
+                    <button
+                      onClick={() => setQrFor((id) => (id === inv.id ? null : inv.id))}
+                      aria-expanded={qrFor === inv.id}
+                      className={`${pill} ${qrFor === inv.id ? 'bg-fg text-white' : 'bg-panel text-fg'}`}
+                    >
+                      <QrCode className="w-4 h-4" aria-hidden="true" />
+                      {qrFor === inv.id ? t('settings.hideQr') : t('settings.showQr')}
+                    </button>
+                  )}
                   <button
                     onClick={() => setConfirm({ type: 'deleteInvite', inviteId: inv.id })}
                     className={`${pill} text-red-700 hover:bg-red-500/10`}
@@ -377,6 +390,12 @@ export default function HouseholdSettings({
                     <Trash2 className="w-4 h-4" aria-hidden="true" /> {t('common.delete')}
                   </button>
                 </div>
+                {qrFor === inv.id && !inv.isExpired && (
+                  <div className="flex flex-col items-center gap-3 mt-4">
+                    <InviteQr url={inviteLink(inv.code)} label={t('settings.qrLabel')} />
+                    <p className="text-[15px] text-mute text-center max-w-xs">{t('settings.qrHint')}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>

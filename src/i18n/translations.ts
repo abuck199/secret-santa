@@ -254,6 +254,10 @@ export const translations = {
     'settings.dangerTitle': 'Leave or delete',
     'settings.shareText': 'Join our household on ThatWish',
     'settings.share': 'Share',
+    'settings.qrHint': 'Ask them to point their phone’s camera at this code: the invite opens on its own.',
+    'settings.qrLabel': 'QR code of the invite link',
+    'settings.hideQr': 'Hide the code',
+    'settings.showQr': 'QR code',
     'settings.copyLink': 'Copy link',
 
     'profile.title': 'My profile',
@@ -556,6 +560,10 @@ export const translations = {
     'settings.dangerTitle': 'Quitter ou supprimer',
     'settings.shareText': 'Rejoignez notre foyer sur ThatWish',
     'settings.share': 'Partager',
+    'settings.qrHint': 'Demandez-leur de pointer l’appareil photo de leur téléphone vers ce code : l’invitation s’ouvre toute seule.',
+    'settings.qrLabel': 'Code QR du lien d’invitation',
+    'settings.hideQr': 'Masquer le code',
+    'settings.showQr': 'Code QR',
     'settings.copyLink': 'Copier le lien',
 
     'profile.title': 'Mon profil',
