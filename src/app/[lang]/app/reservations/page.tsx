@@ -13,5 +13,5 @@ export default async function ReservationsPage() {
   const household = await getCurrentHousehold();
   if (!household) return null;
   const rows = await getMyReservations(household.id);
-  return <ReservationsList key={household.id} initialRows={rows} />;
+  return <ReservationsList key={household.id} householdName={household.name} initialRows={rows} />;
 }
