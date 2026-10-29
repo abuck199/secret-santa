@@ -8,7 +8,7 @@ import LanguageToggle from '@/components/LanguageToggle';
 import { getLang, getT } from '@/i18n/server';
 import type { TFunction } from '@/i18n/translate';
 import { appJsonLd, publicMetadata } from '@/lib/seo';
-import MockName from './mock-name';
+import MockBirthday from './mock-birthday';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -93,7 +93,7 @@ export default async function LandingPage() {
             </div>
 
             <div className="min-w-0 animate-rise [animation-delay:200ms]" aria-hidden="true">
-              <MockPreview t={t} locale={lang === 'fr' ? 'fr-CA' : 'en-US'} />
+              <MockPreview t={t} />
             </div>
           </div>
         </section>
@@ -161,10 +161,7 @@ export default async function LandingPage() {
 
 // A static preview of the app for the hero (decorative only): the same
 // raspberry next-birthday card and gift cards as the real home and list.
-function MockPreview({ t, locale }: { t: TFunction; locale: string }) {
-  const sampleDate = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' }).format(
-    new Date(2000, 5, 30),
-  );
+function MockPreview({ t }: { t: TFunction }) {
   const items = [
     { name: t('landing.mock.item1'), reserved: true },
     { name: t('landing.mock.item2'), reserved: false },
@@ -172,25 +169,7 @@ function MockPreview({ t, locale }: { t: TFunction; locale: string }) {
   ];
   return (
     <div className="max-w-md mx-auto space-y-3">
-      <div className="relative overflow-hidden rounded-3xl bg-brand text-white p-5">
-        <span className="absolute right-5 top-4 w-5 h-5 rounded-full bg-sun animate-float" />
-        <span className="absolute right-14 top-10 w-2.5 h-2.5 rounded-[3px] bg-white/80 rotate-12 animate-float [animation-delay:600ms]" />
-        <p className="eyebrow">{t('landing.mock.next')}</p>
-        <div className="flex items-center gap-4 mt-3">
-          <div className="w-[68px] h-[68px] shrink-0 rounded-2xl bg-white text-brand-ink grid place-items-center text-center">
-            <div>
-              <p className="heading text-[28px] tabular-nums">3</p>
-              <p className="font-mono text-[11px] font-semibold uppercase mt-0.5">{t('dash.daysUnit')}</p>
-            </div>
-          </div>
-          <div className="min-w-0">
-            <p className="heading text-[26px]">
-              <MockName />
-            </p>
-            <p className="text-[15px] mt-1">{sampleDate} · {t('dash.turning', { age: 32 })}</p>
-          </div>
-        </div>
-      </div>
+      <MockBirthday />
 
       {items.map((item) => (
         <div key={item.name} className="flex items-center gap-3 p-3 rounded-[20px] bg-panel shadow-soft">
