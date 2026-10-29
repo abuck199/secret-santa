@@ -26,19 +26,19 @@ export default function AuthShell({
   const { t } = useI18n();
   const signOut = useSignOut();
   return (
-    <div className="min-h-screen bg-paper flex flex-col items-center px-4 pt-14 sm:pt-20 pb-12">
-      <main id="main-content" className="w-full max-w-sm">
-        <div className="flex items-center justify-between mb-7">
+    <div className="min-h-screen bg-paper flex flex-col items-center px-4 pt-8 sm:pt-16 pb-12">
+      <main id="main-content" className="w-full max-w-md">
+        <div className="flex items-center justify-between mb-6 animate-rise">
           <Link href="/" aria-label={t('legal.home')}>
             <Brand size="md" />
           </Link>
           <LanguageToggle />
         </div>
-        <div className="card p-6 sm:p-8 animate-scale-in">
+        <div className="card p-5 sm:p-7 animate-rise [animation-delay:80ms]">
           {title && (
             <div className="mb-6">
-              <h1 className="font-display text-2xl font-medium tracking-tight text-fg">{title}</h1>
-              {subtitle && <p className="text-mute text-sm mt-1.5">{subtitle}</p>}
+              <h1 className="heading text-[26px] text-fg">{title}</h1>
+              {subtitle && <p className="text-mute text-[15px] mt-2 leading-relaxed">{subtitle}</p>}
             </div>
           )}
           {children}
@@ -47,12 +47,12 @@ export default function AuthShell({
         {showSignOut ? (
           <button
             onClick={signOut}
-            className="mx-auto mt-6 flex items-center gap-2 text-sm text-mute hover:text-fg"
+            className="mx-auto mt-5 flex items-center gap-2 min-h-11 px-3 text-[15px] font-semibold text-mute hover:text-fg"
           >
             <LogOut className="w-4 h-4" aria-hidden="true" /> {t('auth.signOut')}
           </button>
         ) : (
-          <p className="text-center text-xs text-mute mt-6">{t('app.tagline')}</p>
+          <p className="text-center text-sm text-mute mt-6">{t('app.tagline')}</p>
         )}
       </main>
     </div>

@@ -69,7 +69,7 @@ export default function CompleteProfile({
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? `${nameId}-err` : undefined}
           />
-          {errors.name && <p id={`${nameId}-err`} className="text-xs text-red-500 mt-1.5">{errors.name}</p>}
+          {errors.name && <p id={`${nameId}-err`} role="alert" className="text-sm font-semibold text-red-700 mt-1.5">{errors.name}</p>}
         </div>
 
         <div className="mb-2">
@@ -86,9 +86,9 @@ export default function CompleteProfile({
             ariaDescribedby={errors.birthday ? bdayErrId : bdayHintId}
           />
           {errors.birthday ? (
-            <p id={bdayErrId} className="text-xs text-red-500 mt-1.5">{errors.birthday}</p>
+            <p id={bdayErrId} role="alert" className="text-sm font-semibold text-red-700 mt-1.5">{errors.birthday}</p>
           ) : (
-            <p id={bdayHintId} className="text-xs text-mute mt-1.5">{t('profile.birthdayHint')}</p>
+            <p id={bdayHintId} className="text-sm text-mute mt-1.5">{t('profile.birthdayHint')}</p>
           )}
         </div>
 

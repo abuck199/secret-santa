@@ -63,14 +63,14 @@ export default function Onboarding({ embedded = false }: { embedded?: boolean })
   }
 
   const tabClass = (key: string) =>
-    `flex-1 py-2 rounded-lg text-sm font-medium transition ${
-      tab === key ? 'bg-panel text-fg shadow-soft' : 'text-mute'
+    `flex-1 min-h-11 rounded-full text-[15px] font-semibold transition ${
+      tab === key ? 'bg-panel text-fg shadow-soft' : 'text-mute hover:text-fg'
     }`;
 
   // Segmented tabs + the active form - same building blocks as AuthShell.
   const tabsAndForm = (
     <>
-      <div className="flex gap-1 p-1 bg-panel-2 rounded-xl mb-6">
+      <div className="flex gap-1 p-1 bg-panel-2 rounded-full mb-6">
         <button type="button" onClick={() => selectTab('create')} aria-pressed={tab === 'create'} className={tabClass('create')}>
           {t('onboard.createTab')}
         </button>
@@ -95,7 +95,7 @@ export default function Onboarding({ embedded = false }: { embedded?: boolean })
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? `${nameId}-err` : undefined}
           />
-          {errors.name && <p id={`${nameId}-err`} className="text-xs text-red-500 mt-1.5">{errors.name}</p>}
+          {errors.name && <p id={`${nameId}-err`} role="alert" className="text-sm font-semibold text-red-700 mt-1.5">{errors.name}</p>}
           <button className="btn-primary w-full mt-5" disabled={loading} aria-busy={loading}>
             {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('onboard.createCta')}
           </button>
@@ -115,7 +115,7 @@ export default function Onboarding({ embedded = false }: { embedded?: boolean })
             aria-invalid={!!errors.code}
             aria-describedby={errors.code ? `${codeId}-err` : undefined}
           />
-          {errors.code && <p id={`${codeId}-err`} className="text-xs text-red-500 mt-1.5">{errors.code}</p>}
+          {errors.code && <p id={`${codeId}-err`} role="alert" className="text-sm font-semibold text-red-700 mt-1.5">{errors.code}</p>}
           <button className="btn-primary w-full mt-5" disabled={loading} aria-busy={loading}>
             {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('onboard.joinCta')}
           </button>
@@ -127,12 +127,12 @@ export default function Onboarding({ embedded = false }: { embedded?: boolean })
   // In-app variant (reached from the nav): heading above, inside the app chrome.
   if (embedded) {
     return (
-      <div className="max-w-sm mx-auto px-4 py-10">
-        <h1 className="font-display text-2xl font-medium tracking-tight text-fg mb-1">
+      <div className="max-w-md mx-auto px-4 py-6 sm:py-10">
+        <h1 className="heading text-[26px] text-fg mb-2 animate-rise">
           {t('nav.newHousehold')}
         </h1>
-        <p className="text-mute text-sm mb-6">{t('onboard.subtitle')}</p>
-        <div className="card p-6 sm:p-8 animate-scale-in">{tabsAndForm}</div>
+        <p className="text-mute text-[15px] mb-6 animate-rise [animation-delay:60ms]">{t('onboard.subtitle')}</p>
+        <div className="card p-5 sm:p-7 animate-rise [animation-delay:120ms]">{tabsAndForm}</div>
       </div>
     );
   }

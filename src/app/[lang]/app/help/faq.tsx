@@ -12,33 +12,43 @@ export default function Faq() {
 
   return (
     <Page>
-      <PageHeader eyebrow={t('nav.faq')} title={t('faq.title')} />
-      <div className="space-y-2">
+      <PageHeader title={t('faq.title')} />
+      <div className="space-y-2.5">
         {faqs.map((f, i) => {
           const expanded = open === i;
           const btnId = `faq-q-${i}`;
           const panelId = `faq-a-${i}`;
           return (
-            <div key={btnId} className="card overflow-hidden">
+            <div
+              key={btnId}
+              className={`rounded-3xl overflow-hidden animate-rise transition-colors ${
+                expanded ? 'bg-panel shadow-soft' : 'bg-panel/60'
+              }`}
+              style={{ animationDelay: `${60 + i * 60}ms` }}
+            >
               <button
                 id={btnId}
                 onClick={() => setOpen(expanded ? -1 : i)}
                 aria-expanded={expanded}
                 aria-controls={panelId}
-                className="w-full flex items-center justify-between gap-3 p-4 text-left"
+                className="w-full min-h-14 flex items-center justify-between gap-3 px-5 py-4 text-left"
               >
-                <span className="font-medium text-fg">{f.q}</span>
-                <ChevronDown
+                <span className="text-base font-bold text-fg">{f.q}</span>
+                <span
                   aria-hidden="true"
-                  className={`w-5 h-5 text-mute transition-transform shrink-0 ${expanded ? 'rotate-180' : ''}`}
-                />
+                  className={`w-9 h-9 shrink-0 rounded-full grid place-items-center transition-[transform,background-color] ${
+                    expanded ? 'rotate-180 bg-brand text-white' : 'bg-panel-2 text-fg'
+                  }`}
+                >
+                  <ChevronDown className="w-5 h-5" strokeWidth={2.4} />
+                </span>
               </button>
               {expanded && (
                 <p
                   id={panelId}
                   role="region"
                   aria-labelledby={btnId}
-                  className="px-4 pb-4 -mt-1 text-sm text-mute leading-relaxed animate-fade-in"
+                  className="px-5 pb-5 -mt-1 text-[15px] text-mute leading-relaxed animate-rise"
                 >
                   {f.a}
                 </p>

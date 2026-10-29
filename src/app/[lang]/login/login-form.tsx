@@ -107,7 +107,7 @@ export default function LoginForm() {
   }
 
   const legal = (
-    <p className="text-center text-xs text-mute mt-5 leading-relaxed">
+    <p className="text-center text-sm text-mute mt-5 leading-relaxed">
       {t('auth.agree')}{' '}
       <Link href="/terms" className="link">{t('legal.terms')}</Link>
       {' · '}
@@ -118,23 +118,23 @@ export default function LoginForm() {
   if (step === 'code') {
     return (
       <AuthShell>
-        <div className="animate-scale-in">
+        <div className="animate-rise">
           <button
             type="button"
             onClick={() => {
               setStep('email');
               setError('');
             }}
-            className="flex items-center gap-1.5 text-sm text-mute hover:text-fg mb-5"
+            className="flex items-center gap-1.5 min-h-11 text-[15px] font-semibold text-mute hover:text-fg mb-3"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" /> {t('auth.changeEmail')}
           </button>
 
           <div className="text-center mb-6">
-            <div className="mx-auto w-12 h-12 rounded-2xl bg-brand-soft text-brand-ink grid place-items-center mb-4">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-brand-soft text-brand-ink grid place-items-center mb-4">
               <KeyRound className="w-6 h-6" strokeWidth={1.8} aria-hidden="true" />
             </div>
-            <h1 className="font-display text-xl font-medium text-fg">{t('auth.codeLabel')}</h1>
+            <h1 className="heading text-xl text-fg">{t('auth.codeLabel')}</h1>
             <p className="text-mute text-sm mt-1.5 leading-relaxed break-words">
               {t('auth.codeSent', { email })}
             </p>
@@ -167,7 +167,7 @@ export default function LoginForm() {
               aria-describedby={error ? `${codeId}-err` : undefined}
               disabled={loading}
             />
-            {error && <p id={`${codeId}-err`} className="text-xs text-red-500 mt-1.5 text-center">{error}</p>}
+            {error && <p id={`${codeId}-err`} role="alert" className="text-sm font-semibold text-red-700 mt-2 text-center">{error}</p>}
 
             <button
               className="btn-primary w-full mt-5"
@@ -182,7 +182,7 @@ export default function LoginForm() {
             type="button"
             onClick={() => sendCode()}
             disabled={cooldown > 0 || loading || !captchaToken}
-            className="w-full mt-3 text-sm text-mute hover:text-fg disabled:hover:text-mute disabled:cursor-not-allowed tabular-nums"
+            className="w-full min-h-11 mt-2 text-[15px] font-semibold text-mute hover:text-fg disabled:hover:text-mute disabled:cursor-not-allowed tabular-nums"
           >
             {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resend')}
           </button>
@@ -200,7 +200,7 @@ export default function LoginForm() {
         <div className="relative">
           <Mail
             aria-hidden="true"
-            className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${error ? 'text-red-500' : 'text-mute'}`}
+            className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${error ? 'text-red-700' : 'text-mute'}`}
           />
           <input
             id={emailId}
@@ -219,9 +219,9 @@ export default function LoginForm() {
           />
         </div>
         {error ? (
-          <p id={`${emailId}-err`} className="text-xs text-red-500 mt-1.5">{error}</p>
+          <p id={`${emailId}-err`} role="alert" className="text-sm font-semibold text-red-700 mt-1.5">{error}</p>
         ) : (
-          <p id={`${emailId}-hint`} className="text-xs text-mute mt-1.5">{t('auth.otpHint')}</p>
+          <p id={`${emailId}-hint`} className="text-sm text-mute mt-1.5">{t('auth.otpHint')}</p>
         )}
 
         <Turnstile ref={turnstile} onToken={setCaptchaToken} />
@@ -230,7 +230,7 @@ export default function LoginForm() {
           {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('auth.sendCode')}
         </button>
         {!captchaToken && !loading && (
-          <p className="text-xs text-mute mt-2 text-center" aria-live="polite">{t('auth.captchaPending')}</p>
+          <p className="text-sm text-mute mt-2 text-center" aria-live="polite">{t('auth.captchaPending')}</p>
         )}
       </form>
     </AuthShell>
