@@ -58,6 +58,13 @@ users, so no data was migrated.
   component that calls Server Actions, updates local state, and calls `router.refresh()` when the
   nav/household changes. Current household = `household` cookie (httpOnly), validated against
   memberships by `getCurrentHousehold()`.
+- Shared UI: `WishCards` (someone else's list: "I'll give this" → plain-words confirmation →
+  gift wraps itself + `Confetti`, from `Celebration.tsx`), `useReservations`, `ConfirmModal`
+  (bottom sheet on phones; `icon`/`eyebrow`/children for explanations). Each member has a page
+  `/app/members/[userId]` (your own → `/app/list`); the home hero card and member cards share a
+  `<ViewTransition name="member-<id>" share="morph">` with its raspberry header. The "+ Add" tab
+  links to `/app/list#add` (`ADD_FIELD_ID`). Per-row actions are labelled pills, never
+  hover-only icons.
 - `/app` layout = guard: no name/birthday → `/welcome`, no household → `/start`, else chrome.
   The gates are routes (a layout that drops its page breaks instant-navigation validation).
 - Code style: single quotes, semicolons, short "why" comments.
