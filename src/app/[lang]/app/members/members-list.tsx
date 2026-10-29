@@ -1,11 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Cake, Search } from 'lucide-react';
-import GiftRow, { useReservations } from '@/components/GiftRow';
+import { useMemo, useState, ViewTransition } from 'react';
+import Link from 'next/link';
+import { Check, ChevronRight, Search } from 'lucide-react';
 import PageHeader, { Page } from '@/components/PageHeader';
 import { useI18n } from '@/i18n/client';
-import { formatBirthday } from '@/lib/dates';
+import { daysUntilBirthday, formatBirthday, whenLabel } from '@/lib/dates';
 import type { HouseholdItem } from '@/server/queries/wishlist';
 
 type Person = {
@@ -16,93 +16,99 @@ type Person = {
   isMe: boolean;
 };
 
-export default function MembersList({ members, initialItems }: { members: Person[]; initialItems: HouseholdItem[] }) {
+// Everyone in the household; tapping a person opens their list.
+export default function MembersList({ members, items }: { members: Person[]; items: HouseholdItem[] }) {
   const { t, lang } = useI18n();
-  const { items, busy, toggle } = useReservations(initialItems);
   const [query, setQuery] = useState('');
 
-  // Items arrive in display order; group them per owner.
-  const itemsByUser = useMemo(() => {
-    const grouped: Record<string, HouseholdItem[]> = {};
-    for (const it of items) (grouped[it.ownerId] ??= []).push(it);
-    return grouped;
+  // Per person: how many ideas, and how many of them I'm giving.
+  const counts = useMemo(() => {
+    const c: Record<string, { ideas: number; mine: number }> = {};
+    for (const it of items) {
+      const entry = (c[it.ownerId] ??= { ideas: 0, mine: 0 });
+      entry.ideas += 1;
+      if (it.reservedByMe) entry.mine += 1;
+    }
+    return c;
   }, [items]);
 
   const q = query.trim().toLowerCase();
-  const visibleMembers = useMemo(() => {
+  const visible = useMemo(() => {
     // Everyone else alphabetically, me last.
     const ordered = [...members].sort((a, b) =>
       a.isMe !== b.isMe ? (a.isMe ? 1 : -1) : a.displayName.localeCompare(b.displayName),
     );
-    if (!q) return ordered;
-    return ordered.filter(
-      (m) =>
-        m.displayName.toLowerCase().includes(q) ||
-        (itemsByUser[m.userId] || []).some((it) => it.item.toLowerCase().includes(q)),
-    );
-  }, [members, itemsByUser, q]);
+    return q ? ordered.filter((m) => m.displayName.toLowerCase().includes(q)) : ordered;
+  }, [members, q]);
 
   return (
     <Page>
       <PageHeader eyebrow={t('nav.members')} title={t('members.title')} subtitle={t('members.subtitle')} />
 
-      <div className="relative mb-6">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" aria-hidden="true" />
-        <input
-          type="search"
-          className="input pl-11"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('members.search')}
-          aria-label={t('members.search')}
-        />
-      </div>
+      {members.length > 6 && (
+        <div className="relative mb-5 animate-rise">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-mute" aria-hidden="true" />
+          <input
+            type="search"
+            className="input pl-11"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('members.search')}
+            aria-label={t('members.search')}
+          />
+        </div>
+      )}
 
-      <div className="space-y-4">
-        {visibleMembers.map((m, idx) => {
-          const list = itemsByUser[m.userId] || [];
+      <ul className="grid sm:grid-cols-2 gap-3">
+        {visible.map((m, i) => {
+          const { ideas = 0, mine = 0 } = counts[m.userId] ?? {};
+          const days = daysUntilBirthday(m.birthday);
           return (
-            <div
-              key={m.userId}
-              id={`m-${m.userId}`}
-              className="card p-5 sm:p-6 animate-slide-up scroll-mt-24"
-              style={{ animationDelay: `${Math.min(idx, 8) * 50}ms`, animationFillMode: 'backwards' }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-fg text-paper font-medium grid place-items-center">
-                  {(m.displayName[0] || '?').toUpperCase()}
-                </div>
-                <div className="min-w-0">
-                  <p className="font-medium text-fg truncate flex items-center gap-2">
-                    {m.displayName}
-                    {m.isMe && <span className="text-mute font-normal">· {t('common.you')}</span>}
-                    {m.role === 'admin' && (
-                      <span className="chip bg-panel-2 text-mute border border-line">{t('common.admin')}</span>
+            <li key={m.userId} className="animate-rise" style={{ animationDelay: `${120 + Math.min(i, 8) * 50}ms` }}>
+              <ViewTransition name={m.isMe ? undefined : `member-${m.userId}`} share="morph" default="none">
+                <Link
+                  href={m.isMe ? '/app/list' : `/app/members/${m.userId}`}
+                  className="press flex items-center gap-3 min-h-[76px] p-3.5 rounded-3xl bg-panel shadow-soft"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="w-12 h-12 shrink-0 rounded-full bg-brand text-white grid place-items-center font-display font-black text-lg"
+                  >
+                    {(m.displayName[0] || '?').toUpperCase()}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-base font-bold text-fg truncate">
+                      {m.displayName}
+                      {m.isMe && <span className="text-mute font-normal"> · {t('common.you')}</span>}
+                    </span>
+                    {m.birthday && days !== null && (
+                      <span className="block text-sm text-mute" suppressHydrationWarning>
+                        {formatBirthday(m.birthday, lang)} · {whenLabel(t, days)}
+                      </span>
                     )}
-                  </p>
-                  {m.birthday && (
-                    <p className="text-xs text-mute flex items-center gap-1 mt-0.5">
-                      <Cake className="w-3 h-3" /> {formatBirthday(m.birthday, lang)}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {list.length === 0 ? (
-                <p className="text-sm text-mute pl-1">{t('members.noItems')}</p>
-              ) : (
-                <div className="space-y-2">
-                  {list.map((it) => (
-                    <GiftRow key={it.id} item={it} busy={busy.has(it.id)} onToggle={() => toggle(it)} />
-                  ))}
-                </div>
-              )}
-
-              {m.isMe && <p className="text-xs text-mute mt-3 italic">{t('members.ownList')}</p>}
-            </div>
+                    <span className="flex flex-wrap gap-1.5 mt-1.5">
+                      <span className="px-2 py-0.5 rounded-full bg-brand-soft font-mono text-xs font-semibold text-fg">
+                        {ideas === 0
+                          ? t('members.ideasNone')
+                          : ideas === 1
+                            ? t('members.ideasOne')
+                            : t('members.ideasMany', { count: ideas })}
+                      </span>
+                      {mine > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sun font-mono text-xs font-semibold text-fg">
+                          <Check className="w-3 h-3" strokeWidth={3} aria-hidden="true" />
+                          {t('members.youGiveCount', { count: mine })}
+                        </span>
+                      )}
+                    </span>
+                  </span>
+                  <ChevronRight className="w-5 h-5 shrink-0 text-mute" strokeWidth={2.4} aria-hidden="true" />
+                </Link>
+              </ViewTransition>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </Page>
   );
 }

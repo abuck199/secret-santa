@@ -21,8 +21,9 @@ export function useReservations(initial: HouseholdItem[]) {
   const patch = (id: string, change: Partial<HouseholdItem>) =>
     setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...change } : it)));
 
-  async function toggle(item: HouseholdItem) {
-    if (busy.has(item.id)) return;
+  // Resolves to true when the change went through.
+  async function toggle(item: HouseholdItem): Promise<boolean> {
+    if (busy.has(item.id)) return false;
     setBusy((s) => new Set(s).add(item.id));
     const res = item.reservedByMe ? await cancelReservation(item.id) : await reserveItem(item.id);
     setBusy((s) => {
@@ -38,12 +39,13 @@ export function useReservations(initial: HouseholdItem[]) {
         patch(item.id, { isReserved: true, reservedByMe: true });
         toast.success(t('members.reservedToast'));
       }
-      return;
+      return true;
     }
     toast.error(actionErrorMessage(t, res));
     // Someone beat us to it: show it as taken. Anything else: reload the truth.
     if (res.error === 'already_reserved') patch(item.id, { isReserved: true, reservedByMe: false });
     else router.refresh();
+    return false;
   }
 
   return { items, busy, toggle };

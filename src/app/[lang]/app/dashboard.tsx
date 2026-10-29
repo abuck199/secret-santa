@@ -1,17 +1,18 @@
 'use client';
 
+import { ViewTransition } from 'react';
 import Link from 'next/link';
 import { ChevronRight, Gift } from 'lucide-react';
 import NextBirthdayCard from '@/components/NextBirthdayCard';
 import { Page } from '@/components/PageHeader';
 import { useCountUp } from '@/components/useCountUp';
 import { useI18n } from '@/i18n/client';
-import { ageTurningNext, daysUntilBirthday, formatBirthday } from '@/lib/dates';
+import { ageTurningNext, daysUntilBirthday, formatBirthday, whenLabel as when } from '@/lib/dates';
 
 type Person = { userId: string; displayName: string; birthday: string | null; isMe: boolean };
 
 // Where "see their list" goes for a member.
-const listHref = (p: Person) => (p.isMe ? '/app/list' : `/app/members#m-${p.userId}`);
+const listHref = (p: Person) => (p.isMe ? '/app/list' : `/app/members/${p.userId}`);
 
 export default function Dashboard({
   myName,
@@ -34,11 +35,7 @@ export default function Dashboard({
     .map((m) => ({ ...m, days: daysUntilBirthday(m.birthday) ?? 0, age: ageTurningNext(m.birthday) }))
     .sort((a, b) => a.days - b.days);
 
-  function whenLabel(days: number) {
-    if (days === 0) return t('dash.birthdayToday');
-    if (days === 1) return t('dash.birthdayTomorrow');
-    return t('dash.birthdayInDays', { days });
-  }
+  const whenLabel = (days: number) => when(t, days);
 
   const hero = birthdays[0];
   const rest = birthdays.slice(1, 6);
@@ -67,13 +64,16 @@ export default function Dashboard({
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-6 lg:items-start">
         <div className="space-y-3">
           {hero ? (
-            <NextBirthdayCard
-              person={hero}
-              isMe={hero.isMe}
-              whenLabel={whenLabel(hero.days)}
-              href={listHref(hero)}
-              className="animate-rise [animation-delay:100ms]"
-            />
+            // Morphs into the raspberry header of that member's list page.
+            <ViewTransition name={hero.isMe ? undefined : `member-${hero.userId}`} share="morph" default="none">
+              <NextBirthdayCard
+                person={hero}
+                isMe={hero.isMe}
+                whenLabel={whenLabel(hero.days)}
+                href={listHref(hero)}
+                className="animate-rise [animation-delay:100ms]"
+              />
+            </ViewTransition>
           ) : (
             <div className="card p-5 animate-rise">
               <p className="text-[15px] text-mute">{t('dash.noBirthdays')}</p>

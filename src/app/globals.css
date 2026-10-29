@@ -86,6 +86,38 @@
   }
 }
 
+/* ===== Celebration: a gift wraps itself and confetti bursts (see Celebration.tsx) ===== */
+@keyframes gift-in { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes lid-drop { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@keyframes tie { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes bow { from { transform: scale(0) rotate(-30deg); } to { transform: none; } }
+@keyframes burst {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+  1% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)); }
+}
+.gift-box, .gift-lid, .gift-ribbon, .gift-bow { transform-box: fill-box; }
+.gift-box { transform-origin: bottom; animation: gift-in 0.3s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
+.gift-lid { animation: lid-drop 0.3s 0.15s ease-out both; }
+.gift-ribbon { transform-origin: top; animation: tie 0.3s 0.3s ease-out both; }
+.gift-bow { transform-origin: center; animation: bow 0.45s 0.5s cubic-bezier(0.3, 1.7, 0.5, 1) both; }
+.confetti {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 9px;
+  height: 9px;
+  animation: burst 1.1s 0.45s cubic-bezier(0.15, 0.7, 0.3, 1) both;
+}
+
+/* Shared-element morph (React <ViewTransition share="morph">): the home card
+   turning into the member page header. */
+::view-transition-group(.morph) {
+  animation-duration: 450ms;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.25, 1);
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   /* Belt-and-suspenders against stray horizontal overflow on mobile.
@@ -242,6 +274,14 @@ body {
   }
   .skeleton::after {
     animation: none;
+  }
+  .confetti {
+    display: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
   .lift:hover {
     transform: none;

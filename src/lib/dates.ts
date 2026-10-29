@@ -1,6 +1,8 @@
 // Birthday helpers. Birthdays are stored as 'YYYY-MM-DD' (a plain date), so we
 // parse the parts directly to avoid timezone drift from new Date(string).
 
+import type { TFunction } from '@/i18n/translate';
+
 export function parseDateParts(dateStr: string | null | undefined) {
   if (!dateStr) return null;
   const [y, m, d] = String(dateStr).split('-').map(Number);
@@ -27,6 +29,13 @@ export function ageTurningNext(dateStr: string | null | undefined, from = new Da
   const thisYears = new Date(today.getFullYear(), parts.m - 1, parts.d);
   if (thisYears < today) nextYear += 1;
   return nextYear - parts.y;
+}
+
+// "today!", "tomorrow", "in 12 days".
+export function whenLabel(t: TFunction, days: number): string {
+  if (days === 0) return t('dash.birthdayToday');
+  if (days === 1) return t('dash.birthdayTomorrow');
+  return t('dash.birthdayInDays', { days });
 }
 
 export function formatBirthday(dateStr: string | null | undefined, lang = 'en'): string {

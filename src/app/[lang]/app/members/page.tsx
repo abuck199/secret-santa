@@ -17,7 +17,7 @@ export default async function MembersPage() {
     <MembersList
       key={household.id}
       members={members.map(({ userId, displayName, birthday, role, isMe }) => ({ userId, displayName, birthday, role, isMe }))}
-      initialItems={items}
+      items={items}
     />
   );
 }

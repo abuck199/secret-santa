@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import { useI18n } from '@/i18n/client';
 
@@ -13,8 +13,12 @@ export default function ConfirmModal({
   title,
   message,
   confirmLabel,
+  cancelLabel,
   danger = true,
   loading = false,
+  icon,
+  eyebrow,
+  children,
   onConfirm,
   onCancel,
 }: {
@@ -22,8 +26,12 @@ export default function ConfirmModal({
   title: string;
   message?: string;
   confirmLabel?: string;
+  cancelLabel?: string;
   danger?: boolean;
   loading?: boolean;
+  icon?: ReactNode; // replaces the warning triangle
+  eyebrow?: string;
+  children?: ReactNode; // extra explanation under the message
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -98,13 +106,15 @@ export default function ConfirmModal({
             danger ? 'bg-red-500/10 text-red-700' : 'bg-brand-soft text-brand-ink'
           }`}
         >
-          <AlertTriangle className="w-6 h-6" aria-hidden="true" />
+          {icon ?? <AlertTriangle className="w-6 h-6" aria-hidden="true" />}
         </div>
+        {eyebrow && <p className="eyebrow text-brand-ink mb-1.5">{eyebrow}</p>}
         <h3 id={titleId} className="heading text-xl text-fg pr-10">{title}</h3>
         {message && <p id={msgId} className="text-[15px] text-mute mt-2.5 leading-relaxed">{message}</p>}
+        {children}
         <div className="flex flex-col-reverse sm:flex-row gap-3 mt-6 mb-4 sm:mb-0">
           <button className="btn-secondary flex-1" onClick={onCancel} disabled={loading}>
-            {t('common.cancel')}
+            {cancelLabel || t('common.cancel')}
           </button>
           <button
             ref={confirmRef}
