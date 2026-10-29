@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import LegalLayout, { type LegalSection } from '@/components/LegalLayout';
 import { getLang, getT } from '@/i18n/server';
-import { alternates } from '@/lib/seo';
+import { publicMetadata } from '@/lib/seo';
 
 // Bump on every content change (and set it to the go-live date at cutover).
 const UPDATED = '2026-10-29';
@@ -158,7 +158,7 @@ const FR: LegalSection[] = [
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t('legal.privacyTitle'), alternates: alternates('/privacy', await getLang()) };
+  return publicMetadata(t, await getLang(), '/privacy', { title: t('legal.privacyTitle'), description: t('seo.privacyDesc') });
 }
 
 export default async function PrivacyPage() {

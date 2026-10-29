@@ -7,10 +7,11 @@ import Footer from '@/components/Footer';
 import LanguageToggle from '@/components/LanguageToggle';
 import { getLang, getT } from '@/i18n/server';
 import type { TFunction } from '@/i18n/translate';
-import { alternates } from '@/lib/seo';
+import { appJsonLd, publicMetadata } from '@/lib/seo';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { alternates: alternates('/', await getLang()) };
+  const t = await getT();
+  return publicMetadata(t, await getLang(), '/', { description: t('landing.hero.subtitle') });
 }
 
 export default async function LandingPage() {
@@ -34,6 +35,8 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-paper text-fg">
+      {/* Tells search engines what ThatWish is (a free web app). */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: appJsonLd(lang, t('landing.hero.subtitle')) }} />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-fg focus:text-paper focus:shadow-card focus:text-sm focus:font-medium"

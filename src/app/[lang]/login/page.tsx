@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getLang, getT } from '@/i18n/server';
-import { alternates } from '@/lib/seo';
+import { publicMetadata } from '@/lib/seo';
 import LoginForm from './login-form';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t('auth.signin'), alternates: alternates('/login', await getLang()) };
+  return publicMetadata(t, await getLang(), '/login', { title: t('auth.signin'), description: t('seo.loginDesc') });
 }
 
 // Sign-in and sign-up are the same flow: email -> 6-digit code. New emails
