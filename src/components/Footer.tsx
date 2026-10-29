@@ -14,7 +14,8 @@ const noYearOnServer = () => null;
 
 // Shared footer used on the landing page, inside the app, and on legal pages.
 // Mobile: compact centered rows. Desktop: brand · links · toggles.
-export default function Footer() {
+// `inApp`: on phones the language switch lives in the account menu instead.
+export default function Footer({ inApp = false }: { inApp?: boolean }) {
   const { t } = useI18n();
   const year = useSyncExternalStore(noSubscribe, currentYear, noYearOnServer);
   return (
@@ -23,7 +24,7 @@ export default function Footer() {
         <div className="hidden sm:block">
           <Brand size="sm" />
         </div>
-        <div className="sm:order-3">
+        <div className={`sm:order-3 ${inApp ? 'hidden md:block' : ''}`}>
           <LanguageToggle />
         </div>
         <div className="sm:order-2 flex flex-wrap items-center justify-center gap-x-2.5 text-sm text-mute">
