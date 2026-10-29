@@ -7,7 +7,7 @@ import { hostOf } from '@/lib/url';
 import type { HouseholdItem } from '@/server/queries/wishlist';
 import { Confetti, WrappedGift } from './Celebration';
 import ConfirmModal from './ConfirmModal';
-import { useReservations } from './GiftRow';
+import { useReservations } from './useReservations';
 
 // Someone else's wishlist as cards: "I'll give it" asks for confirmation
 // (explaining the anonymity in plain words), then the gift wraps itself.

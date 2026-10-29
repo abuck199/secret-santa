@@ -1,0 +1,107 @@
+'use client';
+
+import { useLayoutEffect, useState } from 'react';
+import { Eye, Lock } from 'lucide-react';
+import { Confetti } from '@/components/Celebration';
+import WishCards from '@/components/WishCards';
+import { useI18n } from '@/i18n/client';
+import type { HouseholdItem } from '@/server/queries/wishlist';
+
+// The draw as a card to turn over: the name stays hidden until asked (someone
+// might be looking over your shoulder), and a button hides it again.
+export default function DrawReveal({ receiverName, items }: { receiverName: string; items: HouseholdItem[] }) {
+  const { t } = useI18n();
+  const [revealed, setRevealed] = useState(false);
+  const [flippedOnce, setFlippedOnce] = useState(false);
+
+  // Cache Components keeps this page mounted (hidden) after leaving it:
+  // come back to a face-down card.
+  useLayoutEffect(() => () => setRevealed(false), []);
+
+  function flip() {
+    setRevealed(true);
+    setFlippedOnce(true);
+  }
+
+  return (
+    <div className="animate-rise [animation-delay:100ms]">
+      <div className="relative mx-auto max-w-sm h-[300px] [perspective:1200px]">
+        <div
+          className="relative w-full h-full transition-transform duration-700 [transition-timing-function:cubic-bezier(0.3,1.3,0.5,1)] [transform-style:preserve-3d]"
+          style={{ transform: revealed ? 'rotateY(180deg)' : 'none' }}
+        >
+          {/* Face down */}
+          <div
+            className="absolute inset-0 rounded-3xl bg-brand text-white overflow-hidden [backface-visibility:hidden] flex flex-col items-center justify-center gap-4 p-6"
+            aria-hidden={revealed}
+          >
+            <span aria-hidden="true" className="absolute left-6 top-6 w-6 h-6 rounded-full bg-sun animate-float" />
+            <span aria-hidden="true" className="absolute right-8 top-10 w-3.5 h-3.5 rounded-[3px] bg-white/80 rotate-12 animate-float [animation-delay:500ms]" />
+            <span aria-hidden="true" className="absolute right-10 bottom-8 w-5 h-5 rounded-full border-[3px] border-brand-soft" />
+            <span
+              aria-hidden="true"
+              className="w-24 h-24 rounded-[28px] bg-white text-brand-ink grid place-items-center heading text-[64px] animate-[wiggle_2.4s_ease-in-out_1s_infinite]"
+            >
+              ?
+            </span>
+            <p className="heading text-2xl text-center">{t('dash.santaReady')}</p>
+          </div>
+
+          {/* Face up */}
+          <div
+            className="absolute inset-0 rounded-3xl bg-sun text-fg overflow-hidden [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col items-center justify-center gap-2 p-6 text-center"
+            aria-hidden={!revealed}
+          >
+            <p className="eyebrow">{t('assign.subtitle')}</p>
+            <span
+              aria-hidden="true"
+              className="w-20 h-20 my-1 rounded-full bg-brand text-white grid place-items-center font-display font-black text-4xl"
+            >
+              {(receiverName[0] || '?').toUpperCase()}
+            </span>
+            <p className="heading text-[40px] break-words max-w-full">{receiverName}</p>
+          </div>
+        </div>
+        {revealed && flippedOnce && <Confetti />}
+      </div>
+
+      {/* Announce the result for screen readers (the faces are visual). */}
+      <p className="sr-only" aria-live="polite">
+        {revealed ? `${t('assign.subtitle')} ${receiverName}` : ''}
+      </p>
+
+      <div className="max-w-sm mx-auto mt-5">
+        {revealed ? (
+          <button className="btn-secondary w-full animate-rise" onClick={() => setRevealed(false)}>
+            {t('assign.hide')}
+          </button>
+        ) : (
+          <>
+            <p className="flex items-center justify-center gap-2 text-[15px] text-fg mb-3">
+              <Eye className="w-5 h-5 shrink-0" aria-hidden="true" /> {t('assign.privacy')}
+            </p>
+            <button className="btn-primary w-full" onClick={flip}>
+              {t('assign.flip')}
+            </button>
+          </>
+        )}
+        <p className="flex items-start gap-2 mt-4 text-sm text-mute">
+          <Lock className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" /> {t('assign.secret')}
+        </p>
+      </div>
+
+      {revealed && (
+        <section className="mt-8 animate-rise [animation-delay:500ms]">
+          <h2 className="heading text-lg text-fg mb-3">{t('assign.theirList')}</h2>
+          {items.length === 0 ? (
+            <div className="card p-6 text-center text-[15px] text-mute">
+              {t('member.empty', { name: receiverName })}
+            </div>
+          ) : (
+            <WishCards items={items} ownerName={receiverName} />
+          )}
+        </section>
+      )}
+    </div>
+  );
+}

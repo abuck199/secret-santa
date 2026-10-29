@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
+import { WrappedGift } from '@/components/Celebration';
 import PageHeader, { Page } from '@/components/PageHeader';
 import { getT } from '@/i18n/server';
 import { getCurrentHousehold } from '@/server/queries/households';
 import { getMyAssignment } from '@/server/queries/santa';
 import { getHouseholdWishlists } from '@/server/queries/wishlist';
-import ReceiverList from './receiver-list';
+import DrawReveal from './draw-reveal';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -15,23 +16,19 @@ export default async function MatchPage() {
   const household = await getCurrentHousehold();
   if (!household) return null;
   const t = await getT();
+  const header = <PageHeader eyebrow={`Secret Santa · ${household.name}`} title={t('assign.title')} />;
 
-  const header = <PageHeader eyebrow={t('nav.assignment')} title={t('assign.title')} />;
-  if (!household.secretSantaEnabled) {
-    return (
-      <Page>
-        {header}
-        <div className="card p-12 text-center text-mute">{t('assign.disabled')}</div>
-      </Page>
-    );
-  }
-
-  const assignment = await getMyAssignment(household.id);
+  const assignment = household.secretSantaEnabled ? await getMyAssignment(household.id) : null;
   if (!assignment) {
     return (
       <Page>
         {header}
-        <div className="card p-12 text-center text-mute">{t('assign.notDrawn')}</div>
+        <div className="card p-8 text-center animate-rise [animation-delay:100ms]">
+          <WrappedGift box="rgb(var(--mute) / 0.35)" ribbon="rgb(var(--mute))" className="w-16 h-16 mx-auto mb-3" />
+          <p className="text-[15px] text-mute">
+            {household.secretSantaEnabled ? t('assign.notDrawn') : t('assign.disabled')}
+          </p>
+        </div>
       </Page>
     );
   }
@@ -40,12 +37,7 @@ export default async function MatchPage() {
   return (
     <Page>
       {header}
-      <div className="card lift p-7 mb-6 text-center bg-brand-soft/40 animate-scale-in">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-ink mb-3">{t('assign.subtitle')}</p>
-        <p className="font-display text-2xl sm:text-3xl font-medium text-fg tracking-tight">{assignment.receiverName}</p>
-      </div>
-      <h2 className="font-display text-lg font-medium text-fg mb-3">{t('assign.theirList')}</h2>
-      <ReceiverList key={assignment.receiverId} initialItems={items} />
+      <DrawReveal key={assignment.receiverId} receiverName={assignment.receiverName} items={items} />
     </Page>
   );
 }
