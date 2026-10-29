@@ -12,6 +12,7 @@ import {
   Save,
   Shield,
   ShieldOff,
+  Share2,
   Shuffle,
   Trash2,
   UserPlus,
@@ -47,6 +48,9 @@ type Confirm =
 const noSubscribe = () => () => {};
 const browserOrigin = () => window.location.origin;
 const serverOrigin = () => 'https://thatwish.com';
+// The native share sheet (Messages, Messenger, mail…) exists on phones; not on most desktops.
+const browserCanShare = () => typeof navigator.share === 'function';
+const serverCanShare = () => false;
 
 export default function HouseholdSettings({
   household,
@@ -60,6 +64,7 @@ export default function HouseholdSettings({
   const { t } = useI18n();
   const router = useRouter();
   const origin = useSyncExternalStore(noSubscribe, browserOrigin, serverOrigin);
+  const canShare = useSyncExternalStore(noSubscribe, browserCanShare, serverCanShare);
   const isAdmin = household.role === 'admin';
 
   const [name, setName] = useState(household.name);
@@ -177,16 +182,27 @@ export default function HouseholdSettings({
     deleteInvite: { title: t('common.delete'), message: '' },
   };
 
+  // Small labelled pill used for per-row actions (no icon-only buttons).
+  const pill = 'press inline-flex items-center gap-1.5 min-h-11 px-3.5 rounded-full text-sm font-semibold';
+
   return (
     <Page>
-      <PageHeader eyebrow={t('nav.settings')} title={t('settings.title')} />
+      <PageHeader eyebrow={household.name} title={t('settings.title')} />
 
       {!isAdmin && (
-        <div className="card p-4 mb-4 bg-brand-soft/50 border-brand/20 text-sm text-fg">{t('settings.adminOnly')}</div>
+        <p className="flex items-start gap-2.5 p-4 mb-4 rounded-3xl bg-sun-soft text-[15px] text-fg animate-rise">
+          <Shield className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" /> {t('settings.adminOnly')}
+        </p>
       )}
 
-      <Section title={t('settings.rename')}>
-        <div className="flex gap-2">
+      <Section title={t('settings.rename')} delay={60}>
+        <form
+          className="flex flex-col sm:flex-row gap-2.5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            saveName();
+          }}
+        >
           <input
             className="input"
             value={name}
@@ -197,75 +213,78 @@ export default function HouseholdSettings({
             aria-label={t('settings.rename')}
           />
           {isAdmin && (
-            <button
-              className="btn-primary shrink-0"
-              onClick={saveName}
-              disabled={savingName}
-              aria-busy={savingName}
-              aria-label={t('common.save')}
-            >
+            <button type="submit" className="btn-primary shrink-0" disabled={savingName} aria-busy={savingName}>
               {savingName ? (
-                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                <Loader2 className="w-[18px] h-[18px] animate-spin" aria-hidden="true" />
               ) : (
-                <Save className="w-4 h-4" aria-hidden="true" />
+                <Save className="w-[18px] h-[18px]" aria-hidden="true" />
               )}
-              <span className="hidden sm:inline">{t('common.save')}</span>
+              {t('common.save')}
             </button>
           )}
-        </div>
+        </form>
       </Section>
 
-      <Section title={t('settings.secretSanta')}>
+      <Section title={t('settings.secretSanta')} delay={120}>
         <div className="flex items-center justify-between gap-4">
-          <p className="text-sm text-mute">{t('settings.secretSantaDesc')}</p>
+          <p className="text-[15px] text-mute">{t('settings.secretSantaDesc')}</p>
           <Toggle on={secretSanta} disabled={!isAdmin} onClick={toggleSecretSanta} label={t('settings.secretSanta')} />
         </div>
         {isAdmin && secretSanta && (
-          <button className="btn-secondary mt-4" onClick={runDraw} disabled={drawing}>
-            {drawing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Shuffle className="w-4 h-4" />}
+          <button className="btn-primary mt-4 animate-pop" onClick={runDraw} disabled={drawing}>
+            {drawing ? (
+              <Loader2 className="w-[18px] h-[18px] animate-spin" aria-hidden="true" />
+            ) : (
+              <Shuffle className="w-[18px] h-[18px]" aria-hidden="true" />
+            )}
             {t('settings.draw')}
           </button>
         )}
       </Section>
 
-      <Section title={`${t('settings.members')} (${members.length})`}>
+      <Section title={`${t('settings.members')} (${members.length})`} delay={180}>
         <ul className="divide-y divide-line">
           {members.map((m) => (
-            <li key={m.membershipId} className="flex items-center gap-3 py-2.5">
-              <div className="w-9 h-9 rounded-full bg-fg text-paper text-sm font-medium grid place-items-center">
-                {(m.displayName[0] || '?').toUpperCase()}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-fg truncate">
-                  {m.displayName} {m.isMe && <span className="text-mute font-normal">· {t('common.you')}</span>}
-                </p>
-                <span className="text-xs text-mute flex items-center gap-1">
-                  {m.isOwner && <Crown className="w-3 h-3 text-brand-ink" aria-hidden="true" />}
-                  {m.role === 'admin' ? t('common.admin') : t('common.member')}
+            <li key={m.membershipId} className="py-3 first:pt-0 last:pb-0">
+              <div className="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="w-10 h-10 shrink-0 rounded-full bg-brand text-white grid place-items-center font-display font-black"
+                >
+                  {(m.displayName[0] || '?').toUpperCase()}
                 </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-base font-bold text-fg truncate">
+                    {m.displayName} {m.isMe && <span className="text-mute font-normal">· {t('common.you')}</span>}
+                  </p>
+                  <span className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                    {m.isOwner && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sun font-mono text-xs font-semibold">
+                        <Crown className="w-3 h-3" aria-hidden="true" /> {t('settings.owner')}
+                      </span>
+                    )}
+                    <span className="px-2 py-0.5 rounded-full bg-panel-2 font-mono text-xs font-semibold text-fg">
+                      {m.role === 'admin' ? t('common.admin') : t('common.member')}
+                    </span>
+                  </span>
+                </div>
               </div>
               {/* The owner and yourself can't be changed (the server says the same). */}
               {isAdmin && !m.isMe && !m.isOwner && (
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => toggleRole(m)}
-                    className="p-2 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
-                    title={m.role === 'admin' ? t('settings.removeAdmin') : t('settings.makeAdmin')}
-                    aria-label={m.role === 'admin' ? t('settings.removeAdmin') : t('settings.makeAdmin')}
-                  >
+                <div className="flex flex-wrap gap-2 mt-2 pl-[52px]">
+                  <button onClick={() => toggleRole(m)} className={`${pill} bg-panel-2 text-fg`}>
                     {m.role === 'admin' ? (
                       <ShieldOff className="w-4 h-4" aria-hidden="true" />
                     ) : (
                       <Shield className="w-4 h-4" aria-hidden="true" />
                     )}
+                    {m.role === 'admin' ? t('settings.removeAdmin') : t('settings.makeAdmin')}
                   </button>
                   <button
                     onClick={() => setConfirm({ type: 'removeMember', member: m })}
-                    className="p-2 rounded-lg text-mute hover:text-red-600 hover:bg-red-500/10"
-                    title={t('settings.remove')}
-                    aria-label={t('settings.remove')}
+                    className={`${pill} text-red-700 hover:bg-red-500/10`}
                   >
-                    <Trash2 className="w-4 h-4" aria-hidden="true" />
+                    <Trash2 className="w-4 h-4" aria-hidden="true" /> {t('settings.remove')}
                   </button>
                 </div>
               )}
@@ -275,73 +294,88 @@ export default function HouseholdSettings({
       </Section>
 
       {isAdmin && (
-        <Section title={t('settings.invites')}>
+        <Section title={t('settings.invites')} delay={240}>
+          <p className="text-[15px] text-mute mb-3">
+            {atInviteCap ? t('settings.inviteLimitHint', { max: INVITE_CAP }) : t('settings.inviteHint')}
+          </p>
           <button
-            className="btn-primary mb-2"
+            className="btn-primary mb-4"
             onClick={addInvite}
             disabled={creatingInvite || atInviteCap}
             aria-busy={creatingInvite}
           >
             {creatingInvite ? (
-              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              <Loader2 className="w-[18px] h-[18px] animate-spin" aria-hidden="true" />
             ) : (
-              <UserPlus className="w-4 h-4" aria-hidden="true" />
+              <UserPlus className="w-[18px] h-[18px]" aria-hidden="true" />
             )}
             {t('settings.createInvite')}
           </button>
-          <p className="text-xs text-mute mb-3">
-            {atInviteCap ? t('settings.inviteLimitHint', { max: INVITE_CAP }) : t('settings.inviteHint')}
-          </p>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {invites.map((inv) => (
-              <div key={inv.id} className={`p-2.5 rounded-xl bg-panel-2 border border-line ${inv.isExpired ? 'opacity-60' : ''}`}>
-                <div className="flex items-center gap-2">
+              <div
+                key={inv.id}
+                className={`p-3.5 rounded-2xl bg-paper animate-pop ${inv.isExpired ? 'opacity-60' : ''}`}
+              >
+                <p className="flex items-center gap-2 min-w-0">
                   <Link2 className="w-4 h-4 text-mute shrink-0" aria-hidden="true" />
-                  <code className={`text-xs text-mute truncate flex-1 ${inv.isExpired ? 'line-through' : ''}`}>
+                  <code className={`font-mono text-sm text-fg truncate ${inv.isExpired ? 'line-through' : ''}`}>
                     {inviteLink(inv.code)}
                   </code>
-                  {!inv.isExpired && (
-                    <button
-                      onClick={() => copy(inviteLink(inv.code), inv.id)}
-                      className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel"
-                      title={t('common.copy')}
-                      aria-label={copied === inv.id ? t('common.copied') : t('common.copy')}
-                    >
-                      {copied === inv.id ? (
-                        <Check className="w-4 h-4 text-brand-ink" aria-hidden="true" />
-                      ) : (
-                        <Copy className="w-4 h-4" aria-hidden="true" />
-                      )}
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setConfirm({ type: 'deleteInvite', inviteId: inv.id })}
-                    className="p-1.5 rounded-lg text-mute hover:text-red-600 hover:bg-panel"
-                    title={t('common.delete')}
-                    aria-label={t('common.delete')}
-                  >
-                    <Trash2 className="w-4 h-4" aria-hidden="true" />
-                  </button>
-                </div>
-                <div className="flex items-center gap-2 mt-2 pl-6 text-xs flex-wrap">
-                  <span className="text-mute">
-                    {t('settings.inviteCreatedBy', {
-                      name: inv.createdByMe ? t('common.you') : inv.creatorName || t('common.member'),
-                    })}
-                  </span>
+                </p>
+                <p className="flex items-center gap-1.5 mt-1.5 text-sm text-mute flex-wrap">
+                  {t('settings.inviteCreatedBy', {
+                    name: inv.createdByMe ? t('common.you').toLowerCase() : inv.creatorName || t('common.member'),
+                  })}
+                  {' · '}
                   {inv.joiners.length === 0 ? (
-                    <span className="chip bg-panel text-mute border border-line">{t('settings.inviteUnused')}</span>
+                    t('settings.inviteUnused')
                   ) : (
                     <>
-                      <span className="text-mute">{t('settings.inviteJoinedLabel', { count: inv.joiners.length })}</span>
+                      {t('settings.inviteJoinedLabel', { count: inv.joiners.length })}
                       {inv.joiners.map((j) => (
-                        <span key={j.userId} className="chip bg-brand-soft text-brand-ink border border-brand/30">
-                          <Check className="w-3 h-3" aria-hidden="true" />
+                        <span
+                          key={j.userId}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sun-soft font-semibold text-fg"
+                        >
+                          <Check className="w-3 h-3" strokeWidth={3} aria-hidden="true" />
                           {j.name || t('common.member')}
                         </span>
                       ))}
                     </>
                   )}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-2.5">
+                  {!inv.isExpired && canShare && (
+                    <button
+                      onClick={() =>
+                        navigator.share({ title: 'ThatWish', text: t('settings.shareText'), url: inviteLink(inv.code) }).catch(() => {})
+                      }
+                      className={`${pill} bg-fg text-white`}
+                    >
+                      <Share2 className="w-4 h-4" aria-hidden="true" /> {t('settings.share')}
+                    </button>
+                  )}
+                  {!inv.isExpired && (
+                    <button
+                      onClick={() => copy(inviteLink(inv.code), inv.id)}
+                      className={`${pill} ${copied === inv.id ? 'bg-sun text-fg' : 'bg-panel text-fg'}`}
+                      aria-live="polite"
+                    >
+                      {copied === inv.id ? (
+                        <Check className="w-4 h-4" strokeWidth={3} aria-hidden="true" />
+                      ) : (
+                        <Copy className="w-4 h-4" aria-hidden="true" />
+                      )}
+                      {copied === inv.id ? t('common.copied') : t('settings.copyLink')}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setConfirm({ type: 'deleteInvite', inviteId: inv.id })}
+                    className={`${pill} text-red-700 hover:bg-red-500/10`}
+                  >
+                    <Trash2 className="w-4 h-4" aria-hidden="true" /> {t('common.delete')}
+                  </button>
                 </div>
               </div>
             ))}
@@ -349,24 +383,24 @@ export default function HouseholdSettings({
         </Section>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-2 mt-6">
+      <Section title={t('settings.dangerTitle')} delay={300}>
         {/* The owner can't leave (the server refuses); they can only delete. */}
-        {!household.isOwner && (
-          <button className="btn-secondary text-red-600" onClick={() => setConfirm({ type: 'leave' })}>
-            <LogOut className="w-4 h-4" /> {t('settings.leave')}
+        {!household.isOwner ? (
+          <button className="btn-secondary text-red-700" onClick={() => setConfirm({ type: 'leave' })}>
+            <LogOut className="w-[18px] h-[18px]" aria-hidden="true" /> {t('settings.leave')}
           </button>
-        )}
-        {household.isOwner && (
+        ) : (
           <button className="btn-danger" onClick={() => setConfirm({ type: 'delete' })}>
-            <Trash2 className="w-4 h-4" /> {t('settings.delete')}
+            <Trash2 className="w-[18px] h-[18px]" aria-hidden="true" /> {t('settings.delete')}
           </button>
         )}
-      </div>
+      </Section>
 
       <ConfirmModal
         open={!!confirm}
         title={confirm ? confirmText[confirm.type].title : ''}
         message={confirm ? confirmText[confirm.type].message : ''}
+        confirmLabel={confirm ? confirmText[confirm.type].title : undefined}
         onConfirm={handleConfirm}
         onCancel={() => setConfirm(null)}
       />
@@ -374,12 +408,12 @@ export default function HouseholdSettings({
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({ title, delay = 0, children }: { title: string; delay?: number; children: ReactNode }) {
   return (
-    <div className="card p-5 mb-4">
-      <h2 className="font-display text-lg font-medium text-fg mb-3">{title}</h2>
+    <section className="card p-5 mb-4 animate-rise" style={{ animationDelay: `${delay}ms` }}>
+      <h2 className="heading text-lg text-fg mb-3">{title}</h2>
       {children}
-    </div>
+    </section>
   );
 }
 
@@ -392,13 +426,15 @@ function Toggle({ on, onClick, disabled, label }: { on: boolean; onClick: () => 
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className={`relative w-12 h-7 rounded-full transition shrink-0 ${on ? 'bg-fg' : 'bg-line'} ${
+      className={`relative w-14 h-8 rounded-full transition-colors shrink-0 ${on ? 'bg-brand' : 'bg-line'} ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       }`}
     >
       <span
         aria-hidden="true"
-        className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-paper transition-transform ${on ? 'translate-x-5' : ''}`}
+        className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow-soft transition-transform [transition-timing-function:cubic-bezier(0.3,1.6,0.5,1)] ${
+          on ? 'translate-x-6' : ''
+        }`}
       />
     </button>
   );
