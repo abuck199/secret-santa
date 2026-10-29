@@ -256,15 +256,17 @@ export default function NavBar({
                     <span className="text-[15px] font-semibold text-fg">{t('a11y.language')}</span>
                     <LanguageToggle />
                   </div>
-                  <button
-                    onClick={() => {
-                      closeAll();
-                      signOut();
-                    }}
-                    className="w-full min-h-12 md:min-h-11 mb-3 md:mb-0 flex items-center gap-3 px-3 rounded-2xl text-[15px] font-semibold text-red-700 hover:bg-red-500/10 border-t border-line"
-                  >
-                    <LogOut className="w-5 h-5" aria-hidden="true" /> {t('auth.signOut')}
-                  </button>
+                  <div className="border-t border-line pt-2 mb-3 md:mb-0">
+                    <button
+                      onClick={() => {
+                        closeAll();
+                        signOut();
+                      }}
+                      className="w-full min-h-12 md:min-h-11 flex items-center gap-3 px-3 rounded-2xl text-[15px] font-semibold text-red-700 hover:bg-red-500/10"
+                    >
+                      <LogOut className="w-5 h-5" aria-hidden="true" /> {t('auth.signOut')}
+                    </button>
+                  </div>
                 </div>
               </>
             )}

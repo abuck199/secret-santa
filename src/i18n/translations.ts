@@ -395,7 +395,7 @@ export const translations = {
     'nav.members': 'Membres',
     'nav.reservations': 'Mes réservations',
     'nav.gifts': 'Cadeaux',
-    'nav.assignment': 'Mon attribution',
+    'nav.assignment': 'Ma pige',
     'nav.settings': 'Foyer',
     'nav.profile': 'Profil',
     'nav.faq': 'Aide',
