@@ -16,6 +16,7 @@ export default async function MembersPage() {
   return (
     <MembersList
       key={household.id}
+      householdName={household.name}
       members={members.map(({ userId, displayName, birthday, role, isMe }) => ({ userId, displayName, birthday, role, isMe }))}
       items={items}
     />

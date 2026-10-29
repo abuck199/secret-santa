@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   DndContext,
@@ -17,7 +17,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { ClipboardList, Loader2, Plus } from 'lucide-react';
+import { Gift, Loader2, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import { ADD_FIELD_ID } from '@/components/NavBar';
@@ -31,13 +31,23 @@ import type { MyItem } from '@/server/queries/wishlist';
 
 const MAX_ITEMS = 50; // mirrored for the counter; the server enforces it
 
-export default function WishlistEditor({ householdId, initialItems }: { householdId: string; initialItems: MyItem[] }) {
+export default function WishlistEditor({
+  householdId,
+  householdName,
+  initialItems,
+}: {
+  householdId: string;
+  householdName: string; // lists are per household: say which one
+  initialItems: MyItem[];
+}) {
   const { t } = useI18n();
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ item: '', link: '' });
   const [toDelete, setToDelete] = useState<MyItem | null>(null);
+  const [lastAdded, setLastAdded] = useState<string | null>(null);
+  const linkId = useId();
 
   // Arriving from the "+ Ajouter" tab (/app/list#add): straight to the add field.
   // Also runs when Activity reveals this page again, since effects re-mount then.
@@ -62,6 +72,7 @@ export default function WishlistEditor({ householdId, initialItems }: { househol
     setSaving(false);
     if (!res.ok) return toast.error(actionErrorMessage(t, res));
     setItems((prev) => [...prev, res.data]);
+    setLastAdded(res.data.id);
     setForm({ item: '', link: '' });
     toast.success(t('wishlist.added'));
   }
@@ -114,58 +125,69 @@ export default function WishlistEditor({ householdId, initialItems }: { househol
 
   return (
     <Page>
-      <PageHeader eyebrow={t('nav.wishlist')} title={t('wishlist.title')} subtitle={t('wishlist.subtitle')} />
+      <PageHeader eyebrow={householdName} title={t('wishlist.title')} subtitle={t('wishlist.subtitle')} />
 
-      {/* Add form */}
-      <div className="card p-4 mb-6">
-        <div className="flex flex-col sm:flex-row gap-2">
-          <input
-            id={ADD_FIELD_ID}
-            className="input scroll-mt-24"
-            value={form.item}
-            onChange={(e) => setForm((p) => ({ ...p, item: e.target.value }))}
-            onKeyDown={(e) => e.key === 'Enter' && add()}
-            placeholder={t('wishlist.addPlaceholder')}
-            aria-label={t('wishlist.addPlaceholder')}
-            maxLength={200}
-          />
-          <input
-            className="input sm:max-w-[38%]"
-            value={form.link}
-            onChange={(e) => setForm((p) => ({ ...p, link: e.target.value }))}
-            onKeyDown={(e) => e.key === 'Enter' && add()}
-            placeholder={t('wishlist.linkPlaceholder')}
-            aria-label={t('wishlist.linkPlaceholder')}
-            maxLength={500}
-          />
-          <button className="btn-primary shrink-0" onClick={add} disabled={saving} aria-label={t('common.add')}>
+      {/* Add form: labels above the fields (placeholders vanish while typing). */}
+      <form
+        className="card p-4 sm:p-5 mb-6 animate-rise [animation-delay:80ms]"
+        onSubmit={(e) => {
+          e.preventDefault();
+          add();
+        }}
+      >
+        <h2 className="heading text-lg text-fg mb-3">{t('wishlist.addTitle')}</h2>
+        <label htmlFor={ADD_FIELD_ID} className="label">{t('wishlist.itemLabel')}</label>
+        <input
+          id={ADD_FIELD_ID}
+          className="input scroll-mt-24"
+          value={form.item}
+          onChange={(e) => setForm((p) => ({ ...p, item: e.target.value }))}
+          placeholder={t('wishlist.addPlaceholder')}
+          maxLength={200}
+        />
+        <label htmlFor={linkId} className="label mt-3">{t('wishlist.linkLabel')}</label>
+        <input
+          id={linkId}
+          className="input"
+          type="url"
+          inputMode="url"
+          value={form.link}
+          onChange={(e) => setForm((p) => ({ ...p, link: e.target.value }))}
+          placeholder={t('wishlist.linkPlaceholder')}
+          maxLength={500}
+        />
+        <div className="flex items-center justify-between gap-3 mt-4">
+          <span className="font-mono text-xs font-semibold text-mute tabular-nums">
+            {t('wishlist.count', { count: items.length, max: MAX_ITEMS })}
+          </span>
+          <button type="submit" className="btn-primary" disabled={saving}>
             {saving ? (
-              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              <Loader2 className="w-[18px] h-[18px] animate-spin" aria-hidden="true" />
             ) : (
-              <Plus className="w-4 h-4" aria-hidden="true" />
+              <Plus className="w-[18px] h-[18px]" strokeWidth={2.6} aria-hidden="true" />
             )}
-            <span className="sm:hidden lg:inline">{t('common.add')}</span>
+            {t('wishlist.addButton')}
           </button>
         </div>
-        <p className="text-xs text-mute mt-2.5 text-right tabular-nums">
-          {items.length} / {MAX_ITEMS}
-        </p>
-      </div>
+      </form>
 
       {/* List */}
       {items.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="w-12 h-12 rounded-2xl bg-panel-2 grid place-items-center mx-auto mb-4">
-            <ClipboardList className="w-6 h-6 text-mute" strokeWidth={1.6} />
-          </div>
-          <p className="text-mute">{t('wishlist.empty')}</p>
+        <div className="card p-8 text-center animate-rise [animation-delay:160ms]">
+          <span className="w-14 h-14 rounded-2xl bg-brand-soft text-brand-ink grid place-items-center mx-auto mb-3" aria-hidden="true">
+            <Gift className="w-7 h-7" strokeWidth={2} />
+          </span>
+          <p className="text-[15px] text-mute">{t('wishlist.empty')}</p>
         </div>
       ) : (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        // Fixed id: dnd-kit's generated one differs between server and browser (hydration warning).
+        <DndContext id="wishlist" sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-2">
-              {items.map((item) => (
-                <WishlistItem key={item.id} item={item} onSave={save} onDelete={setToDelete} />
+            <div className="space-y-2.5">
+              {items.map((item, i) => (
+                <div key={item.id} className="animate-rise" style={{ animationDelay: `${160 + Math.min(i, 8) * 50}ms` }}>
+                  <WishlistItem item={item} onSave={save} onDelete={setToDelete} fresh={item.id === lastAdded} />
+                </div>
               ))}
             </div>
           </SortableContext>
@@ -174,12 +196,14 @@ export default function WishlistEditor({ householdId, initialItems }: { househol
 
       <ConfirmModal
         open={!!toDelete}
-        title={t('common.delete')}
+        title={t('wishlist.deleteTitle')}
         message={t('wishlist.deleteConfirm')}
-        confirmLabel={t('common.delete')}
+        confirmLabel={t('wishlist.remove')}
         onConfirm={confirmDelete}
         onCancel={() => setToDelete(null)}
-      />
+      >
+        <p className="mt-3 p-3 rounded-2xl bg-paper text-base font-bold text-fg break-words">{toDelete?.item}</p>
+      </ConfirmModal>
     </Page>
   );
 }

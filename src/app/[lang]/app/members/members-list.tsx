@@ -17,7 +17,15 @@ type Person = {
 };
 
 // Everyone in the household; tapping a person opens their list.
-export default function MembersList({ members, items }: { members: Person[]; items: HouseholdItem[] }) {
+export default function MembersList({
+  householdName,
+  members,
+  items,
+}: {
+  householdName: string;
+  members: Person[];
+  items: HouseholdItem[];
+}) {
   const { t, lang } = useI18n();
   const [query, setQuery] = useState('');
 
@@ -43,7 +51,7 @@ export default function MembersList({ members, items }: { members: Person[]; ite
 
   return (
     <Page>
-      <PageHeader eyebrow={t('nav.members')} title={t('members.title')} subtitle={t('members.subtitle')} />
+      <PageHeader eyebrow={householdName} title={t('members.title')} subtitle={t('members.subtitle')} />
 
       {members.length > 6 && (
         <div className="relative mb-5 animate-rise">

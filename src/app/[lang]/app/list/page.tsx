@@ -14,5 +14,7 @@ export default async function WishlistPage() {
   if (!household) return null;
   const items = await getMyItems(household.id);
   // `key`: switching household starts from that household's list.
-  return <WishlistEditor key={household.id} householdId={household.id} initialItems={items} />;
+  return (
+    <WishlistEditor key={household.id} householdId={household.id} householdName={household.name} initialItems={items} />
+  );
 }
