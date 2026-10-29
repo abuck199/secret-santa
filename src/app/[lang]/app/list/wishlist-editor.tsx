@@ -22,10 +22,12 @@ import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import { ADD_FIELD_ID } from '@/components/NavBar';
 import PageHeader, { Page } from '@/components/PageHeader';
+import LinkPreviewCard from '@/components/LinkPreviewCard';
+import { useLinkPreview } from '@/components/useLinkPreview';
 import WishlistItem from '@/components/WishlistItem';
 import { useI18n } from '@/i18n/client';
 import { actionErrorMessage } from '@/lib/action-error';
-import { normalizeUrl } from '@/lib/url';
+import { hostOf, normalizeUrl } from '@/lib/url';
 import { addItem, deleteItem, reorderItems, updateItem } from '@/server/actions/wishlist';
 import type { MyItem } from '@/server/queries/wishlist';
 
@@ -44,7 +46,8 @@ export default function WishlistEditor({
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ item: '', link: '' });
+  const [form, setForm] = useState<{ item: string; link: string; imageUrl: string | null }>({ item: '', link: '', imageUrl: null });
+  const preview = useLinkPreview();
   const [toDelete, setToDelete] = useState<MyItem | null>(null);
   const [lastAdded, setLastAdded] = useState<string | null>(null);
   const linkId = useId();
@@ -68,16 +71,27 @@ export default function WishlistEditor({
     if (normalizeUrl(form.link) === false) return toast.error(t('err.invalid_link'));
 
     setSaving(true);
-    const res = await addItem(householdId, { item: name, link: form.link });
+    const res = await addItem(householdId, { item: name, link: form.link, imageUrl: form.imageUrl });
     setSaving(false);
     if (!res.ok) return toast.error(actionErrorMessage(t, res));
     setItems((prev) => [...prev, res.data]);
     setLastAdded(res.data.id);
-    setForm({ item: '', link: '' });
+    setForm({ item: '', link: '', imageUrl: null });
+    preview.reset();
     toast.success(t('wishlist.added'));
   }
 
-  async function save(id: string, name: string, link: string) {
+  // A pasted shop link fills in the photo, and the name if it's still empty.
+  async function lookupLink(link: string) {
+    const found = await preview.lookup(link);
+    setForm((f) => ({
+      ...f,
+      imageUrl: found?.image ?? null,
+      item: f.item.trim() || !found?.title ? f.item : found.title,
+    }));
+  }
+
+  async function save(id: string, name: string, link: string, imageUrl: string | null) {
     if (!name.trim()) {
       toast.error(t('common.required'));
       return false;
@@ -86,7 +100,7 @@ export default function WishlistEditor({
       toast.error(t('err.invalid_link'));
       return false;
     }
-    const res = await updateItem(id, { item: name.trim(), link });
+    const res = await updateItem(id, { item: name.trim(), link, imageUrl });
     if (!res.ok) {
       toast.error(actionErrorMessage(t, res));
       return false;
@@ -152,9 +166,29 @@ export default function WishlistEditor({
           type="url"
           inputMode="url"
           value={form.link}
-          onChange={(e) => setForm((p) => ({ ...p, link: e.target.value }))}
+          onChange={(e) => {
+            const link = e.target.value;
+            setForm((p) => ({ ...p, link, ...(link.trim() ? {} : { imageUrl: null }) }));
+            if (!link.trim()) preview.reset();
+          }}
+          onPaste={(e) => {
+            const field = e.currentTarget;
+            setTimeout(() => lookupLink(field.value)); // after the pasted text lands
+          }}
+          onBlur={(e) => lookupLink(e.target.value)}
           placeholder={t('wishlist.linkPlaceholder')}
+          aria-describedby={`${linkId}-hint`}
           maxLength={500}
+        />
+        <p id={`${linkId}-hint`} className="text-sm text-mute mt-1.5">{t('wishlist.linkHint')}</p>
+        <LinkPreviewCard
+          status={preview.status}
+          title={preview.preview?.title ?? null}
+          imageUrl={form.imageUrl}
+          site={hostOf(form.link)}
+          canUseTitle={!!preview.preview?.title && !!form.item.trim() && form.item.trim() !== preview.preview.title}
+          onUseTitle={() => setForm((f) => ({ ...f, item: preview.preview?.title ?? f.item }))}
+          onRemovePhoto={() => setForm((f) => ({ ...f, imageUrl: null }))}
         />
         <div className="flex items-center justify-between gap-3 mt-4">
           <span className="font-mono text-xs font-semibold text-mute tabular-nums">

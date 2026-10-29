@@ -16,6 +16,7 @@ export type MyItem = {
   id: string;
   item: string;
   link: string | null;
+  imageUrl: string | null;
   displayOrder: number;
 };
 
@@ -26,6 +27,7 @@ export async function getMyItems(householdId: string): Promise<MyItem[]> {
       id: wishlistItems.id,
       item: wishlistItems.item,
       link: wishlistItems.link,
+      imageUrl: wishlistItems.imageUrl,
       displayOrder: wishlistItems.displayOrder,
     })
     .from(wishlistItems)
@@ -50,6 +52,7 @@ export async function getHouseholdWishlists(householdId: string): Promise<Househ
       ownerId: wishlistItems.userId,
       item: wishlistItems.item,
       link: wishlistItems.link,
+      imageUrl: wishlistItems.imageUrl,
       displayOrder: wishlistItems.displayOrder,
       claimed: wishlistItems.claimed,
       reservedBy: wishlistItems.reservedBy,
@@ -68,6 +71,7 @@ export async function getHouseholdWishlists(householdId: string): Promise<Househ
       ownerId: r.ownerId,
       item: r.item,
       link: r.link,
+      imageUrl: r.imageUrl,
       displayOrder: r.displayOrder,
       isMine,
       isReserved: !isMine && r.claimed,
@@ -81,6 +85,7 @@ export type MyReservation = {
   id: string;
   item: string;
   link: string | null;
+  imageUrl: string | null;
   purchased: boolean;
   ownerId: string;
   ownerName: string;
@@ -95,6 +100,7 @@ export async function getMyReservations(householdId: string): Promise<MyReservat
       id: wishlistItems.id,
       item: wishlistItems.item,
       link: wishlistItems.link,
+      imageUrl: wishlistItems.imageUrl,
       purchased: wishlistItems.purchased,
       ownerId: wishlistItems.userId,
       ownerName: profiles.displayName,

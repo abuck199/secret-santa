@@ -7,6 +7,7 @@ import { hostOf } from '@/lib/url';
 import type { HouseholdItem } from '@/server/queries/wishlist';
 import { Confetti, WrappedGift } from './Celebration';
 import ConfirmModal from './ConfirmModal';
+import ProductImage from './ProductImage';
 import { useReservations } from './useReservations';
 
 // Someone else's wishlist as cards: "I'll give it" asks for confirmation
@@ -50,18 +51,36 @@ export default function WishCards({ items: initialItems, ownerName }: { items: H
               style={{ animationDelay: `${200 + Math.min(i, 8) * 60}ms` }}
             >
               <div className="flex gap-3.5">
-                <span
-                  className={`relative w-16 h-16 shrink-0 rounded-2xl grid place-items-center ${
-                    taken ? 'bg-panel-2 text-mute' : 'bg-brand-soft text-brand-ink'
-                  }`}
-                >
-                  {/* A chosen gift is a wrapped gift: yours in raspberry, someone else's in grey. */}
-                  {mine ? (
-                    <WrappedGift animate={fresh} className="w-11 h-11" />
-                  ) : taken ? (
-                    <WrappedGift box="rgb(var(--mute) / 0.35)" ribbon="rgb(var(--mute))" className="w-11 h-11" />
-                  ) : (
-                    <Gift className="w-7 h-7" strokeWidth={2} aria-hidden="true" />
+                {/* A chosen gift is a wrapped gift: yours in raspberry, someone else's in grey.
+                    With a product photo, the wrapped gift becomes a badge on its corner. */}
+                <span className="relative w-16 h-16 shrink-0">
+                  <span
+                    className={`absolute inset-0 rounded-2xl overflow-hidden grid place-items-center ${
+                      taken ? 'bg-panel-2 text-mute' : 'bg-brand-soft text-brand-ink'
+                    }`}
+                  >
+                    <ProductImage
+                      src={item.imageUrl}
+                      className={taken ? 'grayscale opacity-60' : ''}
+                      fallback={
+                        mine ? (
+                          <WrappedGift animate={fresh} className="w-11 h-11" />
+                        ) : taken ? (
+                          <WrappedGift box="rgb(var(--mute) / 0.35)" ribbon="rgb(var(--mute))" className="w-11 h-11" />
+                        ) : (
+                          <Gift className="w-7 h-7" strokeWidth={2} aria-hidden="true" />
+                        )
+                      }
+                    />
+                  </span>
+                  {item.imageUrl && (mine || taken) && (
+                    <span className="absolute -right-2 -bottom-2 w-8 h-8 rounded-full bg-panel shadow-soft grid place-items-center">
+                      {mine ? (
+                        <WrappedGift animate={fresh} className="w-6 h-6" />
+                      ) : (
+                        <WrappedGift box="rgb(var(--mute) / 0.35)" ribbon="rgb(var(--mute))" className="w-6 h-6" />
+                      )}
+                    </span>
                   )}
                 </span>
                 <div className="min-w-0 flex-1 pt-0.5">

@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { Confetti, WrappedGift } from '@/components/Celebration';
 import ConfirmModal from '@/components/ConfirmModal';
 import PageHeader, { Page } from '@/components/PageHeader';
+import ProductImage from '@/components/ProductImage';
 import { useI18n } from '@/i18n/client';
 import { actionErrorMessage } from '@/lib/action-error';
 import { hostOf } from '@/lib/url';
@@ -130,8 +131,8 @@ export default function ReservationsList({
                     const isBusy = busy.has(row.id);
                     return (
                       <li key={row.id} className="card p-3.5 flex gap-3">
-                        <span className="w-14 h-14 shrink-0 rounded-2xl bg-brand-soft grid place-items-center">
-                          <WrappedGift className="w-10 h-10" />
+                        <span className="w-14 h-14 shrink-0 rounded-2xl overflow-hidden bg-brand-soft grid place-items-center">
+                          <ProductImage src={row.imageUrl} fallback={<WrappedGift className="w-10 h-10" />} />
                         </span>
                         <div className="min-w-0 flex-1">
                           <p

@@ -5,8 +5,11 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Check, ExternalLink, Gift, GripVertical, Pencil, Trash2 } from 'lucide-react';
 import { useI18n } from '@/i18n/client';
-import { hostOf } from '@/lib/url';
+import { hostOf, normalizeUrl } from '@/lib/url';
 import type { MyItem } from '@/server/queries/wishlist';
+import LinkPreviewCard from './LinkPreviewCard';
+import ProductImage from './ProductImage';
+import { useLinkPreview } from './useLinkPreview';
 
 // A single editable, draggable item on the owner's own wishlist. Edit and
 // remove are always-visible labelled buttons (no hover-only icons on phones).
@@ -18,7 +21,7 @@ export default function WishlistItem({
   disabled,
 }: {
   item: MyItem;
-  onSave: (id: string, name: string, link: string) => Promise<boolean>;
+  onSave: (id: string, name: string, link: string, imageUrl: string | null) => Promise<boolean>;
   onDelete: (item: MyItem) => void;
   fresh?: boolean; // just added: pops in
   disabled?: boolean;
@@ -27,6 +30,8 @@ export default function WishlistItem({
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(item.item);
   const [link, setLink] = useState(item.link || '');
+  const [imageUrl, setImageUrl] = useState(item.imageUrl);
+  const preview = useLinkPreview();
   const nameId = useId();
   const linkId = useId();
 
@@ -42,13 +47,15 @@ export default function WishlistItem({
   };
 
   async function save() {
-    const ok = await onSave(item.id, name, link);
+    const ok = await onSave(item.id, name, link, imageUrl);
     if (ok) setEditing(false);
   }
 
   function cancel() {
     setName(item.item);
     setLink(item.link || '');
+    setImageUrl(item.imageUrl);
+    preview.reset();
     setEditing(false);
   }
 
@@ -79,9 +86,26 @@ export default function WishlistItem({
           type="url"
           inputMode="url"
           value={link}
-          onChange={(e) => setLink(e.target.value)}
+          onChange={(e) => {
+            setLink(e.target.value);
+            if (!e.target.value.trim()) setImageUrl(null);
+          }}
+          onBlur={async (e) => {
+            if (normalizeUrl(e.target.value) === normalizeUrl(item.link)) return; // unchanged link: keep its photo
+            const found = await preview.lookup(e.target.value);
+            setImageUrl(found?.image ?? null);
+          }}
           maxLength={500}
           placeholder={t('wishlist.linkPlaceholder')}
+        />
+        <LinkPreviewCard
+          status={preview.status}
+          title={preview.preview?.title ?? null}
+          imageUrl={imageUrl}
+          site={hostOf(link)}
+          canUseTitle={!!preview.preview?.title && name.trim() !== preview.preview.title}
+          onUseTitle={() => setName(preview.preview?.title ?? name)}
+          onRemovePhoto={() => setImageUrl(null)}
         />
         <div className="flex gap-2.5 justify-end mt-4">
           <button type="button" className="btn-secondary" onClick={cancel}>
@@ -112,8 +136,8 @@ export default function WishlistItem({
         <GripVertical className="w-5 h-5" aria-hidden="true" />
       </button>
 
-      <span className="w-12 h-12 shrink-0 rounded-2xl bg-brand-soft text-brand-ink grid place-items-center" aria-hidden="true">
-        <Gift className="w-6 h-6" strokeWidth={2} />
+      <span className="w-12 h-12 shrink-0 rounded-2xl overflow-hidden bg-brand-soft text-brand-ink grid place-items-center" aria-hidden="true">
+        <ProductImage src={item.imageUrl} fallback={<Gift className="w-6 h-6" strokeWidth={2} />} />
       </span>
 
       <div className="min-w-0 flex-1">

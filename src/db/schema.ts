@@ -123,6 +123,8 @@ export const wishlistItems = pgTable('wishlist_items', {
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   item: text('item').notNull(),
   link: text('link'),
+  // Product photo found on the link's page (https only), shown in place of the gift icon.
+  imageUrl: text('image_url'),
   claimed: boolean('claimed').notNull().default(false),
   // Never send this column to the client: anonymity is the core product promise.
   reservedBy: uuid('reserved_by').references(() => users.id, { onDelete: 'set null' }),

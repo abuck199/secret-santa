@@ -9,6 +9,7 @@ import { db } from '@/db';
 import { wishlistItems } from '@/db/schema';
 import { normalizeUrl } from '@/lib/url';
 import { requireMember } from '../authz';
+import { previewForUrl, type LinkPreview } from '../link-preview';
 import { ActionError, runAction, type ActionResult } from '../result';
 import { requireUser } from '../session';
 import type { MyItem } from '../queries/wishlist';
@@ -19,6 +20,9 @@ const Id = z.uuid();
 const ItemInput = z.object({
   item: z.string().trim().min(1).max(200),
   link: z.string().max(500).nullish(),
+  // Product photo from the link preview: only ever displayed as an <img>, so
+  // https is all that's required.
+  imageUrl: z.url({ protocol: /^https$/ }).max(1000).nullish(),
 });
 
 function cleanLink(link: string | null | undefined): string | null {
@@ -31,8 +35,21 @@ const itemColumns = {
   id: wishlistItems.id,
   item: wishlistItems.item,
   link: wishlistItems.link,
+  imageUrl: wishlistItems.imageUrl,
   displayOrder: wishlistItems.displayOrder,
 };
+
+// Title and photo of a shop page, to fill in a wish from a pasted link.
+// Signed-in users only (it makes our server fetch a URL); never fails: an
+// unreachable or bot-blocking page just gives nothing.
+export async function previewLink(link: string): Promise<ActionResult<LinkPreview>> {
+  return runAction(async () => {
+    await requireUser();
+    const url = cleanLink(z.string().max(500).parse(link));
+    if (!url) return { title: null, image: null };
+    return previewForUrl(url);
+  });
+}
 
 export async function addItem(
   householdId: string,
@@ -40,7 +57,7 @@ export async function addItem(
 ): Promise<ActionResult<MyItem>> {
   return runAction(async () => {
     const hid = Id.parse(householdId);
-    const { item, link } = ItemInput.parse(input);
+    const { item, link, imageUrl } = ItemInput.parse(input);
     const user = await requireMember(hid);
     const cleanedLink = cleanLink(link);
     const mine = and(eq(wishlistItems.householdId, hid), eq(wishlistItems.userId, user.id));
@@ -62,6 +79,7 @@ export async function addItem(
           userId: user.id,
           item,
           link: cleanedLink,
+          imageUrl: cleanedLink ? (imageUrl ?? null) : null, // a photo only comes with a link
           displayOrder: (last ?? -1) + 1, // new items go to the bottom
         })
         .returning(itemColumns);
@@ -76,11 +94,12 @@ export async function updateItem(
 ): Promise<ActionResult<MyItem>> {
   return runAction(async () => {
     const id = Id.parse(itemId);
-    const { item, link } = ItemInput.parse(input);
+    const { item, link, imageUrl } = ItemInput.parse(input);
     const user = await requireUser();
+    const cleanedLink = cleanLink(link);
     const [updated] = await db
       .update(wishlistItems)
-      .set({ item, link: cleanLink(link) })
+      .set({ item, link: cleanedLink, imageUrl: cleanedLink ? (imageUrl ?? null) : null })
       .where(and(eq(wishlistItems.id, id), eq(wishlistItems.userId, user.id)))
       .returning(itemColumns);
     if (!updated) throw new ActionError('not_found');

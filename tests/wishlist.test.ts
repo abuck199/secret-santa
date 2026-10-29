@@ -23,6 +23,23 @@ describe('my wishlist', () => {
     expect(edited).toMatchObject({ item: 'Cookbook', link: null });
   });
 
+  it('keeps an https product photo with a link, and drops it without one', async () => {
+    const alice = await makeUser('Alice');
+    const hid = await makeHousehold(alice);
+    signInAs(alice);
+    const photo = 'https://cdn.example.com/boots.jpg';
+    const a = ok(await addItem(hid, { item: 'Boots', link: 'example.com/boots', imageUrl: photo }));
+    expect(a.imageUrl).toBe(photo);
+    // No link, no photo (it only ever comes from a link preview).
+    const b = ok(await addItem(hid, { item: 'Mug', imageUrl: photo }));
+    expect(b.imageUrl).toBeNull();
+    const edited = ok(await updateItem(a.id, { item: 'Boots', link: '', imageUrl: photo }));
+    expect(edited.imageUrl).toBeNull();
+    // Photos must be https URLs.
+    fails(await addItem(hid, { item: 'X', link: 'example.com', imageUrl: 'http://cdn.example.com/a.jpg' }), 'invalid_input');
+    fails(await addItem(hid, { item: 'X', link: 'example.com', imageUrl: 'javascript:alert(1)' }), 'invalid_input');
+  });
+
   it('refuses unsafe or invalid links', async () => {
     const alice = await makeUser('Alice');
     const hid = await makeHousehold(alice);

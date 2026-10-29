@@ -83,7 +83,13 @@ users, so no data was migrated.
   valid link.
 - Wishlist: max 50 items per person per household (advisory lock), links re-validated
   server-side (`src/lib/url.ts`). Draw: crypto shuffle, cyclic pairing, ≥3 members; nobody
-  (admins included) sees the full draw.
+  (admins included) sees the full draw (the admin's draw animation shows names, never pairs).
+- Link preview (`src/server/link-preview.ts`, action `previewLink`, signed-in only): pasting a
+  shop link fills the photo (`image_url`, https only, kept only with a link) and the name if
+  empty. It fetches user-supplied URLs, so it is SSRF-guarded: http(s) on 80/443, every
+  resolved IP checked at connect time (DNS lookup hook) on each of ≤3 redirects, 5 s / 512 KB,
+  HTML only; tests cover loopback/private/metadata. It sends an honest bot user agent and
+  never tries to get around shops' bot protection (Amazon, Etsy… just give no preview).
 - Households: each person may **own at most 2** (`household_cap`, advisory lock); joining others
   by invite is unlimited; ownership handed over by account deletion may exceed the cap.
 - Account deletion (Law 25) needs a **6-digit code emailed to the owner** (`requestDeletionCode`
@@ -133,7 +139,8 @@ users, so no data was migrated.
 - **CSP** (`next.config.ts`): Next's "without nonces" variant on purpose. Nonces would force
   every page to render per request (no prerender, no CDN cache). Inline scripts stay allowed;
   other origins are blocked except Turnstile (`challenges.cloudflare.com`), Vercel's toolbar on
-  previews, and dev-only needs. Adding a third-party script/iframe means updating the CSP.
+  previews, and dev-only needs. Images allow any `https:` (product photos hotlinked from shops;
+  disclosed in the privacy policy). Adding a third-party script/iframe means updating the CSP.
 - `src/lib/email.ts` creates the Resend client lazily, so importing it needs no API key (tests,
   CI). Keep module top-levels free of env-dependent side effects.
 - Files edited from Windows through `\\wsl.localhost\...` may not trigger Next's file watcher;
@@ -160,7 +167,8 @@ users, so no data was migrated.
   migrated by the owner from their terminal (`DATABASE_URL='<prod direct URL>' pnpm db:migrate`,
   with a leading space to keep it out of shell history), so the URL never passes through Claude.
 - Migrations: `0000` baseline; `0001` dropped the unused `invites` columns (`email`, `role`,
-  `accepted_by`, `accepted_at`).
+  `accepted_by`, `accepted_at`); `0002` added `wishlist_items.image_url` (additive: migrate
+  production before deploying the code that reads it).
 - `BETTER_AUTH_URL` is set for Production only; previews infer it from the request. A wrong value
   causes `INVALID_ORIGIN` on sign-in.
 - Secrets (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`) stay

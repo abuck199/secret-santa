@@ -29,7 +29,9 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' ${turnstile}${devScripts}${toolbar.script}`,
   `style-src 'self' 'unsafe-inline'${toolbar.script}`,
-  `img-src 'self' blob: data:${toolbar.img}`,
+  // https: for wishlist product photos, hotlinked from the shops' own sites
+  // (any shop, so no host list). Images can't run code; scripts stay locked.
+  `img-src 'self' blob: data: https:${toolbar.img}`,
   `font-src 'self'${toolbar.font}`,
   `connect-src 'self'${isDev ? " https://va.vercel-scripts.com" : ""}${toolbar.connect}`,
   `frame-src ${turnstile}${toolbar.frame}`,
