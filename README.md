@@ -1,67 +1,71 @@
 # 🎁 ThatWish
 
 Shared wishlists for birthdays and every occasion. Family or group members add
-what they'd love to receive, and others can quietly **reserve** gifts so there
-are never duplicates - and never any spoilers for the recipient. An optional
+what they'd love to receive, and others quietly **reserve** gifts, so there are
+never duplicates and never any spoilers for the recipient. An optional
 **Secret Santa** draw is built in per household.
 
-- 🏠 **Multi-tenant households** - create or join with an invite link
-- 🎂 **Birthdays** - upcoming birthdays surface on the home page
-- 📝 **Wishlists** with drag-and-drop ordering and optional links
-- 🤫 **Anonymous reservations** - recipients never see what's reserved
-- 🎲 **Optional Secret Santa** draw (admin-controlled, per household)
-- 🌍 **Bilingual** - English / French toggle
-- 🔐 **Supabase Auth** (email + password) with Row-Level Security; the browser
-  only ever uses the public anon key
+Live at [thatwish.com](https://thatwish.com).
+
+- 🏠 **Households**: create one, or join with an invite link
+- 🔑 **No passwords**: sign in with a 6-digit code sent by email
+- 📝 **Wishlists** with links and drag-and-drop ordering
+- 🤫 **Anonymous reservations**: you never learn who reserved your gift, or even that it's reserved
+- 🎂 **Birthdays**: upcoming ones surface on the home page
+- 🎲 **Secret Santa**: optional, admin-controlled draw per household
+- 🌍 **English / French**, following the browser language
+- 🗑️ **Account deletion** built in (Québec Law 25)
 
 ## Stack
 
-React 19 + Vite · Tailwind CSS · Supabase (Postgres + Auth + RLS) ·
-@dnd-kit · lucide-react · react-hot-toast
+Next.js 16 (App Router, Cache Components) · TypeScript · Tailwind CSS 4 ·
+Drizzle ORM · Postgres on [Neon](https://neon.tech) ·
+[Better Auth](https://better-auth.com) (email OTP) · [Resend](https://resend.com) ·
+Vitest + PGlite · Vercel
 
-## Setup
+All data access is server-side: pages read through `src/server/queries`, and
+every change goes through a Server Action in `src/server/actions` that checks
+the session and the caller's role before touching the database.
+
+## Getting started
+
+Requirements: Node 24 and pnpm.
 
 ```bash
-npm install
-cp .env.sample .env   # then fill in your Supabase URL + anon key
-npm run dev           # Vite dev server on http://localhost:3000
+pnpm install
+cp .env.sample .env.local   # then fill it in (see below)
+pnpm db:migrate             # create the tables in your database
+pnpm dev                    # http://localhost:3000
 ```
 
-Other scripts: `npm run build` (production build to `dist/`) and
-`npm run preview` (serve the built app locally).
+### Environment variables (`.env.local`)
 
-### 1. Database
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Postgres connection string (a Neon branch of your own; direct URL locally, pooled URL on Vercel) |
+| `RESEND_API_KEY` | Resend API key, used to email sign-in codes |
+| `EMAIL_FROM` | Sender, e.g. `ThatWish <noreply@thatwish.com>` (the domain must be verified in Resend) |
+| `BETTER_AUTH_SECRET` | Long random string signing sessions: `openssl rand -base64 32`, a different one per environment |
+| `BETTER_AUTH_URL` | Public URL of the app, e.g. `http://localhost:3000`. Leave it unset on Vercel preview deployments (it's inferred from the request) |
 
-Run `db/schema.sql` in your Supabase project's SQL editor (already done if you
-ran it during setup). It creates the tables, RLS policies and the
-SECURITY DEFINER RPCs the app relies on.
+## Scripts
 
-### 2. Supabase Auth settings
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Dev server |
+| `pnpm build` / `pnpm start` | Production build / serve it |
+| `pnpm lint` | ESLint (also blocks database imports outside `src/server`) |
+| `pnpm test` | Server tests against an in-memory Postgres (never touches a real database) |
+| `pnpm db:generate` | Turn changes in `src/db/schema.ts` into a new SQL migration in `drizzle/` |
+| `pnpm db:migrate` | Apply pending migrations to `DATABASE_URL` |
+| `pnpm db:studio` | Browse the database |
 
-- Enable the **Email** provider.
-- Set **Site URL** to your app origin (e.g. `http://localhost:3000` in dev).
-- Add your origin to **Redirect URLs** (used by signup confirmation and the
-  password-reset link).
-- For local testing you may turn off "Confirm email" so signups log in
-  immediately.
+## Deployment
 
-### 3. Environment variables (`.env`)
-
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `VITE_SUPABASE_URL` | yes | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | yes | Public anon / publishable key |
-
-## Security model
-
-There is **no service key in the browser**. Every read is constrained by RLS and
-every privileged write goes through a SECURITY DEFINER RPC:
-
-- `create_household`, `accept_invite`
-- `get_household_wishlists` (masks the reserver - only `is_reserved` /
-  `reserved_by_me` are ever exposed)
-- `reserve_item`, `cancel_reservation`, `set_purchased`, `get_my_reservations`
-- `shuffle_assignments` (admin only)
+Vercel deploys `main` to production and every other branch as a preview.
+Production uses the Neon `production` branch; previews and local development
+use the `dev` branch. Schema changes ship as migrations: run
+`pnpm db:migrate` against each branch.
 
 ---
 

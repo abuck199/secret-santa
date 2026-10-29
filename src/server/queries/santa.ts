@@ -6,7 +6,7 @@ import { db } from '@/db';
 import { assignments, households, profiles } from '@/db/schema';
 import { requireMember } from '../authz';
 
-export type MyAssignment = {
+type MyAssignment = {
   receiverId: string;
   receiverName: string;
 };

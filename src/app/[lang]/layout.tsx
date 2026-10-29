@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/next';
-import { Fraunces, Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { lang as langParam } from 'next/root-params';
 import Toaster from '@/components/Toaster';
@@ -9,18 +8,8 @@ import { LOCALES, isLocale } from '@/i18n/config';
 import { I18nProvider } from '@/i18n/client';
 import { getT } from '@/i18n/server';
 import { getDict } from '@/i18n/translate';
+import { fontVariables } from '../fonts';
 import '../globals.css';
-
-// next/font downloads the files at build time and serves them from our own
-// domain: no visitor request ever reaches Google (same promise as the old
-// app's @fontsource setup).
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  variable: '--font-fraunces',
-  axes: ['opsz'],
-  display: 'swap',
-});
 
 export async function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
@@ -68,7 +57,7 @@ export default async function RootLayout({ children }: LayoutProps<'/[lang]'>) {
   if (!isLocale(lang)) notFound();
   return (
     // The theme script changes <html>'s class before React hydrates.
-    <html lang={lang} className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
+    <html lang={lang} className={fontVariables} suppressHydrationWarning>
       <head>
         {/* Runs while the HTML is parsed, so the right theme is on <html>
             before the first paint. Plain <script> on purpose: next/script's

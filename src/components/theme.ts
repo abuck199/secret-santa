@@ -1,9 +1,9 @@
 // Light/dark theme. The choice lives in localStorage (same key as the old app,
 // so returning users keep it); without one we follow the OS.
 
-export type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark';
 
-export const THEME_KEY = 'thatwish:theme';
+const THEME_KEY = 'thatwish:theme';
 
 // Inlined in <head> by the root layout so the right theme is applied before
 // the first paint (no flash of the wrong theme). Keep it tiny and ES5.

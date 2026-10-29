@@ -13,11 +13,11 @@ import { requireUser, type SessionUser } from './session';
 // 500 instead of a clean "no access".
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function isUuid(value: unknown): value is string {
+function isUuid(value: unknown): value is string {
   return typeof value === 'string' && UUID_RE.test(value);
 }
 
-export async function isMember(householdId: string, userId: string): Promise<boolean> {
+async function isMember(householdId: string, userId: string): Promise<boolean> {
   if (!isUuid(householdId) || !isUuid(userId)) return false;
   const [row] = await db
     .select({ id: memberships.id })
@@ -27,7 +27,7 @@ export async function isMember(householdId: string, userId: string): Promise<boo
   return !!row;
 }
 
-export async function isAdmin(householdId: string, userId: string): Promise<boolean> {
+async function isAdmin(householdId: string, userId: string): Promise<boolean> {
   if (!isUuid(householdId) || !isUuid(userId)) return false;
   const [row] = await db
     .select({ id: memberships.id })

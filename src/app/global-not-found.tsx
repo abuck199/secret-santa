@@ -1,14 +1,11 @@
 import type { Metadata } from 'next';
-import { Fraunces, Inter } from 'next/font/google';
 import NotFoundContent from '@/components/NotFoundContent';
 import { themeInitScript } from '@/components/theme';
+import { fontVariables } from './fonts';
 import './globals.css';
 
 // 404 for any URL no route matches. It bypasses the [lang] root layout, so it
 // brings its own styles, fonts and theme script (see Next's not-found docs).
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', axes: ['opsz'], display: 'swap' });
-
 export const metadata: Metadata = {
   title: 'ThatWish - 404',
   robots: { index: false },
@@ -17,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function GlobalNotFound() {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

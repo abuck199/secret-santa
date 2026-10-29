@@ -12,8 +12,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Old Vite app, kept as reference during the rebuild.
-    "legacy/**",
   ]),
   // Data Access Layer: only src/server may touch the DB or the raw auth API, so
   // every read and mutation goes through its session + membership checks.
