@@ -254,8 +254,8 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
      cookie sets `lang=fr`. `/fr/<non-public>` (old links) and `/en/...` redirect to the plain
      URL. In-app links use plain paths; `localizedPath()` is for SEO only. API routes and
      `public/` files skip the proxy. Unknown locale → 404.
-     Check at cutover: on Vercel, `/` from a French vs English browser must return the right
-     language (the CDN should cache per rewritten path; Next overrides our `Vary` header).
+     Verified on the Vercel preview (2026-10-28): `/` follows the browser language in fresh
+     private windows after switching it, so the CDN caches per rewritten path.
    - **i18n:** `src/i18n/translations.ts` is the old file as-is (same flat keys, `{placeholders}`).
      Server Components: `const t = await getT()` (`src/i18n/server.ts`, reads `next/root-params`).
      Client Components: `const { t, lang } = useI18n()` (`src/i18n/client.tsx`). Links: build
@@ -351,8 +351,11 @@ and `isAdmin(householdId, userId)` as small `EXISTS` queries and call them at th
    - `BETTER_AUTH_URL` is set for **Production only**. Without it Better Auth infers the base
      URL from the request (`better-auth/dist/utils/url.mjs`), so preview deployments work on
      their own *.vercel.app URLs; a wrong value there means `INVALID_ORIGIN` on sign-in.
-   - Confirm Better Auth sees real client IPs on Vercel (`rate_limit` keys must not all be the
-     same, or every visitor shares one bucket).
+   - Better Auth sees real client IPs on Vercel *(verified on the preview 2026-10-28: real IPv4
+     keys in `rate_limit`, real IP on sessions, `otp-email` cap rows written)*.
+   - Preview deployments sit behind Vercel Authentication and Vercel's bot checkpoint (429
+     "Vercel Security Checkpoint" for curl), so check previews in a browser, and read the `dev`
+     DB for server-side evidence.
    - Separate databases *(done 2026-10-28)*: Neon branch `dev` (child of `production`, no
      auto-delete) is what `.env.local` and Vercel **Preview** use; `production` is for Vercel
      **Production** only.
