@@ -4,7 +4,7 @@ import { getLang, getT } from '@/i18n/server';
 import { alternates } from '@/lib/seo';
 
 // Bump on every content change (and set it to the go-live date at cutover).
-const UPDATED = '2026-10-28';
+const UPDATED = '2026-10-29';
 
 // Contact is a dedicated brand inbox (thatwishapp@gmail.com) - no domain email or
 // forwarding needed. Swap to an @thatwish.com address later if you ever want.
@@ -20,6 +20,7 @@ const EN: LegalSection[] = [
     body: [
       'Account information you provide: your email address, display name, and date of birth.',
       'Sign-in codes: we sign you in by emailing you a one-time code. We store it only in hashed form, until it is used or expires a few minutes later.',
+      'Bot check: when you request a sign-in code, Cloudflare Turnstile checks that the request comes from a person, using technical signals such as your IP address and browser characteristics. It is not used for advertising.',
       'Content you create: wishlist items and links, gift reservations, household memberships, and - if your household enables it - Secret Santa assignments.',
       'Limited technical data: privacy-friendly, aggregate, cookieless usage analytics. We do not use advertising or cross-site tracking.',
     ],
@@ -44,7 +45,7 @@ const EN: LegalSection[] = [
     h: 'Who we share it with',
     body: [
       'We do not sell your personal information.',
-      'We use trusted service providers that process data on our behalf: Neon (database hosting), Vercel (application hosting and analytics), and Resend (sending account emails such as sign-in codes). They may store data outside Québec.',
+      'We use trusted service providers that process data on our behalf: Neon (database hosting), Vercel (application hosting and analytics), Resend (sending account emails such as sign-in codes), and Cloudflare (the bot check on the sign-in page). They may store data outside Québec.',
       'We may disclose information if required by law.',
     ],
   },
@@ -93,6 +94,7 @@ const FR: LegalSection[] = [
     body: [
       'Informations de compte que vous fournissez : votre adresse courriel, votre nom affiché et votre date de naissance.',
       'Codes de connexion : nous vous connectons en vous envoyant un code à usage unique par courriel. Nous le conservons uniquement sous forme hachée, jusqu’à ce qu’il soit utilisé ou qu’il expire quelques minutes plus tard.',
+      'Vérification anti-robot : lorsque vous demandez un code de connexion, Cloudflare Turnstile vérifie que la demande vient d’une personne, à l’aide de signaux techniques comme votre adresse IP et les caractéristiques de votre navigateur. Elle ne sert pas à la publicité.',
       'Contenu que vous créez : articles et liens de liste de souhaits, réservations de cadeaux, adhésions à des foyers et - si votre foyer l’active - attributions Secret Santa.',
       'Données techniques limitées : analyses d’utilisation agrégées, sans témoin et respectueuses de la vie privée. Aucune publicité ni suivi intersites.',
     ],
@@ -117,7 +119,7 @@ const FR: LegalSection[] = [
     h: 'Avec qui nous les partageons',
     body: [
       'Nous ne vendons pas vos renseignements personnels.',
-      'Nous faisons appel à des fournisseurs de confiance qui traitent les données pour notre compte : Neon (hébergement de la base de données), Vercel (hébergement et analyses) et Resend (envoi des courriels de compte comme les codes de connexion). Ils peuvent stocker des données hors du Québec.',
+      'Nous faisons appel à des fournisseurs de confiance qui traitent les données pour notre compte : Neon (hébergement de la base de données), Vercel (hébergement et analyses), Resend (envoi des courriels de compte comme les codes de connexion) et Cloudflare (la vérification anti-robot de la page de connexion). Ils peuvent stocker des données hors du Québec.',
       'Nous pouvons divulguer des renseignements si la loi l’exige.',
     ],
   },

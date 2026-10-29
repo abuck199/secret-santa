@@ -35,6 +35,23 @@ describe('households', () => {
     ]);
   });
 
+  it('caps households owned per person at 2, even when creates race', async () => {
+    const alice = await makeUser('Alice');
+    const bob = await makeUser('Bob');
+    await makeHousehold(alice, [], { name: 'First' });
+    await makeHousehold(bob, [{ user: alice }]); // joining others doesn't count
+    signInAs(alice);
+    const results = await Promise.all(['A', 'B', 'C'].map((n) => createHousehold(n)));
+    expect(results.filter((r) => r.ok)).toHaveLength(1);
+    expect(results.find((r) => !r.ok)).toMatchObject({ ok: false, error: 'household_cap', params: { max: '2' } });
+
+    // Deleting one frees a slot.
+    const owned = (await getMyHouseholds()).filter((h) => h.isOwner);
+    expect(owned).toHaveLength(2);
+    ok(await deleteHousehold(owned[0].id));
+    ok(await createHousehold('Again'));
+  });
+
   it('only admins rename or toggle Secret Santa', async () => {
     const alice = await makeUser('Alice');
     const bob = await makeUser('Bob');

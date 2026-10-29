@@ -66,6 +66,9 @@ export const translations = {
     'profile.deleteAccount': "Delete my account",
     'profile.deleteAccountConfirm': "This cannot be undone.",
     'profile.accountDeleted': "Your account has been deleted.",
+    'profile.deleteCodeIntro': 'To confirm, enter the 6-digit code we just sent to {email}.',
+    'auth.captchaFailed': 'The bot check failed. Refresh the page and try again.',
+    'auth.captchaPending': 'One moment: we’re checking that you’re not a bot.',
 
     'landing.getStarted': 'Get started',
     'landing.signin': 'Sign in',
@@ -259,6 +262,10 @@ export const translations = {
     'err.crashText': 'An unexpected error happened on our side. Try again in a moment.',
     'err.retry': 'Try again',
     'err.home': 'Back to home',
+    'err.household_cap': 'You can own up to {max} households. Delete one to create another.',
+    'err.invalid_code': 'That code is incorrect.',
+    'err.code_expired': 'That code has expired. Request a new one.',
+    'err.too_many_attempts': 'Too many attempts. Request a new code.',
   },
 
   fr: {
@@ -325,6 +332,9 @@ export const translations = {
     'profile.deleteAccount': "Supprimer mon compte",
     'profile.deleteAccountConfirm': "Cette action est irréversible.",
     'profile.accountDeleted': "Votre compte a été supprimé.",
+    'profile.deleteCodeIntro': 'Pour confirmer, entrez le code à 6 chiffres que nous venons d’envoyer à {email}.',
+    'auth.captchaFailed': 'La vérification anti-robot a échoué. Actualisez la page et réessayez.',
+    'auth.captchaPending': 'Un instant : nous vérifions que vous n’êtes pas un robot.',
 
     'landing.getStarted': 'Commencer',
     'landing.signin': 'Connexion',
@@ -518,6 +528,10 @@ export const translations = {
     'err.crashText': 'Une erreur inattendue s’est produite de notre côté. Réessayez dans un instant.',
     'err.retry': 'Réessayer',
     'err.home': 'Retour à l’accueil',
+    'err.household_cap': 'Vous pouvez posséder au plus {max} foyers. Supprimez-en un pour en créer un autre.',
+    'err.invalid_code': 'Ce code est incorrect.',
+    'err.code_expired': 'Ce code a expiré. Demandez-en un nouveau.',
+    'err.too_many_attempts': 'Trop de tentatives. Demandez un nouveau code.',
   },
 };
 

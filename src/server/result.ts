@@ -23,7 +23,11 @@ export type ErrorCode =
   | 'own_item'
   | 'already_reserved'
   | 'santa_disabled'
-  | 'santa_min_members';
+  | 'santa_min_members'
+  | 'household_cap'
+  | 'invalid_code'
+  | 'code_expired'
+  | 'too_many_attempts';
 
 // `params` fill placeholders in the translated message, e.g. {name}.
 export type ActionResult<T = void> =

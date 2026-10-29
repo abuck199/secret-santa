@@ -3,7 +3,7 @@
 // Households and their members. Every export here is a public POST endpoint:
 // validate input, derive the user from the session, check the role.
 
-import { and, eq, or } from 'drizzle-orm';
+import { and, count, eq, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/db';
 import { assignments, households, memberships } from '@/db/schema';
@@ -41,12 +41,25 @@ async function isInActiveDraw(householdId: string, userId: string) {
 
 /* --------------------------- Households -------------------------- */
 
+// Each person may own at most this many households (anti-abuse; joining others
+// by invite is unlimited). Ownership handed over by deleteAccount can exceed it.
+const MAX_OWNED_HOUSEHOLDS = 2;
+
 // Replaces the `create_household` RPC.
 export async function createHousehold(name: string): Promise<ActionResult<{ id: string }>> {
   return runAction(async () => {
     const user = await requireUser();
     const cleanName = Name.parse(name);
     const created = await db.transaction(async (tx) => {
+      // One create at a time per person, so a double submit can't pass the cap.
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${`households:${user.id}`}, 0))`);
+      const [{ owned }] = await tx
+        .select({ owned: count() })
+        .from(households)
+        .where(eq(households.ownerId, user.id));
+      if (owned >= MAX_OWNED_HOUSEHOLDS) {
+        throw new ActionError('household_cap', { max: String(MAX_OWNED_HOUSEHOLDS) });
+      }
       const [h] = await tx
         .insert(households)
         .values({ name: cleanName, ownerId: user.id })

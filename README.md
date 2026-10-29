@@ -8,7 +8,7 @@ never duplicates and never any spoilers for the recipient. An optional
 Live at [thatwish.com](https://thatwish.com).
 
 - 🏠 **Households**: create one, or join with an invite link
-- 🔑 **No passwords**: sign in with a 6-digit code sent by email
+- 🔑 **No passwords**: sign in with a 6-digit code sent by email, behind an invisible bot check
 - 📝 **Wishlists** with links and drag-and-drop ordering
 - 🤫 **Anonymous reservations**: you never learn who reserved your gift, or even that it's reserved
 - 🎂 **Birthdays**: upcoming ones surface on the home page
@@ -47,6 +47,7 @@ pnpm dev                    # http://localhost:3000
 | `EMAIL_FROM` | Sender, e.g. `ThatWish <noreply@thatwish.com>` (the domain must be verified in Resend) |
 | `BETTER_AUTH_SECRET` | Long random string signing sessions: `openssl rand -base64 32`, a different one per environment |
 | `BETTER_AUTH_URL` | Public URL of the app, e.g. `http://localhost:3000`. Leave it unset on Vercel preview deployments (it's inferred from the request) |
+| `TURNSTILE_SECRET_KEY`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile keys for the bot check on sign-in. Optional locally (Cloudflare's always-pass test keys are used); **required on Vercel**, or the build fails on purpose |
 
 ## Scripts
 

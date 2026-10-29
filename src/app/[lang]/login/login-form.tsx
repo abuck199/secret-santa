@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useId, useLayoutEffect, useState, type FormEvent } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, KeyRound, Loader2, Mail } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AuthShell from '@/components/AuthShell';
+import Turnstile, { type TurnstileHandle } from '@/components/Turnstile';
 import { useI18n } from '@/i18n/client';
 import { authClient } from '@/lib/auth-client';
 
@@ -28,6 +29,9 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  // Bot check token for the next code request (single-use).
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const turnstile = useRef<TurnstileHandle>(null);
   const emailId = useId();
   const codeId = useId();
 
@@ -41,6 +45,7 @@ export default function LoginForm() {
       setError('');
       setLoading(false);
       setCooldown(0);
+      setCaptchaToken(null);
     };
   }, []);
 
@@ -61,12 +66,19 @@ export default function LoginForm() {
     e?.preventDefault();
     const clean = email.trim().toLowerCase();
     if (!EMAIL_RE.test(clean)) return setError(t('auth.invalidEmail'));
+    if (!captchaToken) return void toast(t('auth.captchaPending'));
     setLoading(true);
     setError('');
-    const { error: err } = await authClient.emailOtp.sendVerificationOtp({ email: clean, type: 'sign-in' });
+    const { error: err } = await authClient.emailOtp.sendVerificationOtp({
+      email: clean,
+      type: 'sign-in',
+      fetchOptions: { headers: { 'x-captcha-response': captchaToken } },
+    });
     setLoading(false);
+    turnstile.current?.reset(); // a token works once
     if (err) {
-      toast.error(err.status === 429 ? t('auth.tooManyRequests') : t('err.generic'));
+      if (err.code === 'VERIFICATION_FAILED' || err.code === 'MISSING_RESPONSE') toast.error(t('auth.captchaFailed'));
+      else toast.error(err.status === 429 ? t('auth.tooManyRequests') : t('err.generic'));
       return;
     }
     setEmail(clean);
@@ -169,11 +181,13 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => sendCode()}
-            disabled={cooldown > 0 || loading}
+            disabled={cooldown > 0 || loading || !captchaToken}
             className="w-full mt-3 text-sm text-mute hover:text-fg disabled:hover:text-mute disabled:cursor-not-allowed tabular-nums"
           >
             {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resend')}
           </button>
+          {/* A fresh token for "send a new code". */}
+          <Turnstile ref={turnstile} onToken={setCaptchaToken} />
         </div>
       </AuthShell>
     );
@@ -210,9 +224,14 @@ export default function LoginForm() {
           <p id={`${emailId}-hint`} className="text-xs text-mute mt-1.5">{t('auth.otpHint')}</p>
         )}
 
-        <button className="btn-primary w-full mt-5" disabled={loading} aria-busy={loading}>
+        <Turnstile ref={turnstile} onToken={setCaptchaToken} />
+
+        <button className="btn-primary w-full mt-5" disabled={loading || !captchaToken} aria-busy={loading}>
           {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : t('auth.sendCode')}
         </button>
+        {!captchaToken && !loading && (
+          <p className="text-xs text-mute mt-2 text-center" aria-live="polite">{t('auth.captchaPending')}</p>
+        )}
       </form>
     </AuthShell>
   );

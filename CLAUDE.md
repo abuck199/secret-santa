@@ -18,6 +18,9 @@ users, so no data was migrated.
   `-pooler` URLs). Chosen over Supabase, whose free tier pauses after 7 idle days. Portable.
 - **Better Auth, email OTP only** (`src/lib/auth.ts`), self-hosted in the app, tables in our DB.
   No passwords, no OAuth. UUID ids. A `databaseHooks.user.create.after` hook creates `profiles`.
+  Cloudflare Turnstile (Better Auth `captcha` plugin) guards `/email-otp/send-verification-otp`:
+  `src/components/Turnstile.tsx` (invisible unless Cloudflare wants a click) sends a single-use
+  token in `x-captcha-response`; the login form resets the widget after every send.
 - **Resend** for the code emails (`src/lib/email.ts`, EN/FR). Free tier: 100/day.
 - **Vercel** (project `thatwish`), Node 24 (`engines`), `vercel.json` sets the Next.js preset.
 - **Authorization lives in the app**: one DB role, no RLS. Every mutation is a Server Action that
@@ -65,8 +68,13 @@ users, so no data was migrated.
 - Wishlist: max 50 items per person per household (advisory lock), links re-validated
   server-side (`src/lib/url.ts`). Draw: crypto shuffle, cyclic pairing, ≥3 members; nobody
   (admins included) sees the full draw.
-- Account deletion (Law 25): owned households go to another admin, else the longest-standing
-  member; empty ones are deleted; then the leave cleanup everywhere; then the user row.
+- Households: each person may **own at most 2** (`household_cap`, advisory lock); joining others
+  by invite is unlimited; ownership handed over by account deletion may exceed the cap.
+- Account deletion (Law 25) needs a **6-digit code emailed to the owner** (`requestDeletionCode`
+  then `deleteAccount(code)`; Better Auth's `email-verification` OTP type carries these codes,
+  `DELETION_OTP_TYPE` in `src/lib/email.ts`, with its own email wording). Then: owned households
+  go to another admin, else the longest-standing member; empty ones are deleted; the leave
+  cleanup runs everywhere; the user row goes.
 
 ## i18n and routing
 
@@ -108,6 +116,12 @@ users, so no data was migrated.
 - **Rate limiting:** Better Auth limits per IP in the DB (`rate_limit` table, production only);
   `src/server/otp-throttle.ts` caps 5 code emails/hour per address (silently skipped, so it
   can't be used to probe addresses or burn the Resend quota).
+- **CSP** (`next.config.ts`): Next's "without nonces" variant on purpose. Nonces would force
+  every page to render per request (no prerender, no CDN cache). Inline scripts stay allowed;
+  other origins are blocked except Turnstile (`challenges.cloudflare.com`), Vercel's toolbar on
+  previews, and dev-only needs. Adding a third-party script/iframe means updating the CSP.
+- `src/lib/email.ts` creates the Resend client lazily, so importing it needs no API key (tests,
+  CI). Keep module top-levels free of env-dependent side effects.
 - Files edited from Windows through `\\wsl.localhost\...` may not trigger Next's file watcher;
   restart `pnpm dev` if it serves stale code (or open the folder with VS Code's WSL extension).
 - Vercel previews sit behind Vercel Authentication, and Vercel's bot checkpoint answers 429 to
@@ -128,8 +142,13 @@ users, so no data was migrated.
   `accepted_by`, `accepted_at`).
 - `BETTER_AUTH_URL` is set for Production only; previews infer it from the request. A wrong value
   causes `INVALID_ORIGIN` on sign-in.
-- Secrets (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `RESEND_API_KEY`) stay out of git; one
-  `BETTER_AUTH_SECRET` per environment.
+- Secrets (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`) stay
+  out of git; one `BETTER_AUTH_SECRET` per environment.
+- Turnstile keys: unset locally → Cloudflare's always-pass test keys. On Vercel (Production and
+  Preview) `next.config.ts` **fails the build** if `TURNSTILE_SECRET_KEY` or
+  `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is missing, so the bot check can't silently be a no-op.
+  The Turnstile widget's hostname list in Cloudflare must include thatwish.com and the
+  preview domain.
 
 ## Tests and CI
 
@@ -144,7 +163,10 @@ account deletion and the OTP cap. **Add a test with every new action or rule.**
 
 ## Open items
 
-- After a few quiet weeks: delete the old Supabase project, the Supabase/Google OAuth client, and
-  any Resend key used only by Supabase. Remove the `VITE_*` env vars from Vercel.
-- Judgment calls not done (revisit if needed): CSP (needs a nonce/hash for the theme script),
-  re-auth before account deletion, a cap on households created per user.
+- Old-stack teardown *(done 2026-10-29)*: Supabase project deleted, Google OAuth client deleted,
+  Supabase-only Resend key revoked; production code emails confirmed delivered afterwards.
+  Still to confirm: `VITE_*` env vars removed from Vercel, and link previews (Messenger,
+  WhatsApp) work despite Vercel's bot checkpoint.
+- Hardening round 2 *(2026-10-29)*: Turnstile on sign-in, code-confirmed account deletion,
+  2 owned households max, CSP without nonces. A nonce-based (strict) CSP was declined: it
+  would make every page dynamic.

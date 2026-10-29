@@ -1,19 +1,18 @@
 'use client';
 
-import { useId, useState, type FormEvent } from 'react';
+import { useId, useLayoutEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Globe, Loader2, Save, Sun, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ConfirmModal from '@/components/ConfirmModal';
 import DatePicker from '@/components/DatePicker';
 import LanguageToggle from '@/components/LanguageToggle';
 import PageHeader, { Page } from '@/components/PageHeader';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useI18n } from '@/i18n/client';
 import { actionErrorMessage } from '@/lib/action-error';
-import { deleteAccount } from '@/server/actions/account';
 import { updateProfile } from '@/server/actions/profile';
 import type { MyProfile } from '@/server/queries/profile';
+import DeleteAccountDialog from './delete-account-dialog';
 
 export default function ProfileForm({ profile }: { profile: MyProfile }) {
   const { t } = useI18n();
@@ -21,8 +20,11 @@ export default function ProfileForm({ profile }: { profile: MyProfile }) {
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [birthday, setBirthday] = useState(profile.birthday ?? '');
   const [saving, setSaving] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  // Cache Components keeps this page mounted (hidden) after navigating away:
+  // don't come back to a half-finished deletion dialog.
+  useLayoutEffect(() => () => setDeleteOpen(false), []);
 
   const nameId = useId();
   const bdayLabelId = useId();
@@ -37,23 +39,6 @@ export default function ProfileForm({ profile }: { profile: MyProfile }) {
     if (!res.ok) return toast.error(actionErrorMessage(t, res));
     toast.success(t('profile.saved'));
     router.refresh(); // nav initials, dashboard greeting, birthdays
-  }
-
-  async function removeAccount() {
-    setDeleting(true);
-    const res = await deleteAccount();
-    if (!res.ok) {
-      setDeleting(false);
-      setConfirmDelete(false);
-      return toast.error(actionErrorMessage(t, res));
-    }
-    toast.success(t('profile.accountDeleted'));
-    // Full page load (like sign-out) so no hidden route keeps this account's data.
-    // A short delay lets the toast show first.
-    setTimeout(() => {
-      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload on purpose
-      window.location.href = '/';
-    }, 800);
   }
 
   return (
@@ -117,21 +102,13 @@ export default function ProfileForm({ profile }: { profile: MyProfile }) {
           <Trash2 className="w-[18px] h-[18px] text-red-600" aria-hidden="true" /> {t('profile.dangerZone')}
         </h2>
         <p className="text-sm text-mute mb-4 leading-relaxed">{t('profile.deleteAccountDesc')}</p>
-        <button className="btn-danger" onClick={() => setConfirmDelete(true)} disabled={deleting}>
-          {deleting ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Trash2 className="w-4 h-4" aria-hidden="true" />}
+        <button className="btn-danger" onClick={() => setDeleteOpen(true)}>
+          <Trash2 className="w-4 h-4" aria-hidden="true" />
           {t('profile.deleteAccount')}
         </button>
       </div>
 
-      <ConfirmModal
-        open={confirmDelete}
-        title={t('profile.deleteAccount')}
-        message={`${t('profile.deleteAccountDesc')} ${t('profile.deleteAccountConfirm')}`}
-        confirmLabel={t('profile.deleteAccount')}
-        loading={deleting}
-        onConfirm={removeAccount}
-        onCancel={() => setConfirmDelete(false)}
-      />
+      {deleteOpen && <DeleteAccountDialog email={profile.email} onClose={() => setDeleteOpen(false)} />}
     </Page>
   );
 }

@@ -1,15 +1,27 @@
 import { and, eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { assignments, households, memberships, profiles, users, wishlistItems } from '@/db/schema';
-import { deleteAccount } from '@/server/actions/account';
+import { deleteAccount, requestDeletionCode } from '@/server/actions/account';
 import { allowOtpEmail, OTP_EMAILS_PER_HOUR } from '@/server/otp-throttle';
 import { db, resetDb } from './helpers/db';
-import { makeDraw, makeHousehold, makeItem, makeUser, ok } from './helpers/fixtures';
+import { fails, makeDraw, makeHousehold, makeItem, makeUser, ok } from './helpers/fixtures';
 import { signInAs } from './helpers/session';
 
 beforeEach(resetDb);
 
 describe('deleteAccount', () => {
+  it('needs the emailed code: wrong, expired or malformed codes delete nothing', async () => {
+    const x = await makeUser('X');
+    await makeHousehold(x);
+    signInAs(x);
+    ok(await requestDeletionCode());
+    fails(await deleteAccount('654321'), 'invalid_code');
+    fails(await deleteAccount('000000'), 'code_expired');
+    fails(await deleteAccount('abc'), 'invalid_input');
+    expect(await db.select().from(users).where(eq(users.id, x.id))).toHaveLength(1);
+    expect(await db.select().from(households).where(eq(households.ownerId, x.id))).toHaveLength(1);
+  });
+
   it('hands owned households over, deletes empty ones, and cleans up everywhere', async () => {
     const x = await makeUser('X');
     const olderMember = await makeUser('Older');
@@ -29,7 +41,7 @@ describe('deleteAccount', () => {
     const held = await makeItem(h3, owner3, 'held', { claimed: true, reservedBy: x.id, purchased: false });
 
     signInAs(x);
-    ok(await deleteAccount());
+    ok(await deleteAccount('123456'));
 
     const [h1Row] = await db.select().from(households).where(eq(households.id, h1));
     expect(h1Row.ownerId).toBe(admin.id);

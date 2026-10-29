@@ -18,5 +18,20 @@ vi.mock('next/navigation', () => ({
   unstable_rethrow: () => {},
 }));
 
-// Only deleteAccount touches Better Auth (to sign out first).
-vi.mock('@/lib/auth', () => ({ auth: { api: { signOut: async () => {} } } }));
+// Only the account actions touch Better Auth. Deletion codes: '123456' is
+// right, '000000' has expired, anything else is wrong.
+vi.mock('@/lib/auth', async () => {
+  const { APIError } = await import('better-auth/api');
+  return {
+    auth: {
+      api: {
+        signOut: async () => {},
+        sendVerificationOTP: async () => ({ success: true }),
+        checkVerificationOTP: async ({ body }: { body: { otp: string } }) => {
+          if (body.otp === '123456') return { success: true };
+          throw new APIError('BAD_REQUEST', { code: body.otp === '000000' ? 'OTP_EXPIRED' : 'INVALID_OTP' });
+        },
+      },
+    },
+  };
+});
