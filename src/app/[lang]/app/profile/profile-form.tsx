@@ -42,9 +42,22 @@ export default function ProfileForm({ profile }: { profile: MyProfile }) {
 
   return (
     <Page>
-      <PageHeader eyebrow={t('nav.profile')} title={t('profile.title')} />
+      <PageHeader title={t('profile.title')} />
 
-      <form onSubmit={saveProfile} className="card p-5 mb-4">
+      <form onSubmit={saveProfile} className="card p-5 mb-4 animate-rise [animation-delay:60ms]">
+        {/* Who you are, as others see you: updates live while typing. */}
+        <div className="flex items-center gap-3.5 mb-5">
+          <span
+            aria-hidden="true"
+            className="w-16 h-16 shrink-0 rounded-full bg-brand text-white grid place-items-center font-display font-black text-2xl"
+          >
+            {(displayName.trim()[0] || '?').toUpperCase()}
+          </span>
+          <div className="min-w-0">
+            <p className="heading text-xl text-fg truncate">{displayName.trim() || '…'}</p>
+            <p className="text-sm text-mute truncate mt-1">{profile.email}</p>
+          </div>
+        </div>
         <div className="mb-4">
           <label htmlFor={nameId} className="label">{t('profile.displayName')}</label>
           <input
@@ -65,36 +78,33 @@ export default function ProfileForm({ profile }: { profile: MyProfile }) {
             ariaLabelledby={bdayLabelId}
             ariaDescribedby={bdayHintId}
           />
-          <p id={bdayHintId} className="text-xs text-mute mt-1.5">{t('profile.birthdayHint')}</p>
+          <p id={bdayHintId} className="text-sm text-mute mt-1.5">{t('profile.birthdayHint')}</p>
         </div>
-        <div className="flex items-center justify-between gap-3 mt-4">
-          <p className="text-xs text-mute truncate">{profile.email}</p>
-          <button className="btn-primary" disabled={saving} aria-busy={saving}>
-            {saving ? (
-              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-            ) : (
-              <Save className="w-4 h-4" aria-hidden="true" />
-            )}
-            {t('common.save')}
-          </button>
-        </div>
+        <button className="btn-primary w-full sm:w-auto mt-4" disabled={saving} aria-busy={saving}>
+          {saving ? (
+            <Loader2 className="w-[18px] h-[18px] animate-spin" aria-hidden="true" />
+          ) : (
+            <Save className="w-[18px] h-[18px]" aria-hidden="true" />
+          )}
+          {t('common.save')}
+        </button>
       </form>
 
-      <div className="card p-5 mb-4 flex items-center justify-between gap-4">
-        <h2 className="font-display text-lg font-medium text-fg flex items-center gap-2">
-          <Globe className="w-[18px] h-[18px] text-brand-ink" aria-hidden="true" /> {t('profile.language')}
+      <div className="card p-5 mb-4 flex items-center justify-between gap-4 animate-rise [animation-delay:120ms]">
+        <h2 className="heading text-lg text-fg flex items-center gap-2">
+          <Globe className="w-5 h-5 text-brand-ink" aria-hidden="true" /> {t('profile.language')}
         </h2>
         <LanguageToggle />
       </div>
 
       {/* Law 25: people can delete their account themselves. */}
-      <div className="card p-5 border-red-500/30">
-        <h2 className="font-display text-lg font-medium text-fg mb-2 flex items-center gap-2">
-          <Trash2 className="w-[18px] h-[18px] text-red-600" aria-hidden="true" /> {t('profile.dangerZone')}
+      <div className="card p-5 animate-rise [animation-delay:180ms]">
+        <h2 className="heading text-lg text-red-700 mb-2 flex items-center gap-2">
+          <Trash2 className="w-5 h-5" aria-hidden="true" /> {t('profile.dangerZone')}
         </h2>
-        <p className="text-sm text-mute mb-4 leading-relaxed">{t('profile.deleteAccountDesc')}</p>
+        <p className="text-[15px] text-mute mb-4 leading-relaxed">{t('profile.deleteAccountDesc')}</p>
         <button className="btn-danger" onClick={() => setDeleteOpen(true)}>
-          <Trash2 className="w-4 h-4" aria-hidden="true" />
+          <Trash2 className="w-[18px] h-[18px]" aria-hidden="true" />
           {t('profile.deleteAccount')}
         </button>
       </div>

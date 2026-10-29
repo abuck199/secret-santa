@@ -131,6 +131,11 @@ users, so no data was migrated.
   CI). Keep module top-levels free of env-dependent side effects.
 - Files edited from Windows through `\\wsl.localhost\...` may not trigger Next's file watcher;
   restart `pnpm dev` if it serves stale code (or open the folder with VS Code's WSL extension).
+  If a restart still serves old CSS (seen with `@theme` values in `globals.css`), Turbopack's
+  cache is stale: stop the server, `rm -rf .next`, start again.
+- Entrance animations use `animation-fill-mode: backwards`, never `both`: a transform kept after
+  the animation turns each card into its own stacking context and popovers (date picker,
+  menus) slide under the next card.
 - Vercel previews sit behind Vercel Authentication, and Vercel's bot checkpoint answers 429 to
   curl (production too), so check deployments in a browser and read the DB for evidence.
 

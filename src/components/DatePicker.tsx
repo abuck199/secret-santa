@@ -151,7 +151,7 @@ export default function DatePicker({
         <button
           type="button"
           onClick={() => onChange('')}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-fg p-0.5 rounded"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 grid place-items-center rounded-full text-mute hover:text-fg hover:bg-panel-2"
           aria-label={t('common.clear')}
         >
           <X className="w-4 h-4" aria-hidden="true" />
@@ -162,14 +162,14 @@ export default function DatePicker({
         <div
           role="dialog"
           aria-label={t('common.selectDate')}
-          className="absolute z-50 mt-2 w-[300px] max-w-[calc(100vw-2rem)] card p-3 animate-scale-in"
+          className="absolute z-50 mt-2 w-[320px] max-w-[calc(100vw-2rem)] card shadow-card p-3 animate-scale-in"
         >
           {/* Header: nav + month/year selects */}
           <div className="flex items-center gap-1.5 mb-3">
             <button
               type="button"
               onClick={() => move(-1)}
-              className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
+              className="w-10 h-10 shrink-0 grid place-items-center rounded-full text-mute hover:text-fg hover:bg-panel-2"
               aria-label={t('common.prevMonth')}
             >
               <ChevronLeft className="w-4 h-4" aria-hidden="true" />
@@ -179,7 +179,7 @@ export default function DatePicker({
               value={view.m}
               onChange={(e) => setView((v) => ({ ...v, m: Number(e.target.value) }))}
               aria-label={t('a11y.month')}
-              className="flex-1 bg-panel border border-line rounded-lg px-2 py-1.5 text-sm font-medium text-fg outline-none focus:border-brand cursor-pointer"
+              className="flex-1 min-w-0 min-h-10 bg-panel border-2 border-line rounded-xl px-2 text-[15px] font-semibold text-fg outline-none focus:border-brand cursor-pointer"
             >
               {months.map((name, i) => (
                 <option key={name} value={i}>
@@ -192,7 +192,7 @@ export default function DatePicker({
               value={view.y}
               onChange={(e) => setView((v) => ({ ...v, y: Number(e.target.value) }))}
               aria-label={t('a11y.year')}
-              className="bg-panel border border-line rounded-lg px-2 py-1.5 text-sm font-medium text-fg outline-none focus:border-brand cursor-pointer"
+              className="min-h-10 bg-panel border-2 border-line rounded-xl px-2 text-[15px] font-semibold text-fg outline-none focus:border-brand cursor-pointer"
             >
               {years.map((y) => (
                 <option key={y} value={y}>
@@ -204,7 +204,7 @@ export default function DatePicker({
             <button
               type="button"
               onClick={() => move(1)}
-              className="p-1.5 rounded-lg text-mute hover:text-fg hover:bg-panel-2"
+              className="w-10 h-10 shrink-0 grid place-items-center rounded-full text-mute hover:text-fg hover:bg-panel-2"
               aria-label={t('common.nextMonth')}
             >
               <ChevronRight className="w-4 h-4" aria-hidden="true" />
@@ -214,7 +214,7 @@ export default function DatePicker({
           {/* Weekday labels */}
           <div className="grid grid-cols-7 mb-1" aria-hidden="true">
             {weekdays.map((w) => (
-              <div key={w} className="text-center text-[11px] font-semibold uppercase text-mute py-1">
+              <div key={w} className="text-center font-mono text-xs font-semibold uppercase text-mute py-1">
                 {w.slice(0, 2)}
               </div>
             ))}
@@ -240,13 +240,13 @@ export default function DatePicker({
                   aria-label={dayLabelFmt.format(new Date(view.y, view.m, d))}
                   aria-pressed={isSelected || undefined}
                   aria-current={isToday ? 'date' : undefined}
-                  className={`h-9 rounded-lg text-sm grid place-items-center transition ${
+                  className={`h-10 rounded-full text-[15px] grid place-items-center transition ${
                     isSelected
-                      ? 'bg-fg text-paper font-medium'
+                      ? 'bg-brand text-white font-bold'
                       : disabled
                       ? 'text-mute/40 cursor-not-allowed'
                       : 'text-fg hover:bg-panel-2'
-                  } ${isToday && !isSelected ? 'ring-1 ring-brand/50' : ''}`}
+                  } ${isToday && !isSelected ? 'ring-2 ring-sun' : ''}`}
                 >
                   {d}
                 </button>

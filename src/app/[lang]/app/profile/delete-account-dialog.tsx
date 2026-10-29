@@ -75,27 +75,34 @@ export default function DeleteAccountDialog({ email, onClose }: { email: string;
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => !deleting && onClose()} />
-      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="relative card p-6 w-full max-w-sm animate-scale-in">
+    // Same shape as ConfirmModal: bottom sheet on phones, centred card from sm up.
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:px-4">
+      <div className="absolute inset-0 bg-fg/50 animate-fade-in" onClick={() => !deleting && onClose()} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative w-full sm:max-w-sm bg-panel rounded-t-[28px] sm:rounded-3xl shadow-card px-5 pt-3 pb-safe sm:p-6 animate-sheet sm:animate-scale-in max-h-[92vh] overflow-y-auto"
+      >
+        <span aria-hidden="true" className="sm:hidden block w-11 h-1.5 rounded-full bg-line mx-auto mb-4" />
         <button
           onClick={onClose}
           disabled={deleting}
           aria-label={t('common.cancel')}
-          className="absolute right-4 top-4 text-mute hover:text-fg"
+          className="absolute right-3 top-3 w-11 h-11 grid place-items-center rounded-full text-mute hover:text-fg hover:bg-panel-2"
         >
           <X className="w-5 h-5" aria-hidden="true" />
         </button>
-        <div className="w-11 h-11 rounded-xl grid place-items-center mb-3 bg-red-500/10 text-red-600">
+        <div className="w-11 h-11 rounded-2xl grid place-items-center mb-3 bg-red-500/10 text-red-700">
           <AlertTriangle className="w-6 h-6" aria-hidden="true" />
         </div>
-        <h3 id={titleId} className="font-display text-xl font-semibold text-fg">{t('profile.deleteAccount')}</h3>
-        <p className="text-sm text-mute mt-1.5 leading-relaxed">
+        <h3 id={titleId} className="heading text-xl text-fg pr-10">{t('profile.deleteAccount')}</h3>
+        <p className="text-[15px] text-mute mt-2.5 leading-relaxed">
           {t('profile.deleteAccountDesc')} {t('profile.deleteAccountConfirm')}
         </p>
 
         <form onSubmit={confirm} className="mt-4">
-          <label htmlFor={codeId} className="text-sm text-fg block mb-2 break-words">
+          <label htmlFor={codeId} className="text-[15px] font-semibold text-fg block mb-2 break-words">
             {t('profile.deleteCodeIntro', { email })}
           </label>
           <input
@@ -114,9 +121,13 @@ export default function DeleteAccountDialog({ email, onClose }: { email: string;
             aria-describedby={error ? `${codeId}-err` : undefined}
             disabled={deleting}
           />
-          {error && <p id={`${codeId}-err`} className="text-xs text-red-500 mt-1.5 text-center">{error}</p>}
+          {error && (
+            <p id={`${codeId}-err`} role="alert" className="text-sm font-semibold text-red-700 mt-2 text-center">
+              {error}
+            </p>
+          )}
 
-          <div className="flex gap-2 mt-5">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 mt-5">
             <button type="button" className="btn-secondary flex-1" onClick={onClose} disabled={deleting}>
               {t('common.cancel')}
             </button>
@@ -130,7 +141,7 @@ export default function DeleteAccountDialog({ email, onClose }: { email: string;
           type="button"
           onClick={sendCode}
           disabled={cooldown > 0 || deleting}
-          className="w-full mt-3 text-sm text-mute hover:text-fg disabled:hover:text-mute disabled:cursor-not-allowed tabular-nums"
+          className="w-full min-h-11 mt-2 mb-3 sm:mb-0 text-sm font-semibold text-mute hover:text-fg disabled:hover:text-mute disabled:cursor-not-allowed tabular-nums"
         >
           {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resend')}
         </button>

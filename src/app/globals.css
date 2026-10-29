@@ -51,10 +51,12 @@
   --animate-slide-up: slide-up 0.35s ease-out;
   --animate-float: float 4s ease-in-out infinite;
   /* Entrances: content rises in (stagger with animation-delay), bottom sheets
-     slide up, small confirmations pop. */
-  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
-  --animate-sheet: sheet 0.4s cubic-bezier(0.2, 1, 0.3, 1) both;
-  --animate-pop: pop 0.4s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+     slide up, small confirmations pop. `backwards`, not `both`: a transform
+     kept after the animation would make every card its own stacking context,
+     and a popover (date picker, menus) would slide under the next card. */
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1) backwards;
+  --animate-sheet: sheet 0.4s cubic-bezier(0.2, 1, 0.3, 1) backwards;
+  --animate-pop: pop 0.4s cubic-bezier(0.3, 1.6, 0.5, 1) backwards;
 
   @keyframes fade-in {
     0% { opacity: 0; }
