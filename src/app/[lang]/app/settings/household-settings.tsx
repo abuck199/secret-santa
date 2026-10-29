@@ -14,13 +14,11 @@ import {
   ShieldOff,
   QrCode,
   Share2,
-  Shuffle,
   Trash2,
   UserPlus,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
-import DrawCeremony from '@/components/DrawCeremony';
 import InviteQr from '@/components/InviteQr';
 import PageHeader, { Page } from '@/components/PageHeader';
 import { useI18n } from '@/i18n/client';
@@ -34,9 +32,10 @@ import {
   setSecretSanta,
 } from '@/server/actions/households';
 import { createInvite, deleteInvite } from '@/server/actions/invites';
-import { shuffleAssignments } from '@/server/actions/santa';
 import type { MyHousehold, Member } from '@/server/queries/households';
 import type { Invite } from '@/server/queries/invites';
+import type { SantaAdmin as SantaAdminData } from '@/server/queries/santa';
+import SantaAdmin from './santa-admin';
 
 // Mirrors the server-side cap (5 non-expired links) to disable the button early.
 const INVITE_CAP = 5;
@@ -59,10 +58,12 @@ export default function HouseholdSettings({
   household,
   initialMembers,
   initialInvites,
+  initialSanta,
 }: {
   household: MyHousehold;
   initialMembers: Member[];
   initialInvites: Invite[];
+  initialSanta: SantaAdminData | null; // admins only
 }) {
   const { t } = useI18n();
   const router = useRouter();
@@ -75,12 +76,10 @@ export default function HouseholdSettings({
   const [members, setMembers] = useState(initialMembers);
   const [invites, setInvites] = useState(initialInvites);
   const [savingName, setSavingName] = useState(false);
-  const [drawing, setDrawing] = useState(false);
   const [creatingInvite, setCreatingInvite] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [qrFor, setQrFor] = useState<string | null>(null); // invite whose QR code is open
   const [confirm, setConfirm] = useState<Confirm | null>(null);
-  const [ceremony, setCeremony] = useState(false); // the draw animation, after a successful draw
 
   const fail = (res: Parameters<typeof actionErrorMessage>[1]) => toast.error(actionErrorMessage(t, res));
   const inviteLink = (code: string) => `${origin}/join/${code}`;
@@ -105,15 +104,6 @@ export default function HouseholdSettings({
       return fail(res);
     }
     router.refresh(); // the Secret Santa tab appears / disappears
-  }
-
-  async function runDraw() {
-    if (members.length < 3) return toast.error(t('settings.drawNeed'));
-    setDrawing(true);
-    const res = await shuffleAssignments(household.id);
-    setDrawing(false);
-    if (!res.ok) return fail(res);
-    setCeremony(true); // its closing text replaces the old "draw done" toast
   }
 
   async function addInvite() {
@@ -235,15 +225,8 @@ export default function HouseholdSettings({
           <p className="text-[15px] text-mute">{t('settings.secretSantaDesc')}</p>
           <Toggle on={secretSanta} disabled={!isAdmin} onClick={toggleSecretSanta} label={t('settings.secretSanta')} />
         </div>
-        {isAdmin && secretSanta && (
-          <button className="btn-primary mt-4 animate-pop" onClick={runDraw} disabled={drawing}>
-            {drawing ? (
-              <Loader2 className="w-[18px] h-[18px] animate-spin" aria-hidden="true" />
-            ) : (
-              <Shuffle className="w-[18px] h-[18px]" aria-hidden="true" />
-            )}
-            {t('settings.draw')}
-          </button>
+        {isAdmin && secretSanta && initialSanta && (
+          <SantaAdmin householdId={household.id} members={members} initial={initialSanta} />
         )}
       </Section>
 
@@ -416,8 +399,6 @@ export default function HouseholdSettings({
           </button>
         )}
       </Section>
-
-      {ceremony && <DrawCeremony names={members.map((m) => m.displayName)} onClose={() => setCeremony(false)} />}
 
       <ConfirmModal
         open={!!confirm}

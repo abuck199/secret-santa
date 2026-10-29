@@ -1,6 +1,6 @@
 // Transactional email via Resend: one-time codes (sign-in, and confirming an
-// account deletion). The FROM domain must be verified in Resend or codes land
-// in spam.
+// account deletion) and the Secret Santa "your draw is ready" notice. The
+// FROM domain must be verified in Resend or they land in spam.
 
 import 'server-only';
 import { Resend } from 'resend';
@@ -79,29 +79,20 @@ const DISPLAY = "'Archivo Black','Arial Black',Helvetica,Arial,sans-serif";
 const MONO = "'IBM Plex Mono',Menlo,Consolas,'Courier New',monospace";
 const LOGO = 'https://thatwish.com/apple-touch-icon.png';
 
-// Subject, plain text and HTML for a code email. Kept apart from sending so it
-// can be tested and previewed without Resend.
-export function renderOtpEmail(otp: string, lang: EmailLang, purpose: CodePurpose = 'sign-in') {
-  const c = copy[purpose][lang];
-  const danger = purpose === 'delete-account';
-  const warning = 'warning' in c ? c.warning : null;
-  const codeBg = danger ? C.dangerSoft : C.paper;
-  const codeInk = danger ? C.danger : C.ink;
-
-  // Tables and inline styles only: that's what Gmail and Outlook render. The
-  // code's cell has 10px more padding on the left to offset the letter-spacing
-  // trailing after its last digit, so it looks centred.
-  const html = `<!doctype html>
+// The page around every email: logo, white card, footer. Tables and inline
+// styles only: that's what Gmail and Outlook render.
+function shell(lang: EmailLang, title: string, preheader: string, card: string) {
+  return `<!doctype html>
 <html lang="${lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
-<title>${c.subject(otp)}</title>
+<title>${title}</title>
 </head>
 <body style="margin:0;padding:0;background:${C.paper};">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${c.preheader}</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${preheader}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.paper};">
   <tr><td align="center" style="padding:32px 16px;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;">
@@ -114,17 +105,7 @@ export function renderOtpEmail(otp: string, lang: EmailLang, purpose: CodePurpos
         </tr></table>
       </td></tr>
       <tr><td style="background:${C.panel};border-radius:24px;padding:28px 24px;">
-        ${
-          warning
-            ? `<p style="margin:0 0 14px;"><span style="display:inline-block;padding:6px 12px;border-radius:999px;background:${C.dangerSoft};color:${C.danger};font-family:${MONO};font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">⚠ ${warning}</span></p>`
-            : ''
-        }
-        <h1 style="margin:0 0 12px;font-family:${DISPLAY};font-size:26px;line-height:1.1;font-weight:900;text-transform:uppercase;letter-spacing:-0.5px;color:${C.ink};">${c.title}</h1>
-        <p style="margin:0 0 20px;font-family:${SANS};font-size:16px;line-height:1.5;color:${C.ink};">${c.intro}</p>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr><td align="center" style="background:${codeBg};border-radius:16px;padding:20px 12px 20px 22px;font-family:${MONO};font-size:36px;line-height:1;font-weight:700;letter-spacing:10px;color:${codeInk};">${otp}</td></tr>
-        </table>
-        <p style="margin:20px 0 0;font-family:${SANS};font-size:14px;line-height:1.5;color:${C.mute};">${c.expiry}</p>
+        ${card}
       </td></tr>
       <tr><td align="center" style="padding:20px 8px 0;font-family:${SANS};font-size:13px;line-height:1.5;color:${C.mute};">
         ${footer[lang]}<br>
@@ -135,15 +116,99 @@ export function renderOtpEmail(otp: string, lang: EmailLang, purpose: CodePurpos
 </table>
 </body>
 </html>`;
+}
+
+const h1 = (text: string) =>
+  `<h1 style="margin:0 0 12px;font-family:${DISPLAY};font-size:26px;line-height:1.1;font-weight:900;text-transform:uppercase;letter-spacing:-0.5px;color:${C.ink};">${text}</h1>`;
+const para = (text: string, last = false) =>
+  `<p style="margin:0 0 ${last ? 0 : 20}px;font-family:${SANS};font-size:16px;line-height:1.5;color:${C.ink};">${text}</p>`;
+const small = (text: string) =>
+  `<p style="margin:20px 0 0;font-family:${SANS};font-size:14px;line-height:1.5;color:${C.mute};">${text}</p>`;
+const escape = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// Subject, plain text and HTML for a code email. Kept apart from sending so it
+// can be tested and previewed without Resend.
+export function renderOtpEmail(otp: string, lang: EmailLang, purpose: CodePurpose = 'sign-in') {
+  const c = copy[purpose][lang];
+  const danger = purpose === 'delete-account';
+  const warning = 'warning' in c ? c.warning : null;
+  const codeBg = danger ? C.dangerSoft : C.paper;
+  const codeInk = danger ? C.danger : C.ink;
+
+  // The code's cell has 10px more padding on the left to offset the
+  // letter-spacing trailing after its last digit, so it looks centred.
+  const card = `${
+    warning
+      ? `<p style="margin:0 0 14px;"><span style="display:inline-block;padding:6px 12px;border-radius:999px;background:${C.dangerSoft};color:${C.danger};font-family:${MONO};font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">⚠ ${warning}</span></p>`
+      : ''
+  }
+        ${h1(c.title)}
+        ${para(c.intro)}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr><td align="center" style="background:${codeBg};border-radius:16px;padding:20px 12px 20px 22px;font-family:${MONO};font-size:36px;line-height:1;font-weight:700;letter-spacing:10px;color:${codeInk};">${otp}</td></tr>
+        </table>
+        ${small(c.expiry)}`;
 
   return {
     subject: c.subject(otp),
     text: `${c.title}\n\n${c.intro}\n\n${otp}\n\n${c.expiry}\n\n— ThatWish · https://thatwish.com`,
-    html,
+    html: shell(lang, c.subject(otp), c.preheader, card),
   };
 }
 
 export async function sendOtpEmail(to: string, otp: string, lang: EmailLang, purpose: CodePurpose = 'sign-in') {
   const { error } = await resend().emails.send({ from, to, ...renderOtpEmail(otp, lang, purpose) });
   if (error) throw new Error(`Resend: ${error.message}`);
+}
+
+const santaCopy = {
+  en: {
+    subject: (household: string) => `Your Secret Santa draw is ready (${household})`,
+    title: 'Your draw is ready',
+    intro: (household: string) =>
+      `The Secret Santa draw for <strong>${household}</strong> is done. Open ThatWish to find out who you’re giving a gift to.`,
+    button: 'See my draw',
+    secret: 'This email doesn’t say who it is: it only shows in your account. Nobody else knows, not even the admins.',
+    preheader: 'Find out who you’re giving a gift to.',
+  },
+  fr: {
+    subject: (household: string) => `Votre pige Secret Santa est prête (${household})`,
+    title: 'Votre pige est prête',
+    intro: (household: string) =>
+      `La pige Secret Santa de <strong>${household}</strong> est faite. Ouvrez ThatWish pour découvrir à qui vous offrez un cadeau.`,
+    button: 'Voir ma pige',
+    secret: `Ce courriel ne dit pas de qui il s’agit${NB}: c’est visible seulement dans votre compte. Personne d’autre ne le sait, pas même les administrateurs.`,
+    preheader: 'Découvrez à qui vous offrez un cadeau.',
+  },
+} as const;
+
+// "Your draw is ready": never names anyone, only links to the page where the
+// signed-in member sees their own match.
+export function renderSantaEmail(household: string, link: string, lang: EmailLang) {
+  const c = santaCopy[lang];
+  const name = escape(household);
+  const card = `${h1(c.title)}
+        ${para(c.intro(name))}
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+          <tr><td style="background:${C.ink};border-radius:999px;">
+            <a href="${escape(link)}" style="display:inline-block;padding:14px 26px;font-family:${SANS};font-size:16px;font-weight:700;color:#FFFFFF;text-decoration:none;">${c.button} →</a>
+          </td></tr>
+        </table>
+        ${small(c.secret)}`;
+  return {
+    subject: c.subject(household),
+    text: `${c.title}\n\n${c.intro(household).replace(/<\/?strong>/g, '')}\n\n${c.button}: ${link}\n\n${c.secret}\n\n— ThatWish · https://thatwish.com`,
+    html: shell(lang, escape(c.subject(household)), c.preheader, card),
+  };
+}
+
+// One email per member (nobody sees the others' addresses), in batches of
+// 100, Resend's batch limit.
+export async function sendSantaEmails(to: string[], household: string, link: string, lang: EmailLang) {
+  const mail = renderSantaEmail(household, link, lang);
+  for (let i = 0; i < to.length; i += 100) {
+    const { error } = await resend().batch.send(to.slice(i, i + 100).map((addr) => ({ from, to: addr, ...mail })));
+    if (error) throw new Error(`Resend: ${error.message}`);
+  }
 }

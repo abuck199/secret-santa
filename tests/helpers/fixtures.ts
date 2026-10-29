@@ -1,5 +1,6 @@
 // Small builders for test data, written straight to the test DB.
 
+import { eq } from 'drizzle-orm';
 import { expect } from 'vitest';
 import type { ActionResult } from '@/server/result';
 import type { SessionUser } from '@/server/session';
@@ -68,10 +69,15 @@ export async function makeInvite(householdId: string, by: SessionUser, opts: { c
   return code;
 }
 
-export async function makeDraw(householdId: string, pairs: [SessionUser, SessionUser][]) {
+// An announced draw (what members can see), unless `announced: false`.
+export async function makeDraw(householdId: string, pairs: [SessionUser, SessionUser][], opts: { announced?: boolean } = {}) {
   for (const [giver, receiver] of pairs) {
     await db.insert(assignments).values({ householdId, giverId: giver.id, receiverId: receiver.id });
   }
+  await db
+    .update(households)
+    .set({ santaAnnouncedAt: opts.announced === false ? null : new Date() })
+    .where(eq(households.id, householdId));
 }
 
 // Unwrap an ActionResult in tests: assert it succeeded, or failed with `code`.

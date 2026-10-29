@@ -24,6 +24,8 @@ export type ErrorCode =
   | 'already_reserved'
   | 'santa_disabled'
   | 'santa_min_members'
+  | 'santa_impossible'
+  | 'santa_not_drawn'
   | 'household_cap'
   | 'invalid_code'
   | 'code_expired'

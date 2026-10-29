@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderOtpEmail, type CodePurpose, type EmailLang } from '@/lib/email';
+import { renderOtpEmail, renderSantaEmail, type CodePurpose, type EmailLang } from '@/lib/email';
 
 const cases: [CodePurpose, EmailLang][] = [
   ['sign-in', 'en'],
@@ -32,5 +32,18 @@ describe('code emails', () => {
       expect(src).toMatch(/^https:\/\/thatwish\.com\//);
       expect(src).not.toMatch(/\.svg$/);
     }
+  });
+});
+
+describe('Secret Santa announcement', () => {
+  it.each(['en', 'fr'] as const)('links to the draw page without naming anyone (%s)', (lang) => {
+    const mail = renderSantaEmail('Famille <Tremblay>', 'https://thatwish.com/app/match', lang);
+    expect(mail.html).toContain('href="https://thatwish.com/app/match"');
+    expect(mail.text).toContain('https://thatwish.com/app/match');
+    expect(mail.subject).toContain('Famille <Tremblay>');
+    // The household name is escaped in the HTML.
+    expect(mail.html).toContain('Famille &lt;Tremblay&gt;');
+    expect(mail.html).not.toContain('<Tremblay>');
+    expect(mail.html).toContain(`<html lang="${lang}">`);
   });
 });

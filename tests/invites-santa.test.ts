@@ -1,17 +1,26 @@
-import { eq } from 'drizzle-orm';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { assignments } from '@/db/schema';
+import { and, eq } from 'drizzle-orm';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { assignments, memberships, santaExclusions } from '@/db/schema';
+import { sendSantaEmails } from '@/lib/email';
 import { acceptInvite, createInvite, deleteInvite } from '@/server/actions/invites';
-import { setSecretSanta } from '@/server/actions/households';
-import { shuffleAssignments } from '@/server/actions/santa';
+import { removeMember, setSecretSanta } from '@/server/actions/households';
+import { addExclusion, announceDraw, removeExclusion, shuffleAssignments } from '@/server/actions/santa';
+import { SANTA_ANNOUNCEMENTS_PER_DAY } from '@/server/otp-throttle';
 import { getMembers } from '@/server/queries/households';
 import { getInvites } from '@/server/queries/invites';
-import { getMyAssignment } from '@/server/queries/santa';
+import { getMyAssignment, getSantaAdmin } from '@/server/queries/santa';
+import { pairKey } from '@/server/santa-draw';
 import { db, resetDb } from './helpers/db';
 import { fails, makeHousehold, makeInvite, makeUser, ok } from './helpers/fixtures';
 import { signInAs } from './helpers/session';
 
-beforeEach(resetDb);
+// The announcement email, without Resend.
+vi.mock('@/lib/email', () => ({ sendSantaEmails: vi.fn(async () => {}) }));
+
+beforeEach(async () => {
+  await resetDb();
+  vi.mocked(sendSantaEmails).mockClear();
+});
 
 describe('invites', () => {
   it('admins create up to 5 active links; expired ones free a slot', async () => {
@@ -96,11 +105,129 @@ describe('Secret Santa', () => {
     const hid = await makeHousehold(a, [{ user: b }, { user: c }], { santa: true });
     signInAs(a);
     ok(await shuffleAssignments(hid));
+    ok(await announceDraw(hid));
     const mine = await getMyAssignment(hid);
     expect(mine && [b.id, c.id]).toContain(mine!.receiverId);
     expect(Object.keys(mine!)).toEqual(['receiverId', 'receiverName']);
     ok(await setSecretSanta(hid, false));
     expect(await getMyAssignment(hid)).toBeNull();
     expect((await getMembers(hid)).length).toBe(3);
+  });
+
+  it('never pairs excluded people, in either direction', async () => {
+    const people = await Promise.all(['A', 'B', 'C', 'D', 'E', 'F'].map(makeUser));
+    const [a, b, c, d, e, f] = people;
+    const hid = await makeHousehold(a, people.slice(1).map((user) => ({ user })), { santa: true });
+    signInAs(a);
+    for (const [x, y] of [[a, b], [c, d], [e, f], [a, c]]) ok(await addExclusion(hid, x.id, y.id));
+    const banned = new Set([pairKey(a.id, b.id), pairKey(c.id, d.id), pairKey(e.id, f.id), pairKey(a.id, c.id)]);
+    for (let i = 0; i < 30; i++) {
+      ok(await shuffleAssignments(hid));
+      const draw = await db.select().from(assignments).where(eq(assignments.householdId, hid));
+      expect(draw).toHaveLength(6);
+      expect(new Set(draw.map((x) => x.receiverId)).size).toBe(6);
+      expect(draw.some((x) => banned.has(pairKey(x.giverId, x.receiverId)))).toBe(false);
+    }
+  });
+
+  it('says so when the exclusions leave no possible draw, and keeps the old one', async () => {
+    const [a, b, c] = await Promise.all(['A', 'B', 'C'].map(makeUser));
+    const hid = await makeHousehold(a, [{ user: b }, { user: c }], { santa: true });
+    signInAs(a);
+    ok(await shuffleAssignments(hid));
+    const before = await db.select().from(assignments).where(eq(assignments.householdId, hid));
+    // With 3 people every pair sits next to each other in the loop.
+    ok(await addExclusion(hid, b.id, c.id));
+    fails(await shuffleAssignments(hid), 'santa_impossible');
+    expect(await db.select().from(assignments).where(eq(assignments.householdId, hid))).toEqual(before);
+  });
+
+  it('a draw stays hidden until announced, and a redraw hides it again', async () => {
+    const [a, b, c] = await Promise.all(['A', 'B', 'C'].map(makeUser));
+    const hid = await makeHousehold(a, [{ user: b }, { user: c }], { santa: true });
+    signInAs(a);
+    fails(await announceDraw(hid), 'santa_not_drawn');
+    ok(await shuffleAssignments(hid));
+    expect(await getSantaAdmin(hid)).toMatchObject({ drawn: true, announced: false });
+    for (const u of [a, b, c]) {
+      signInAs(u);
+      expect(await getMyAssignment(hid)).toBeNull();
+    }
+
+    signInAs(b);
+    fails(await announceDraw(hid), 'forbidden');
+    signInAs(a);
+    expect(ok(await announceDraw(hid))).toEqual({ emailed: true });
+    expect(sendSantaEmails).toHaveBeenCalledTimes(1);
+    const [to, household, link] = vi.mocked(sendSantaEmails).mock.calls[0];
+    expect([...to].sort()).toEqual([a.email, b.email, c.email].sort());
+    expect(household).toBe('Famille Test');
+    expect(link).toMatch(/\/app\/match$/);
+    for (const u of [a, b, c]) {
+      signInAs(u);
+      expect(await getMyAssignment(hid)).not.toBeNull();
+    }
+
+    // Announcing again sends nothing more.
+    signInAs(a);
+    expect(ok(await announceDraw(hid))).toEqual({ emailed: false });
+    expect(sendSantaEmails).toHaveBeenCalledTimes(1);
+
+    ok(await shuffleAssignments(hid));
+    expect(await getSantaAdmin(hid)).toMatchObject({ drawn: true, announced: false });
+    signInAs(b);
+    expect(await getMyAssignment(hid)).toBeNull();
+  });
+
+  it(`emails a household at most ${SANTA_ANNOUNCEMENTS_PER_DAY} times a day, but still announces`, async () => {
+    const [a, b, c] = await Promise.all(['A', 'B', 'C'].map(makeUser));
+    const hid = await makeHousehold(a, [{ user: b }, { user: c }], { santa: true });
+    signInAs(a);
+    for (let i = 0; i < SANTA_ANNOUNCEMENTS_PER_DAY; i++) {
+      ok(await shuffleAssignments(hid));
+      expect(ok(await announceDraw(hid))).toEqual({ emailed: true });
+    }
+    ok(await shuffleAssignments(hid));
+    expect(ok(await announceDraw(hid))).toEqual({ emailed: false });
+    expect(sendSantaEmails).toHaveBeenCalledTimes(SANTA_ANNOUNCEMENTS_PER_DAY);
+    expect(await getSantaAdmin(hid)).toMatchObject({ announced: true });
+  });
+
+  it('exclusions: admins only, between two different members, gone with a removed member', async () => {
+    const [a, b, c, outsider] = await Promise.all(['A', 'B', 'C', 'Out'].map(makeUser));
+    const hid = await makeHousehold(a, [{ user: b }, { user: c }], { santa: true });
+    signInAs(b);
+    fails(await addExclusion(hid, a.id, c.id), 'forbidden');
+    await expect(getSantaAdmin(hid)).rejects.toThrow();
+
+    signInAs(a);
+    fails(await addExclusion(hid, b.id, b.id), 'invalid_input');
+    fails(await addExclusion(hid, b.id, outsider.id), 'not_found');
+    const { id } = ok(await addExclusion(hid, c.id, b.id));
+    // Same pair the other way round: no duplicate.
+    expect(ok(await addExclusion(hid, b.id, c.id))).toEqual({ id });
+    const { exclusions } = await getSantaAdmin(hid);
+    expect(exclusions).toHaveLength(1);
+    expect([exclusions[0].a.name, exclusions[0].b.name].sort()).toEqual(['B', 'C']);
+
+    // Another household's admin can't remove it.
+    const hid2 = await makeHousehold(outsider);
+    signInAs(outsider);
+    ok(await removeExclusion(hid2, id));
+    signInAs(a);
+    expect((await getSantaAdmin(hid)).exclusions).toHaveLength(1);
+
+    ok(await addExclusion(hid, a.id, b.id));
+    const [mb] = await db
+      .select({ id: memberships.id })
+      .from(memberships)
+      .where(and(eq(memberships.householdId, hid), eq(memberships.userId, b.id)));
+    ok(await removeMember(mb.id));
+    expect(await db.select().from(santaExclusions).where(eq(santaExclusions.householdId, hid))).toHaveLength(0);
+
+    ok(await addExclusion(hid, a.id, c.id));
+    const left = await getSantaAdmin(hid);
+    ok(await removeExclusion(hid, left.exclusions[0].id));
+    expect((await getSantaAdmin(hid)).exclusions).toHaveLength(0);
   });
 });

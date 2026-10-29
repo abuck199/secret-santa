@@ -76,14 +76,23 @@ users, so no data was migrated.
 - Can't leave while Secret Santa is on and you're in the draw (`in_active_draw`); the admin turns
   it off after the season or removes you. Leaving/removal: your items in that household go,
   unbought reservations are released, bought ones stay taken (anonymously), your draw pairings
-  are voided.
+  and exclusions are voided.
 - Invites: 16-hex codes, multi-use, 30 days, max 5 active per household (locked count). Unknown
   and expired codes give the same error. Everyone who joins by link is a plain member; who
   joined through which link is in `invite_redemptions`. A removed member can rejoin with a
   valid link.
 - Wishlist: max 50 items per person per household (advisory lock), links re-validated
-  server-side (`src/lib/url.ts`). Draw: crypto shuffle, cyclic pairing, ≥3 members; nobody
-  (admins included) sees the full draw (the admin's draw animation shows names, never pairs).
+  server-side (`src/lib/url.ts`). Draw (`src/server/santa-draw.ts`): crypto shuffle, cyclic
+  pairing, ≥3 members; nobody (admins included) sees the full draw (the admin's draw
+  animation shows names, never pairs).
+- Secret Santa flow: the admin lists **exclusions** (`santa_exclusions`, pairs like partners
+  who must not draw each other, either direction; `santa_impossible` when no draw fits). A new
+  draw is a hidden **draft** (`households.santa_announced_at` null) the admin can redo; members
+  see their match only after **Announce** (`announceDraw`), which emails everyone in the draw a
+  name-free "your draw is ready" link (admin's language, link from `BETTER_AUTH_URL`, never the
+  Host header; max 3 rounds/day per household, then it announces without emails). Redrawing
+  resets to draft. The UI never checks a draft against new exclusions (that would hint at
+  pairs); it just says "redo the draw".
 - Link preview (`src/server/link-preview.ts`, action `previewLink`, signed-in only): pasting a
   shop link fills the photo (`image_url`, https only, kept only with a link) and the name if
   empty. It fetches user-supplied URLs, so it is SSRF-guarded: http(s) on 80/443, every
@@ -168,7 +177,9 @@ users, so no data was migrated.
   with a leading space to keep it out of shell history), so the URL never passes through Claude.
 - Migrations: `0000` baseline; `0001` dropped the unused `invites` columns (`email`, `role`,
   `accepted_by`, `accepted_at`); `0002` added `wishlist_items.image_url` (additive: migrate
-  production before deploying the code that reads it).
+  production before deploying the code that reads it); `0003` added `santa_exclusions` and
+  `households.santa_announced_at` (additive; marks existing draws announced so they stay
+  visible).
 - `BETTER_AUTH_URL` is set for Production only; previews infer it from the request. A wrong value
   causes `INVALID_ORIGIN` on sign-in.
 - Secrets (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`) stay

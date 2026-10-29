@@ -83,6 +83,9 @@ export const households = pgTable('households', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   secretSantaEnabled: boolean('secret_santa_enabled').notNull().default(false),
+  // A new draw stays hidden (a draft the admin can redo) until announced:
+  // then members see their match and get an email. Null = not announced.
+  santaAnnouncedAt: timestamp('santa_announced_at', { withTimezone: true }),
   ownerId: uuid('owner_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -132,6 +135,16 @@ export const wishlistItems = pgTable('wishlist_items', {
   displayOrder: integer('display_order').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [index('wishlist_household_idx').on(t.householdId)]);
+
+// Pairs who must not draw each other in Secret Santa (e.g. partners), in
+// either direction. Stored once per pair, with user_a < user_b.
+export const santaExclusions = pgTable('santa_exclusions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  householdId: uuid('household_id').notNull().references(() => households.id, { onDelete: 'cascade' }),
+  userA: uuid('user_a').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userB: uuid('user_b').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [unique().on(t.householdId, t.userA, t.userB)]);
 
 export const assignments = pgTable('assignments', {
   id: uuid('id').primaryKey().defaultRandom(),
