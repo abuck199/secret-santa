@@ -127,7 +127,7 @@ export default function NavBar({
           Solid background on purpose: a backdrop-filter would become the
           containing block of the account sheet's position: fixed. */}
       <nav className="sticky top-0 z-40 bg-paper">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 h-[72px] flex items-center justify-between gap-3">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-4 min-w-0">
             <Link href="/app" aria-label={t('nav.dashboard')} className="hidden md:block shrink-0">
               <Brand size="sm" />
@@ -140,11 +140,11 @@ export default function NavBar({
                 aria-haspopup="menu"
                 aria-expanded={switcherOpen}
                 aria-label={`${t('nav.switchHousehold')}: ${current.name}`}
-                className="press flex items-center gap-2.5 h-12 max-w-full pl-1.5 pr-4 rounded-full bg-panel shadow-soft text-base font-semibold text-fg"
+                className="press flex items-center gap-2 h-11 max-w-full pl-1.5 pr-3.5 rounded-full bg-panel shadow-soft text-[15px] font-semibold text-fg"
               >
                 <span
                   aria-hidden="true"
-                  className="w-9 h-9 shrink-0 rounded-full bg-sun grid place-items-center font-display font-black text-[13px]"
+                  className="w-8 h-8 shrink-0 rounded-full bg-sun grid place-items-center font-display font-black text-xs"
                 >
                   {initials(current.name)}
                 </span>
@@ -184,7 +184,7 @@ export default function NavBar({
                   key={path}
                   href={path}
                   aria-current={active ? 'page' : undefined}
-                  className={`press flex items-center gap-2 h-11 px-4 rounded-full text-[15px] font-semibold transition-colors ${
+                  className={`press flex items-center gap-2 h-10 px-3.5 rounded-full text-sm font-semibold transition-colors ${
                     active ? 'bg-sun text-fg' : 'text-mute hover:text-fg hover:bg-panel'
                   }`}
                 >
@@ -203,7 +203,7 @@ export default function NavBar({
               aria-label={t('a11y.account')}
               aria-haspopup="menu"
               aria-expanded={accountOpen}
-              className="press w-12 h-12 rounded-full bg-brand text-white font-display font-black text-lg grid place-items-center"
+              className="press w-11 h-11 rounded-full bg-brand text-white font-display font-black text-base grid place-items-center"
             >
               {initials(name)}
             </button>
@@ -221,12 +221,12 @@ export default function NavBar({
                   <div className="flex items-center gap-3 px-2 py-3 border-b border-line">
                     <span
                       aria-hidden="true"
-                      className="w-12 h-12 shrink-0 rounded-full bg-brand text-white font-display font-black text-lg grid place-items-center"
+                      className="w-11 h-11 shrink-0 rounded-full bg-brand text-white font-display font-black text-base grid place-items-center"
                     >
                       {initials(name)}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-lg text-fg truncate">{name}</p>
+                      <p className="font-semibold text-base text-fg truncate">{name}</p>
                       <p className="text-sm text-mute truncate">
                         {current.name} · {current.role === 'admin' ? t('common.admin') : t('common.member')}
                       </p>
@@ -234,7 +234,7 @@ export default function NavBar({
                     <button
                       onClick={closeAll}
                       aria-label={t('a11y.closeMenu')}
-                      className="md:hidden w-12 h-12 grid place-items-center rounded-full text-mute hover:bg-panel-2"
+                      className="md:hidden w-11 h-11 grid place-items-center rounded-full text-mute hover:bg-panel-2"
                     >
                       <X className="w-5 h-5" aria-hidden="true" />
                     </button>
@@ -246,14 +246,14 @@ export default function NavBar({
                         href={href}
                         onClick={closeAll}
                         aria-current={isActive(href) ? 'page' : undefined}
-                        className="w-full min-h-14 md:min-h-12 flex items-center gap-3 px-3 rounded-2xl text-base font-semibold text-fg hover:bg-panel-2"
+                        className="w-full min-h-12 md:min-h-11 flex items-center gap-3 px-3 rounded-2xl text-[15px] font-semibold text-fg hover:bg-panel-2"
                       >
                         <Icon className="w-5 h-5 text-mute" strokeWidth={2.2} aria-hidden="true" /> {label}
                       </Link>
                     ))}
                   </div>
                   <div className="flex items-center justify-between gap-3 px-3 py-3 border-t border-line">
-                    <span className="text-base font-semibold text-fg">{t('a11y.language')}</span>
+                    <span className="text-[15px] font-semibold text-fg">{t('a11y.language')}</span>
                     <LanguageToggle />
                   </div>
                   <button
@@ -261,7 +261,7 @@ export default function NavBar({
                       closeAll();
                       signOut();
                     }}
-                    className="w-full min-h-14 md:min-h-12 mb-3 md:mb-0 flex items-center gap-3 px-3 rounded-2xl text-base font-semibold text-red-700 hover:bg-red-500/10 border-t border-line"
+                    className="w-full min-h-12 md:min-h-11 mb-3 md:mb-0 flex items-center gap-3 px-3 rounded-2xl text-[15px] font-semibold text-red-700 hover:bg-red-500/10 border-t border-line"
                   >
                     <LogOut className="w-5 h-5" aria-hidden="true" /> {t('auth.signOut')}
                   </button>
@@ -290,10 +290,10 @@ export default function NavBar({
               field?.scrollIntoView({ block: 'center', behavior: 'smooth' });
               field?.focus({ preventScroll: true });
             }}
-            className="flex flex-col items-center justify-end gap-0.5 min-h-14 text-[13px] font-bold text-fg"
+            className="flex flex-col items-center justify-end gap-0.5 min-h-[52px] pb-1 text-xs font-bold text-fg"
           >
-            <span className="press -mt-7 w-14 h-14 rounded-full bg-fg text-white grid place-items-center border-4 border-paper">
-              <Plus className="w-7 h-7" strokeWidth={2.6} aria-hidden="true" />
+            <span className="press -mt-6 w-[52px] h-[52px] rounded-full bg-fg text-white grid place-items-center border-4 border-paper">
+              <Plus className="w-6 h-6" strokeWidth={2.6} aria-hidden="true" />
             </span>
             {t('common.add')}
           </Link>
@@ -310,11 +310,11 @@ function Tab({ label, icon: Icon, path, active }: { label: string; icon: Icon; p
     <Link
       href={path}
       aria-current={active ? 'page' : undefined}
-      className={`press flex flex-col items-center justify-center gap-0.5 min-h-14 rounded-2xl text-[13px] leading-tight text-center transition-colors ${
+      className={`press flex flex-col items-center justify-center gap-0.5 min-h-[52px] rounded-2xl text-xs leading-tight text-center transition-colors ${
         active ? 'bg-paper text-fg font-bold' : 'text-mute font-semibold'
       }`}
     >
-      <Icon className="w-6 h-6" strokeWidth={2.2} aria-hidden="true" />
+      <Icon className="w-[22px] h-[22px]" strokeWidth={2.2} aria-hidden="true" />
       {label}
     </Link>
   );

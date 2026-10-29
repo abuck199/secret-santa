@@ -89,19 +89,19 @@ export default function ConfirmModal({
         <button
           onClick={onCancel}
           aria-label={t('common.cancel')}
-          className="absolute right-3 top-3 w-12 h-12 grid place-items-center rounded-full text-mute hover:text-fg hover:bg-panel-2"
+          className="absolute right-3 top-3 w-11 h-11 grid place-items-center rounded-full text-mute hover:text-fg hover:bg-panel-2"
         >
           <X className="w-5 h-5" aria-hidden="true" />
         </button>
         <div
-          className={`w-12 h-12 rounded-2xl grid place-items-center mb-4 ${
+          className={`w-11 h-11 rounded-2xl grid place-items-center mb-3 ${
             danger ? 'bg-red-500/10 text-red-700' : 'bg-brand-soft text-brand-ink'
           }`}
         >
           <AlertTriangle className="w-6 h-6" aria-hidden="true" />
         </div>
-        <h3 id={titleId} className="heading text-2xl text-fg pr-10">{title}</h3>
-        {message && <p id={msgId} className="text-base text-mute mt-3 leading-relaxed">{message}</p>}
+        <h3 id={titleId} className="heading text-xl text-fg pr-10">{title}</h3>
+        {message && <p id={msgId} className="text-[15px] text-mute mt-2.5 leading-relaxed">{message}</p>}
         <div className="flex flex-col-reverse sm:flex-row gap-3 mt-6 mb-4 sm:mb-0">
           <button className="btn-secondary flex-1" onClick={onCancel} disabled={loading}>
             {t('common.cancel')}

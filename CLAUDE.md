@@ -30,8 +30,9 @@ users, so no data was migrated.
   (action buttons), one brand colour (raspberry `brand`; `brand-ink` for small text/links,
   `brand-soft` washes) for everything about people, `sun` (yellow) for "this is yours". Fonts
   (`src/app/fonts.ts`): Archivo `font-display` (titles, uppercase), IBM Plex Sans body, IBM Plex
-  Mono `font-mono` labels. Built for older, less tech-savvy relatives too: ≥48px labelled buttons,
-  ≥15px text, confirmation before reserving, state never shown by colour alone. Animations are
+  Mono `font-mono` labels. Built for older, less tech-savvy relatives too: ≥44px labelled touch
+  targets, ~15px body text (the owner found larger sizes too big), confirmation before
+  reserving, state never shown by colour alone. Animations are
   part of the product (transitions, celebrations, reveals) and must honour reduced motion.
 
 ## Architecture rules
