@@ -14,6 +14,7 @@ import {
   LogOut,
   Plus,
   Settings,
+  Ticket,
   User,
   Users,
   X,
@@ -65,7 +66,7 @@ export default function NavBar({
     ...(current.secretSantaEnabled ? [{ label: t('nav.assignment'), icon: Heart, path: '/app/match' }] : []),
   ];
   // Phones: 2 tabs, the add button, 2 tabs. The Secret Santa page is reached
-  // from the home screen and the account menu.
+  // from the home screen and the group menu.
   const [home, list, members, gifts] = items;
 
   const isActive = (path: string) =>
@@ -114,12 +115,21 @@ export default function NavBar({
     router.refresh();
   }
 
+  // Two menus, one job each: the group pill holds everything about the group,
+  // the avatar only what's about you.
   const accountLinks: { label: string; icon: Icon; href: string }[] = [
-    ...(current.secretSantaEnabled ? [{ label: t('nav.assignment'), icon: Heart, href: '/app/match' }] : []),
     { label: t('nav.profile'), icon: User, href: '/app/profile' },
-    { label: t('nav.settings'), icon: Settings, href: '/app/settings' },
     { label: t('nav.faq'), icon: HelpCircle, href: '/app/help' },
   ];
+  const groupLinks: { label: string; icon: Icon; href: string; phoneOnly?: boolean }[] = [
+    { label: t('nav.settings'), icon: Settings, href: '/app/settings' },
+    // Desktop shows "My match" in the top bar; phones have no room for it in the tab bar.
+    ...(current.secretSantaEnabled
+      ? [{ label: t('nav.assignment'), icon: Heart, href: '/app/match', phoneOnly: true }]
+      : []),
+  ];
+  const menuRow = 'w-full min-h-12 md:min-h-11 flex items-center gap-3 px-3 rounded-2xl text-[15px] font-semibold text-fg hover:bg-panel-2';
+  const menuIcon = 'w-5 h-5 text-mute shrink-0';
 
   return (
     <>
@@ -133,13 +143,13 @@ export default function NavBar({
               <Brand size="sm" />
             </Link>
 
-            {/* Household switcher */}
+            {/* Group menu: switch, manage, create, join */}
             <div className="relative min-w-0" ref={switcherRef}>
               <button
                 onClick={() => setSwitcherOpen((o) => !o)}
                 aria-haspopup="menu"
                 aria-expanded={switcherOpen}
-                aria-label={`${t('nav.switchHousehold')}: ${current.name}`}
+                aria-label={`${t('nav.groupMenu')}: ${current.name}`}
                 className="press flex items-center gap-2 h-11 max-w-full pl-1.5 pr-3.5 rounded-full bg-panel shadow-soft text-[15px] font-semibold text-fg"
               >
                 <span
@@ -153,23 +163,57 @@ export default function NavBar({
               </button>
               {switcherOpen && (
                 <div className="absolute left-0 mt-2 w-72 max-w-[calc(100vw-2rem)] z-50 card shadow-card p-2 animate-scale-in">
-                  {households.map((h) => (
-                    <button
-                      key={h.id}
-                      onClick={() => pickHousehold(h.id)}
-                      className="w-full min-h-12 flex items-center justify-between gap-2 px-3 rounded-2xl text-base hover:bg-panel-2 text-left text-fg"
-                    >
-                      <span className="truncate">{h.name}</span>
-                      {h.id === current.id && <Check className="w-5 h-5 text-brand-ink shrink-0" aria-hidden="true" />}
-                    </button>
-                  ))}
-                  <Link
-                    href="/app/new"
-                    onClick={closeAll}
-                    className="w-full min-h-12 flex items-center gap-2 px-3 rounded-2xl text-base text-fg hover:bg-panel-2 font-semibold mt-1 border-t border-line"
-                  >
-                    <Plus className="w-5 h-5 text-brand-ink" aria-hidden="true" /> {t('nav.newHousehold')}
-                  </Link>
+                  <p className="eyebrow px-3 pt-2 pb-1">{t('nav.yourGroups')}</p>
+                  {households.map((h) => {
+                    const here = h.id === current.id;
+                    return (
+                      <button
+                        key={h.id}
+                        onClick={() => pickHousehold(h.id)}
+                        aria-current={here ? 'true' : undefined}
+                        className={`w-full min-h-12 flex items-center gap-3 px-3 rounded-2xl text-left text-fg hover:bg-panel-2 ${
+                          here ? 'bg-sun-soft' : ''
+                        }`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`w-8 h-8 shrink-0 rounded-full grid place-items-center font-display font-black text-xs ${
+                            here ? 'bg-sun' : 'bg-panel-2'
+                          }`}
+                        >
+                          {initials(h.name)}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[15px] font-semibold">{h.name}</span>
+                          <span className="block text-xs text-mute">
+                            {h.role === 'admin' ? t('common.admin') : t('common.member')}
+                          </span>
+                        </span>
+                        {here && <Check className="w-5 h-5 text-fg shrink-0" strokeWidth={2.6} aria-hidden="true" />}
+                      </button>
+                    );
+                  })}
+                  <div className="mt-1 pt-1 border-t border-line">
+                    {groupLinks.map(({ label, icon: Icon, href, phoneOnly }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={closeAll}
+                        aria-current={isActive(href) ? 'page' : undefined}
+                        className={`${menuRow} ${phoneOnly ? 'md:hidden' : ''}`}
+                      >
+                        <Icon className={menuIcon} strokeWidth={2.2} aria-hidden="true" /> {label}
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="mt-1 pt-1 border-t border-line">
+                    <Link href="/app/new" onClick={closeAll} className={menuRow}>
+                      <Plus className="w-5 h-5 text-brand-ink shrink-0" strokeWidth={2.4} aria-hidden="true" /> {t('nav.createGroup')}
+                    </Link>
+                    <Link href="/app/new/join" onClick={closeAll} className={menuRow}>
+                      <Ticket className="w-5 h-5 text-brand-ink shrink-0" strokeWidth={2.2} aria-hidden="true" /> {t('nav.joinGroup')}
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
@@ -225,12 +269,7 @@ export default function NavBar({
                     >
                       {initials(name)}
                     </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-base text-fg truncate">{name}</p>
-                      <p className="text-sm text-mute truncate">
-                        {current.name} · {current.role === 'admin' ? t('common.admin') : t('common.member')}
-                      </p>
-                    </div>
+                    <p className="min-w-0 flex-1 font-semibold text-base text-fg truncate">{name}</p>
                     <button
                       onClick={closeAll}
                       aria-label={t('a11y.closeMenu')}
@@ -246,9 +285,9 @@ export default function NavBar({
                         href={href}
                         onClick={closeAll}
                         aria-current={isActive(href) ? 'page' : undefined}
-                        className="w-full min-h-12 md:min-h-11 flex items-center gap-3 px-3 rounded-2xl text-[15px] font-semibold text-fg hover:bg-panel-2"
+                        className={menuRow}
                       >
-                        <Icon className="w-5 h-5 text-mute" strokeWidth={2.2} aria-hidden="true" /> {label}
+                        <Icon className={menuIcon} strokeWidth={2.2} aria-hidden="true" /> {label}
                       </Link>
                     ))}
                   </div>

@@ -21,7 +21,7 @@ const EN: LegalSection[] = [
       'Account information you provide: your email address, display name, and date of birth.',
       'Sign-in codes: we sign you in by emailing you a one-time code. We store it only in hashed form, until it is used or expires a few minutes later.',
       'Bot check: when you request a sign-in code, Cloudflare Turnstile checks that the request comes from a person, using technical signals such as your IP address and browser characteristics. It is not used for advertising.',
-      'Content you create: wishlist items and links, gift reservations, household memberships, and - if your household enables it - Secret Santa assignments and the pairs who shouldn’t draw each other.',
+      'Content you create: wishlist items and links, gift reservations, group memberships, and - if your group enables it - Secret Santa assignments and the pairs who shouldn’t draw each other.',
       'Product photos: when you add a shop link, ThatWish reads that page’s public title and photo. The photo is then shown straight from the shop’s website, which, like any image, can see the viewer’s IP address.',
       'Limited technical data: privacy-friendly, aggregate, cookieless usage analytics. We do not use advertising or cross-site tracking.',
     ],
@@ -53,7 +53,7 @@ const EN: LegalSection[] = [
   {
     h: 'How long we keep it',
     body: [
-      'We keep your information while your account is active. You can delete your wishlists, leave households, or delete your account at any time, after which we remove your personal data within a reasonable period.',
+      'We keep your information while your account is active. You can delete your wishlists, leave groups, or delete your account at any time, after which we remove your personal data within a reasonable period.',
     ],
   },
   {
@@ -96,7 +96,7 @@ const FR: LegalSection[] = [
       'Informations de compte que vous fournissez : votre adresse courriel, votre nom affiché et votre date de naissance.',
       'Codes de connexion : nous vous connectons en vous envoyant un code à usage unique par courriel. Nous le conservons uniquement sous forme hachée, jusqu’à ce qu’il soit utilisé ou qu’il expire quelques minutes plus tard.',
       'Vérification anti-robot : lorsque vous demandez un code de connexion, Cloudflare Turnstile vérifie que la demande vient d’une personne, à l’aide de signaux techniques comme votre adresse IP et les caractéristiques de votre navigateur. Elle ne sert pas à la publicité.',
-      'Contenu que vous créez : articles et liens de liste de souhaits, réservations de cadeaux, adhésions à des foyers et - si votre foyer l’active - attributions Secret Santa et duos qui ne doivent pas se piger.',
+      'Contenu que vous créez : articles et liens de liste de souhaits, réservations de cadeaux, adhésions à des groupes et - si votre groupe l’active - attributions Secret Santa et duos qui ne doivent pas se piger.',
       'Photos de produits : quand vous ajoutez le lien d’un magasin, ThatWish lit le titre et la photo publics de cette page. La photo est ensuite affichée directement depuis le site du magasin, qui, comme pour toute image, peut voir l’adresse IP de la personne qui la regarde.',
       'Données techniques limitées : analyses d’utilisation agrégées, sans témoin et respectueuses de la vie privée. Aucune publicité ni suivi intersites.',
     ],
@@ -128,7 +128,7 @@ const FR: LegalSection[] = [
   {
     h: 'Durée de conservation',
     body: [
-      'Nous conservons vos renseignements tant que votre compte est actif. Vous pouvez supprimer vos listes, quitter des foyers ou supprimer votre compte à tout moment ; nous retirons alors vos données personnelles dans un délai raisonnable.',
+      'Nous conservons vos renseignements tant que votre compte est actif. Vous pouvez supprimer vos listes, quitter des groupes ou supprimer votre compte à tout moment ; nous retirons alors vos données personnelles dans un délai raisonnable.',
     ],
   },
   {

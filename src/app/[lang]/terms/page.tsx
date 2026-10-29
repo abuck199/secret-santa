@@ -4,7 +4,7 @@ import { getLang, getT } from '@/i18n/server';
 import { publicMetadata } from '@/lib/seo';
 
 // Bump on every content change (and set it to the go-live date at cutover).
-const UPDATED = '2026-10-28';
+const UPDATED = '2026-10-29';
 
 const EN: LegalSection[] = [
   {
@@ -16,7 +16,7 @@ const EN: LegalSection[] = [
   {
     h: 'The service',
     body: [
-      'ThatWish lets households and groups keep shared wishlists, reserve gifts privately, see upcoming birthdays, and optionally run a Secret Santa draw.',
+      'ThatWish lets families, friends and other groups keep shared wishlists, reserve gifts privately, see upcoming birthdays, and optionally run a Secret Santa draw.',
     ],
   },
   {
@@ -34,7 +34,7 @@ const EN: LegalSection[] = [
   {
     h: 'Your content',
     body: [
-      'You keep ownership of the content you add (wishlist items, links, names). You grant us a limited licence to host and display that content to the members of your households so the service can function.',
+      'You keep ownership of the content you add (wishlist items, links, names). You grant us a limited licence to host and display that content to the members of your groups so the service can function.',
     ],
   },
   {
@@ -78,7 +78,7 @@ const FR: LegalSection[] = [
   {
     h: 'Le service',
     body: [
-      'ThatWish permet aux foyers et aux groupes de tenir des listes de souhaits partagées, de réserver des cadeaux en privé, de voir les anniversaires à venir et, en option, de lancer un tirage Secret Santa.',
+      'ThatWish permet aux familles, aux amis et à d’autres groupes de tenir des listes de souhaits partagées, de réserver des cadeaux en privé, de voir les anniversaires à venir et, en option, de lancer un tirage Secret Santa.',
     ],
   },
   {
@@ -96,7 +96,7 @@ const FR: LegalSection[] = [
   {
     h: 'Votre contenu',
     body: [
-      'Vous conservez la propriété du contenu que vous ajoutez (articles, liens, noms). Vous nous accordez une licence limitée pour héberger et afficher ce contenu aux membres de vos foyers afin que le service fonctionne.',
+      'Vous conservez la propriété du contenu que vous ajoutez (articles, liens, noms). Vous nous accordez une licence limitée pour héberger et afficher ce contenu aux membres de vos groupes afin que le service fonctionne.',
     ],
   },
   {

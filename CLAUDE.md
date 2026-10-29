@@ -65,6 +65,11 @@ users, so no data was migrated.
   `<ViewTransition name="member-<id>" share="morph">` with its raspberry header. The "+ Add" tab
   links to `/app/list#add` (`ADD_FIELD_ID`). Per-row actions are labelled pills, never
   hover-only icons.
+- **Wording:** users see **"group" / "groupe"** (a family, friends, colleagues), never
+  "household" / "foyer" (= one roof); the code and DB keep `household`. Two menus, one job
+  each: the group pill (`NavBar`) = your groups, "Manage group" (`/app/settings`), "My match"
+  (phones), "Create a group" (`/app/new`), "Join with a code" (`/app/new/join`); the avatar =
+  only you (profile, help, language, sign out).
 - `/app` layout = guard: no name/birthday → `/welcome`, no household → `/start`, else chrome.
   The gates are routes (a layout that drops its page breaks instant-navigation validation).
 - Code style: single quotes, semicolons, short "why" comments.

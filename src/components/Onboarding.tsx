@@ -16,12 +16,18 @@ function codeFrom(input: string) {
   return trimmed.match(/\/join\/([^/?#\s]+)/)?.[1] ?? trimmed;
 }
 
-// Shown when a signed-in user belongs to no household yet. Also reachable from
-// the nav ("New / join household") as `embedded`.
-export default function Onboarding({ embedded = false }: { embedded?: boolean }) {
+// Shown when a signed-in user belongs to no group yet. Also reachable from the
+// group menu ("Create a group", "Join with a code") as `embedded`.
+export default function Onboarding({
+  embedded = false,
+  initialTab = 'create',
+}: {
+  embedded?: boolean;
+  initialTab?: 'create' | 'join';
+}) {
   const { t } = useI18n();
   const router = useRouter();
-  const [tab, setTab] = useState<'create' | 'join'>('create');
+  const [tab, setTab] = useState(initialTab);
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -129,7 +135,7 @@ export default function Onboarding({ embedded = false }: { embedded?: boolean })
     return (
       <div className="max-w-md mx-auto px-4 py-6 sm:py-10">
         <h1 className="heading text-[26px] text-fg mb-2 animate-rise">
-          {t('nav.newHousehold')}
+          {t('onboard.embeddedTitle')}
         </h1>
         <p className="text-mute text-[15px] mb-6 animate-rise [animation-delay:60ms]">{t('onboard.subtitle')}</p>
         <div className="card p-5 sm:p-7 animate-rise [animation-delay:120ms]">{tabsAndForm}</div>
