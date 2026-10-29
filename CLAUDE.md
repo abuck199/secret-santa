@@ -188,6 +188,9 @@ account deletion and the OTP cap. **Add a test with every new action or rule.**
   Supabase-only Resend key revoked; production code emails confirmed delivered afterwards.
   Still to confirm: `VITE_*` env vars removed from Vercel, and link previews (Messenger,
   WhatsApp) work despite Vercel's bot checkpoint.
+- Google Search Console *(2026-10-29)*: domain property verified (TXT record at Namecheap, which
+  hosts the DNS), sitemap submitted, live URL test passed: Vercel's bot checkpoint lets
+  Googlebot through.
 - Hardening round 2 *(2026-10-29)*: Turnstile on sign-in, code-confirmed account deletion,
   2 owned households max, CSP without nonces. A nonce-based (strict) CSP was declined: it
   would make every page dynamic.
