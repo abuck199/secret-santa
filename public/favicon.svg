@@ -1,12 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="134 110 244 294" role="img" aria-label="Gift mark">
-  <style>
-    .box { fill: #1E1C19; }
-    @media (prefers-color-scheme: dark) { .box { fill: #F4F2EE; } }
-  </style>
-  <g transform="translate(0,10)">
-    <path d="M256 104 L267 141 L304 152 L267 163 L256 200 L245 163 L208 152 L245 141 Z" fill="#8A6321"/>
-    <rect class="box" x="138" y="216" width="236" height="46" rx="12"/>
-    <rect class="box" x="154" y="262" width="204" height="128" rx="14"/>
-    <rect x="239" y="216" width="34" height="174" fill="#8A6321"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112.64" fill="#C43C6A"/>
+  <svg x="111.53" y="81.92" width="288.95" height="348.16" viewBox="134 110 244 294">
+    <g transform="translate(0,10)">
+      <path d="M256 104 L267 141 L304 152 L267 163 L256 200 L245 163 L208 152 L245 141 Z" fill="#F4C542"/>
+      <rect x="138" y="216" width="236" height="48" rx="12" fill="#FFFFFF"/>
+      <rect x="154" y="262" width="204" height="128" rx="14" fill="#FFFFFF"/>
+      <rect x="239" y="216" width="34" height="174" fill="#F4C542"/>
+    </g>
+  </svg>
 </svg>
