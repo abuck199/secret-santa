@@ -64,7 +64,8 @@ export default function MembersList({ members, initialItems }: { members: Person
           return (
             <div
               key={m.userId}
-              className="card p-5 sm:p-6 animate-slide-up"
+              id={`m-${m.userId}`}
+              className="card p-5 sm:p-6 animate-slide-up scroll-mt-24"
               style={{ animationDelay: `${Math.min(idx, 8) * 50}ms`, animationFillMode: 'backwards' }}
             >
               <div className="flex items-center gap-3 mb-4">

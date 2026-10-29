@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowUpRight, Cake } from 'lucide-react';
+import { ArrowRight, Cake } from 'lucide-react';
 import { useI18n } from '@/i18n/client';
 import { formatBirthday } from '@/lib/dates';
+import { useCountUp } from './useCountUp';
 
-// Featured "next birthday" card with a brand-coloured progress ring that fills as the
-// date approaches.
+// Featured "next birthday" card: the brand-coloured hero of the home screen,
+// with a countdown that ticks down to the real number on arrival.
 export default function NextBirthdayCard({
   person,
   isMe,
@@ -21,75 +22,54 @@ export default function NextBirthdayCard({
   const { t, lang } = useI18n();
   const days = person.days;
   const today = days === 0;
-
-  // Ring fills over the final stretch toward the birthday.
-  const progress = Math.max(0, Math.min(1, (365 - days) / 365));
-  const r = 34;
-  const circ = 2 * Math.PI * r;
-  const offset = today ? 0 : circ * (1 - progress);
+  const shown = useCountUp(days, 1000, Math.min(days + 18, 365));
 
   return (
-    <div
-      className="card lift relative overflow-hidden p-6 sm:p-7 mb-10 animate-slide-up"
-      style={{ animationFillMode: 'backwards' }}
-    >
-      <div className="flex items-center gap-5 sm:gap-6">
-        {/* Ring */}
-        <div className="relative shrink-0 w-[92px] h-[92px]">
-          <svg width="92" height="92" viewBox="0 0 92 92" className="-rotate-90">
-            <circle cx="46" cy="46" r={r} fill="none" stroke="rgb(var(--line))" strokeWidth="5" />
-            <circle
-              cx="46"
-              cy="46"
-              r={r}
-              fill="none"
-              stroke="rgb(var(--brand))"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeDasharray={circ}
-              strokeDashoffset={offset}
-              style={{ transition: 'stroke-dashoffset 1.1s cubic-bezier(0.22,1,0.36,1)' }}
-            />
-          </svg>
-          <div className="absolute inset-0 grid place-items-center text-center">
-            {today ? (
-              <Cake className="w-8 h-8 text-brand-ink" strokeWidth={1.7} />
-            ) : (
-              <div>
-                <p className="font-display text-2xl font-medium text-fg leading-none tabular-nums">{days}</p>
-                <p className="text-[10px] uppercase tracking-[0.12em] text-mute mt-1">
-                  {days === 1 ? t('dash.dayUnit') : t('dash.daysUnit')}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
+    <section className="relative overflow-hidden rounded-3xl bg-brand text-white p-5 sm:p-7 mb-5 animate-rise [animation-delay:120ms]">
+      {/* Confetti-like shapes, purely decorative. */}
+      <span aria-hidden="true" className="absolute right-6 top-5 w-6 h-6 rounded-full bg-sun animate-float" />
+      <span
+        aria-hidden="true"
+        className="absolute right-16 top-12 w-3 h-3 rounded-[3px] bg-white/80 rotate-12 animate-float [animation-delay:600ms]"
+      />
+      <span
+        aria-hidden="true"
+        className="absolute right-7 top-16 w-4 h-4 rounded-full border-[3px] border-brand-soft animate-float [animation-delay:300ms]"
+      />
 
-        {/* Text */}
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-1.5">
-            {t('dash.nextBirthday')}
-          </p>
-          <p className="font-display text-xl sm:text-2xl font-medium text-fg leading-tight truncate">
-            {person.displayName}
-            {isMe && <span className="text-mute font-sans font-normal text-base"> · {t('common.you')}</span>}
-          </p>
-          <p className="text-sm text-mute mt-1.5">
-            {formatBirthday(person.birthday, lang)}
+      <p className="eyebrow relative">{t('dash.nextBirthday')}</p>
+
+      <div className="relative flex items-center gap-4 mt-3">
+        <div
+          aria-label={today ? whenLabel : `${days} ${days === 1 ? t('dash.dayUnit') : t('dash.daysUnit')}`}
+          className="w-[84px] h-[84px] shrink-0 rounded-[20px] bg-white text-brand-ink grid place-items-center text-center"
+        >
+          {today ? (
+            <Cake className="w-9 h-9" strokeWidth={2} aria-hidden="true" />
+          ) : (
+            <div aria-hidden="true">
+              <p className="heading text-[38px] tabular-nums">{shown}</p>
+              <p className="eyebrow mt-0.5">{days === 1 ? t('dash.dayUnit') : t('dash.daysUnit')}</p>
+            </div>
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="heading text-[32px] sm:text-4xl break-words">{person.displayName}</p>
+          <p className="text-base mt-1.5">
+            {isMe ? t('common.you') : formatBirthday(person.birthday, lang)}
             {person.age ? ` · ${t('dash.turning', { age: person.age })}` : ''}
-            {' · '}
-            <span className={today ? 'text-brand-ink font-medium' : ''}>{whenLabel}</span>
+            {today && ` · ${whenLabel}`}
           </p>
         </div>
-
-        {/* CTA */}
-        {!isMe && (
-          <Link href={href} className="btn-secondary shrink-0 hidden sm:inline-flex">
-            {t('dash.viewList')}
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
-        )}
       </div>
-    </div>
+
+      <Link
+        href={href}
+        className="press relative mt-5 inline-flex items-center gap-2 min-h-12 px-5 rounded-full bg-white text-brand-ink text-base font-semibold"
+      >
+        {isMe ? t('nav.wishlist') : t('dash.viewList')}
+        <ArrowRight className="w-5 h-5" strokeWidth={2.4} aria-hidden="true" />
+      </Link>
+    </section>
   );
 }
