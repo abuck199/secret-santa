@@ -17,7 +17,7 @@ function rememberLang(code: Locale) {
 // the OTP email read it) and reloads the same URL in that language (on a
 // crawlable /fr page, the plain URL). A full page load, not router.refresh():
 // the language is the root layout's param, and client-rendering a new root
-// layout would re-create <html> and its theme script.
+// layout would re-create <html>.
 export default function LanguageToggle({ className = '' }: { className?: string }) {
   const { lang, t } = useI18n();
   const pathname = usePathname();
@@ -29,13 +29,13 @@ export default function LanguageToggle({ className = '' }: { className?: string 
   }
 
   return (
-    <div role="group" aria-label={t('a11y.language')} className={`inline-flex items-center rounded-full border border-line p-0.5 ${className}`}>
+    <div role="group" aria-label={t('a11y.language')} className={`inline-flex items-center rounded-full bg-panel border-2 border-line p-0.5 ${className}`}>
       {LANGS.map((l) => (
         <button
           key={l.code}
           type="button"
           onClick={() => change(l.code)}
-          className={`px-2.5 py-1 rounded-full text-xs font-semibold transition ${
+          className={`min-h-10 min-w-11 px-3 rounded-full text-sm font-semibold transition ${
             lang === l.code ? 'bg-fg text-paper' : 'text-mute hover:text-fg'
           }`}
           aria-pressed={lang === l.code}

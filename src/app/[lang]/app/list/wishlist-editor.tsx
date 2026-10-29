@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   DndContext,
@@ -20,6 +20,7 @@ import {
 import { ClipboardList, Loader2, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
+import { ADD_FIELD_ID } from '@/components/NavBar';
 import PageHeader, { Page } from '@/components/PageHeader';
 import WishlistItem from '@/components/WishlistItem';
 import { useI18n } from '@/i18n/client';
@@ -37,6 +38,12 @@ export default function WishlistEditor({ householdId, initialItems }: { househol
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ item: '', link: '' });
   const [toDelete, setToDelete] = useState<MyItem | null>(null);
+
+  // Arriving from the "+ Ajouter" tab (/app/list#add): straight to the add field.
+  // Also runs when Activity reveals this page again, since effects re-mount then.
+  useEffect(() => {
+    if (window.location.hash === `#${ADD_FIELD_ID}`) document.getElementById(ADD_FIELD_ID)?.focus();
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -113,7 +120,8 @@ export default function WishlistEditor({ householdId, initialItems }: { househol
       <div className="card p-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-2">
           <input
-            className="input"
+            id={ADD_FIELD_ID}
+            className="input scroll-mt-24"
             value={form.item}
             onChange={(e) => setForm((p) => ({ ...p, item: e.target.value }))}
             onKeyDown={(e) => e.key === 'Enter' && add()}

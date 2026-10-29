@@ -12,7 +12,6 @@ import {
   HelpCircle,
   Home,
   LogOut,
-  Menu,
   Plus,
   Settings,
   User,
@@ -36,6 +35,10 @@ function initials(name: string) {
   return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || name[0].toUpperCase();
 }
 
+// The "+ Ajouter" tab: the wishlist page focuses its add field on this hash.
+export const ADD_FIELD_ID = 'add';
+const ADD_ITEM_HREF = `/app/list#${ADD_FIELD_ID}`;
+
 export default function NavBar({
   name,
   households,
@@ -49,33 +52,35 @@ export default function NavBar({
   const router = useRouter();
   const pathname = usePathname();
   const signOut = useSignOut();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLDivElement>(null);
   const switcherRef = useRef<HTMLDivElement>(null);
 
   const items: { label: string; icon: Icon; path: string }[] = [
     { label: t('nav.dashboard'), icon: Home, path: '/app' },
     { label: t('nav.wishlist'), icon: ClipboardList, path: '/app/list' },
     { label: t('nav.members'), icon: Users, path: '/app/members' },
-    { label: t('nav.reservations'), icon: Gift, path: '/app/reservations' },
+    { label: t('nav.gifts'), icon: Gift, path: '/app/reservations' },
     ...(current.secretSantaEnabled ? [{ label: t('nav.assignment'), icon: Heart, path: '/app/match' }] : []),
   ];
+  // Phones: 2 tabs, the add button, 2 tabs. The Secret Santa page is reached
+  // from the home screen and the account menu.
+  const [home, list, members, gifts] = items;
 
   const isActive = (path: string) =>
     path === '/app' ? pathname === '/app' : pathname.startsWith(path);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
-      if (switcherRef.current && !switcherRef.current.contains(e.target as Node)) setSwitcherOpen(false);
+      const target = e.target as Node;
+      if (accountRef.current && !accountRef.current.contains(target)) setAccountOpen(false);
+      if (switcherRef.current && !switcherRef.current.contains(target)) setSwitcherOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setProfileOpen(false);
+        setAccountOpen(false);
         setSwitcherOpen(false);
-        setMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', onClick);
@@ -86,16 +91,17 @@ export default function NavBar({
     };
   }, []);
 
+  // The account menu is a full sheet on phones: keep the page from scrolling behind it.
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    const phone = window.matchMedia('(max-width: 767px)').matches;
+    document.body.style.overflow = accountOpen && phone ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
-  }, [menuOpen]);
+  }, [accountOpen]);
 
   const closeAll = () => {
-    setMenuOpen(false);
-    setProfileOpen(false);
+    setAccountOpen(false);
     setSwitcherOpen(false);
   };
 
@@ -108,259 +114,208 @@ export default function NavBar({
     router.refresh();
   }
 
-  const switcher = (block: boolean) => (
-    <div className={block ? '' : 'relative'} ref={block ? undefined : switcherRef}>
-      <button
-        onClick={() => setSwitcherOpen((o) => !o)}
-        aria-haspopup="menu"
-        aria-expanded={switcherOpen}
-        aria-label={t('nav.switchHousehold')}
-        className={`flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 text-sm font-medium text-fg hover:bg-panel-2 transition ${
-          block ? 'w-full justify-between' : ''
-        }`}
-      >
-        <span className="truncate max-w-[160px]">{current.name}</span>
-        <ChevronDown className="w-4 h-4 text-mute" aria-hidden="true" />
-      </button>
-      {switcherOpen && (
-        <div className={`${block ? 'mt-2' : 'absolute left-0 mt-2 w-64'} z-50 card p-1.5 animate-scale-in`}>
-          {households.map((h) => (
-            <button
-              key={h.id}
-              onClick={() => pickHousehold(h.id)}
-              className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm hover:bg-panel-2 text-left text-fg"
-            >
-              <span className="truncate">{h.name}</span>
-              {h.id === current.id && <Check className="w-4 h-4 text-brand-ink shrink-0" />}
-            </button>
-          ))}
-          <Link
-            href="/app/new"
-            onClick={closeAll}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-fg hover:bg-panel-2 font-medium mt-1 border-t border-line"
-          >
-            <Plus className="w-4 h-4 text-brand-ink" /> {t('nav.newHousehold')}
-          </Link>
-        </div>
-      )}
-    </div>
-  );
+  const accountLinks: { label: string; icon: Icon; href: string }[] = [
+    ...(current.secretSantaEnabled ? [{ label: t('nav.assignment'), icon: Heart, href: '/app/match' }] : []),
+    { label: t('nav.profile'), icon: User, href: '/app/profile' },
+    { label: t('nav.settings'), icon: Settings, href: '/app/settings' },
+    { label: t('nav.faq'), icon: HelpCircle, href: '/app/help' },
+  ];
 
   return (
     <>
-      {/* ===== Desktop ===== */}
-      <nav className="hidden md:block sticky top-0 z-40 bg-paper/80 backdrop-blur-xl border-b border-line">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link href="/app" aria-label={t('nav.dashboard')}>
+      {/* ===== Top bar (all sizes) =====
+          Solid background on purpose: a backdrop-filter would become the
+          containing block of the account sheet's position: fixed. */}
+      <nav className="sticky top-0 z-40 bg-paper">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 h-[72px] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-4 min-w-0">
+            <Link href="/app" aria-label={t('nav.dashboard')} className="hidden md:block shrink-0">
               <Brand size="sm" />
             </Link>
-            {switcher(false)}
+
+            {/* Household switcher */}
+            <div className="relative min-w-0" ref={switcherRef}>
+              <button
+                onClick={() => setSwitcherOpen((o) => !o)}
+                aria-haspopup="menu"
+                aria-expanded={switcherOpen}
+                aria-label={`${t('nav.switchHousehold')}: ${current.name}`}
+                className="press flex items-center gap-2.5 h-12 max-w-full pl-1.5 pr-4 rounded-full bg-panel shadow-soft text-base font-semibold text-fg"
+              >
+                <span
+                  aria-hidden="true"
+                  className="w-9 h-9 shrink-0 rounded-full bg-sun grid place-items-center font-display font-black text-[13px]"
+                >
+                  {initials(current.name)}
+                </span>
+                <span className="truncate">{current.name}</span>
+                <ChevronDown className="w-4 h-4 shrink-0" strokeWidth={2.4} aria-hidden="true" />
+              </button>
+              {switcherOpen && (
+                <div className="absolute left-0 mt-2 w-72 max-w-[calc(100vw-2rem)] z-50 card shadow-card p-2 animate-scale-in">
+                  {households.map((h) => (
+                    <button
+                      key={h.id}
+                      onClick={() => pickHousehold(h.id)}
+                      className="w-full min-h-12 flex items-center justify-between gap-2 px-3 rounded-2xl text-base hover:bg-panel-2 text-left text-fg"
+                    >
+                      <span className="truncate">{h.name}</span>
+                      {h.id === current.id && <Check className="w-5 h-5 text-brand-ink shrink-0" aria-hidden="true" />}
+                    </button>
+                  ))}
+                  <Link
+                    href="/app/new"
+                    onClick={closeAll}
+                    className="w-full min-h-12 flex items-center gap-2 px-3 rounded-2xl text-base text-fg hover:bg-panel-2 font-semibold mt-1 border-t border-line"
+                  >
+                    <Plus className="w-5 h-5 text-brand-ink" aria-hidden="true" /> {t('nav.newHousehold')}
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-0.5">
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center gap-1">
             {items.map(({ label, icon: Icon, path }) => {
               const active = isActive(path);
               return (
                 <Link
                   key={path}
                   href={path}
-                  aria-label={label}
                   aria-current={active ? 'page' : undefined}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                    active ? 'text-fg' : 'text-mute hover:text-fg'
+                  className={`press flex items-center gap-2 h-11 px-4 rounded-full text-[15px] font-semibold transition-colors ${
+                    active ? 'bg-sun text-fg' : 'text-mute hover:text-fg hover:bg-panel'
                   }`}
                 >
-                  <Icon className="w-4 h-4" strokeWidth={1.9} aria-hidden="true" />
+                  <Icon className="w-[18px] h-[18px]" strokeWidth={2.2} aria-hidden="true" />
                   <span className="hidden lg:inline">{label}</span>
-                  {active && (
-                    <span aria-hidden="true" className="absolute -bottom-[1.35rem] left-2 right-2 h-0.5 bg-brand rounded-full" />
-                  )}
+                  <span className="lg:hidden sr-only">{label}</span>
                 </Link>
               );
             })}
           </div>
 
-          <div className="flex items-center gap-2">
-            <LanguageToggle />
-            <div className="relative" ref={profileRef}>
-              <button
-                onClick={() => setProfileOpen((o) => !o)}
-                aria-label={t('a11y.account')}
-                aria-haspopup="menu"
-                aria-expanded={profileOpen}
-                className="w-9 h-9 rounded-full bg-fg text-paper text-sm font-semibold grid place-items-center hover:opacity-90 transition"
-              >
-                {initials(name)}
-              </button>
-              {profileOpen && (
-                <div className="absolute right-0 mt-2 w-60 card p-1.5 animate-scale-in z-50">
-                  <div className="px-3 py-2.5 border-b border-line">
-                    <p className="font-semibold text-fg truncate">{name}</p>
-                    <p className="text-xs text-mute truncate">{current.name}</p>
-                  </div>
-                  <MenuRow icon={User} label={t('nav.profile')} href="/app/profile" onClick={closeAll} />
-                  <MenuRow icon={Settings} label={t('nav.settings')} href="/app/settings" onClick={closeAll} />
-                  <MenuRow icon={HelpCircle} label={t('nav.faq')} href="/app/help" onClick={closeAll} />
-                  <div className="border-t border-line mt-1 pt-1">
-                    <button
-                      onClick={() => {
-                        closeAll();
-                        signOut();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-500/10"
+          {/* Account menu: dropdown on desktop, bottom sheet on phones */}
+          <div className="relative shrink-0" ref={accountRef}>
+            <button
+              onClick={() => setAccountOpen((o) => !o)}
+              aria-label={t('a11y.account')}
+              aria-haspopup="menu"
+              aria-expanded={accountOpen}
+              className="press w-12 h-12 rounded-full bg-brand text-white font-display font-black text-lg grid place-items-center"
+            >
+              {initials(name)}
+            </button>
+            {accountOpen && (
+              <>
+                <div className="md:hidden fixed inset-0 z-40 bg-fg/50 animate-fade-in" onClick={closeAll} />
+                <div
+                  role="dialog"
+                  aria-label={t('a11y.account')}
+                  className="fixed md:absolute inset-x-0 bottom-0 md:left-auto md:bottom-auto md:mt-2 md:w-72 z-50
+                    bg-panel rounded-t-[28px] md:rounded-3xl shadow-card px-4 pt-3 pb-safe md:p-2
+                    animate-sheet md:animate-scale-in max-h-[85vh] overflow-y-auto"
+                >
+                  <span aria-hidden="true" className="md:hidden block w-11 h-1.5 rounded-full bg-line mx-auto mb-3" />
+                  <div className="flex items-center gap-3 px-2 py-3 border-b border-line">
+                    <span
+                      aria-hidden="true"
+                      className="w-12 h-12 shrink-0 rounded-full bg-brand text-white font-display font-black text-lg grid place-items-center"
                     >
-                      <LogOut className="w-4 h-4" /> {t('auth.signOut')}
+                      {initials(name)}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-lg text-fg truncate">{name}</p>
+                      <p className="text-sm text-mute truncate">
+                        {current.name} · {current.role === 'admin' ? t('common.admin') : t('common.member')}
+                      </p>
+                    </div>
+                    <button
+                      onClick={closeAll}
+                      aria-label={t('a11y.closeMenu')}
+                      className="md:hidden w-12 h-12 grid place-items-center rounded-full text-mute hover:bg-panel-2"
+                    >
+                      <X className="w-5 h-5" aria-hidden="true" />
                     </button>
                   </div>
+                  <div className="py-2">
+                    {accountLinks.map(({ label, icon: Icon, href }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={closeAll}
+                        aria-current={isActive(href) ? 'page' : undefined}
+                        className="w-full min-h-14 md:min-h-12 flex items-center gap-3 px-3 rounded-2xl text-base font-semibold text-fg hover:bg-panel-2"
+                      >
+                        <Icon className="w-5 h-5 text-mute" strokeWidth={2.2} aria-hidden="true" /> {label}
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between gap-3 px-3 py-3 border-t border-line">
+                    <span className="text-base font-semibold text-fg">{t('a11y.language')}</span>
+                    <LanguageToggle />
+                  </div>
+                  <button
+                    onClick={() => {
+                      closeAll();
+                      signOut();
+                    }}
+                    className="w-full min-h-14 md:min-h-12 mb-3 md:mb-0 flex items-center gap-3 px-3 rounded-2xl text-base font-semibold text-red-700 hover:bg-red-500/10 border-t border-line"
+                  >
+                    <LogOut className="w-5 h-5" aria-hidden="true" /> {t('auth.signOut')}
+                  </button>
                 </div>
-              )}
-            </div>
+              </>
+            )}
           </div>
         </div>
       </nav>
 
-      {/* ===== Mobile top ===== */}
-      <nav className="md:hidden sticky top-0 z-40 bg-paper/85 backdrop-blur-xl border-b border-line">
-        <div className="px-4 h-14 flex items-center justify-between">
-          <Link href="/app" aria-label={t('nav.dashboard')}>
-            <Brand size="sm" showMark={false} />
+      {/* ===== Phone bottom bar ===== */}
+      <nav
+        aria-label={t('nav.menu')}
+        className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-panel rounded-t-3xl shadow-bar pb-safe"
+      >
+        <div className="grid grid-cols-5 gap-1 px-2 pt-2">
+          <Tab {...home} active={isActive(home.path)} />
+          <Tab {...list} active={isActive(list.path)} />
+          <Link
+            href={ADD_ITEM_HREF}
+            onClick={(e) => {
+              // Already on the list: a same-page hash change triggers nothing, so focus the field here.
+              if (pathname !== '/app/list') return;
+              e.preventDefault();
+              const field = document.getElementById(ADD_FIELD_ID);
+              field?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+              field?.focus({ preventScroll: true });
+            }}
+            className="flex flex-col items-center justify-end gap-0.5 min-h-14 text-[13px] font-bold text-fg"
+          >
+            <span className="press -mt-7 w-14 h-14 rounded-full bg-fg text-white grid place-items-center border-4 border-paper">
+              <Plus className="w-7 h-7" strokeWidth={2.6} aria-hidden="true" />
+            </span>
+            {t('common.add')}
           </Link>
-          <span className="text-sm font-medium text-mute truncate max-w-[32vw]">{current.name}</span>
+          <Tab {...members} active={isActive(members.path)} />
+          <Tab {...gifts} active={isActive(gifts.path)} />
         </div>
       </nav>
-
-      {/* ===== Mobile bottom bar ===== */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-paper/95 backdrop-blur-xl border-t border-line pb-safe">
-        <div className="flex items-center justify-around px-2 py-1.5">
-          {items.slice(0, 3).map(({ label, icon: Icon, path }) => (
-            <Link
-              key={path}
-              href={path}
-              aria-current={isActive(path) ? 'page' : undefined}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg ${
-                isActive(path) ? 'text-fg' : 'text-mute'
-              }`}
-            >
-              <Icon className="w-5 h-5" strokeWidth={1.9} aria-hidden="true" />
-              <span className="text-[11px] font-medium">{label}</span>
-            </Link>
-          ))}
-          <button
-            onClick={() => setMenuOpen(true)}
-            aria-haspopup="dialog"
-            aria-expanded={menuOpen}
-            className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-mute"
-          >
-            <Menu className="w-5 h-5" strokeWidth={1.9} aria-hidden="true" />
-            <span className="text-[11px] font-medium">{t('nav.menu')}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ===== Mobile sheet ===== */}
-      {menuOpen && (
-        <>
-          <div
-            className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 animate-fade-in"
-            onClick={() => setMenuOpen(false)}
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label={t('nav.menu')}
-            className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-panel rounded-t-3xl shadow-card max-h-[85vh] overflow-y-auto animate-slide-up pb-safe border-t border-line"
-          >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-              <span className="font-display text-lg font-medium text-fg">{t('nav.menu')}</span>
-              <button onClick={() => setMenuOpen(false)} aria-label={t('a11y.closeMenu')} className="text-mute">
-                <X className="w-5 h-5" aria-hidden="true" />
-              </button>
-            </div>
-
-            <div className="p-5 space-y-5">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-fg text-paper font-semibold grid place-items-center">
-                  {initials(name)}
-                </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-fg truncate">{name}</p>
-                  <p className="text-xs text-mute">
-                    {current.role === 'admin' ? t('common.admin') : t('common.member')}
-                  </p>
-                </div>
-                <div className="ml-auto">
-                  <LanguageToggle />
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mute mb-2">
-                  {t('nav.switchHousehold')}
-                </p>
-                {switcher(true)}
-              </div>
-
-              <div className="space-y-1">
-                {items.map(({ label, icon, path }) => (
-                  <SheetRow key={path} icon={icon} label={label} href={path} active={isActive(path)} onClick={closeAll} />
-                ))}
-                <SheetRow icon={User} label={t('nav.profile')} href="/app/profile" active={isActive('/app/profile')} onClick={closeAll} />
-                <SheetRow icon={Settings} label={t('nav.settings')} href="/app/settings" active={isActive('/app/settings')} onClick={closeAll} />
-                <SheetRow icon={HelpCircle} label={t('nav.faq')} href="/app/help" active={isActive('/app/help')} onClick={closeAll} />
-              </div>
-
-              <button
-                onClick={() => {
-                  closeAll();
-                  signOut();
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-500/10 font-medium"
-              >
-                <LogOut className="w-5 h-5" /> {t('auth.signOut')}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
     </>
   );
 }
 
-function MenuRow({ icon: Icon, label, href, onClick }: { icon: Icon; label: string; href: string; onClick: () => void }) {
+function Tab({ label, icon: Icon, path, active }: { label: string; icon: Icon; path: string; active: boolean }) {
   return (
     <Link
-      href={href}
-      onClick={onClick}
-      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-fg hover:bg-panel-2"
-    >
-      <Icon className="w-4 h-4 text-mute" /> {label}
-    </Link>
-  );
-}
-
-function SheetRow({
-  icon: Icon,
-  label,
-  href,
-  active,
-  onClick,
-}: {
-  icon: Icon;
-  label: string;
-  href: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${
-        active ? 'bg-panel-2 text-fg' : 'text-mute hover:bg-panel-2 hover:text-fg'
+      href={path}
+      aria-current={active ? 'page' : undefined}
+      className={`press flex flex-col items-center justify-center gap-0.5 min-h-14 rounded-2xl text-[13px] leading-tight text-center transition-colors ${
+        active ? 'bg-paper text-fg font-bold' : 'text-mute font-semibold'
       }`}
     >
-      <Icon className="w-5 h-5" /> {label}
+      <Icon className="w-6 h-6" strokeWidth={2.2} aria-hidden="true" />
+      {label}
     </Link>
   );
 }

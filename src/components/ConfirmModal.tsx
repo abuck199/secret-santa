@@ -71,34 +71,38 @@ export default function ConfirmModal({
 
   if (!open) return null;
 
+  // A bottom sheet on phones (thumb-reachable), a centred card from sm up.
+  // Buttons stack on phones with the confirm action on top (col-reverse keeps
+  // Cancel first in the DOM, so Tab order stays Cancel → Confirm).
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={onCancel} />
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:px-4">
+      <div className="absolute inset-0 bg-fg/50 animate-fade-in" onClick={onCancel} />
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={message ? msgId : undefined}
-        className="relative card p-6 w-full max-w-sm animate-scale-in"
+        className="relative w-full sm:max-w-sm bg-panel rounded-t-[28px] sm:rounded-3xl shadow-card px-5 pt-3 pb-safe sm:p-6 animate-sheet sm:animate-scale-in"
       >
+        <span aria-hidden="true" className="sm:hidden block w-11 h-1.5 rounded-full bg-line mx-auto mb-4" />
         <button
           onClick={onCancel}
           aria-label={t('common.cancel')}
-          className="absolute right-4 top-4 text-mute hover:text-fg"
+          className="absolute right-3 top-3 w-12 h-12 grid place-items-center rounded-full text-mute hover:text-fg hover:bg-panel-2"
         >
           <X className="w-5 h-5" aria-hidden="true" />
         </button>
         <div
-          className={`w-11 h-11 rounded-xl grid place-items-center mb-3 ${
-            danger ? 'bg-red-500/10 text-red-600' : 'bg-brand-soft text-brand-ink'
+          className={`w-12 h-12 rounded-2xl grid place-items-center mb-4 ${
+            danger ? 'bg-red-500/10 text-red-700' : 'bg-brand-soft text-brand-ink'
           }`}
         >
           <AlertTriangle className="w-6 h-6" aria-hidden="true" />
         </div>
-        <h3 id={titleId} className="font-display text-xl font-semibold text-fg">{title}</h3>
-        {message && <p id={msgId} className="text-sm text-mute mt-1.5 leading-relaxed">{message}</p>}
-        <div className="flex gap-2 mt-5">
+        <h3 id={titleId} className="heading text-2xl text-fg pr-10">{title}</h3>
+        {message && <p id={msgId} className="text-base text-mute mt-3 leading-relaxed">{message}</p>}
+        <div className="flex flex-col-reverse sm:flex-row gap-3 mt-6 mb-4 sm:mb-0">
           <button className="btn-secondary flex-1" onClick={onCancel} disabled={loading}>
             {t('common.cancel')}
           </button>
