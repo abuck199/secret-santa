@@ -25,6 +25,14 @@ users, so no data was migrated.
 - **Vercel** (project `thatwish`), Node 24 (`engines`), `vercel.json` sets the Next.js preset.
 - **Authorization lives in the app**: one DB role, no RLS. Every mutation is a Server Action that
   reads the session and checks membership/role explicitly.
+- **Design (redesign "I2", decided with the owner 2026-10-29), light mode only (no dark mode, on
+  purpose):** tokens in `src/app/globals.css`: cream `paper`, white `panel`, near-black `fg`
+  (action buttons), one brand colour (raspberry `brand`; `brand-ink` for small text/links,
+  `brand-soft` washes) for everything about people, `sun` (yellow) for "this is yours". Fonts
+  (`src/app/fonts.ts`): Archivo `font-display` (titles, uppercase), IBM Plex Sans body, IBM Plex
+  Mono `font-mono` labels. Built for older, less tech-savvy relatives too: ≥48px labelled buttons,
+  ≥15px text, confirmation before reserving, state never shown by colour alone. Animations are
+  part of the product (transitions, celebrations, reveals) and must honour reduced motion.
 
 ## Architecture rules
 
@@ -106,11 +114,9 @@ users, so no data was migrated.
     `useLayoutEffect` cleanup. See `node_modules/next/dist/docs/01-app/02-guides/preserving-ui-state.md`.
   - Dev-only noise: a request that triggers the `/welcome` or `/start` redirect logs "Could not
     validate `instant` … NEXT_REDIRECT". Harmless.
-- **Theme:** plain inline `<script>` in `<head>` (localStorage `thatwish:theme`, else OS). Not
-  `next/script` `beforeInteractive`: it waits for Next's JS and flashes.
 - **404:** unmatched URLs use `src/app/global-not-found.tsx` (experimental `globalNotFound`; it
-  carries its own CSS, fonts (shared `src/app/fonts.ts`) and theme script, and picks the
-  language in the browser). A `[lang]/[...missing]`
+  carries its own CSS and fonts (shared `src/app/fonts.ts`) and picks the language in the
+  browser). A `[lang]/[...missing]`
   catch-all does NOT work in production. `[lang]/not-found.tsx` handles `notFound()` in pages;
   `[lang]/error.tsx` and `app/global-error.tsx` handle crashes.
 - **Rate limiting:** Better Auth limits per IP in the DB (`rate_limit` table, production only);

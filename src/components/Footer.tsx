@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useI18n } from '@/i18n/client';
 import Brand from './Brand';
 import LanguageToggle from './LanguageToggle';
-import ThemeToggle from './ThemeToggle';
 
 // The year is read in the browser only: pages are prerendered at build time,
 // and Cache Components rejects `new Date()` during prerender.
@@ -24,8 +23,7 @@ export default function Footer() {
         <div className="hidden sm:block">
           <Brand size="sm" />
         </div>
-        <div className="flex items-center gap-2 sm:order-3">
-          <ThemeToggle />
+        <div className="sm:order-3">
           <LanguageToggle />
         </div>
         <div className="sm:order-2 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs text-mute">

@@ -8,8 +8,6 @@ export const translations = {
     'a11y.skip': 'Skip to content',
     'a11y.account': 'Account menu',
     'a11y.closeMenu': 'Close menu',
-    'a11y.toDark': 'Switch to dark mode',
-    'a11y.toLight': 'Switch to light mode',
     'a11y.language': 'Language',
     'a11y.month': 'Month',
     'a11y.year': 'Year',
@@ -32,7 +30,6 @@ export const translations = {
     'common.prevMonth': 'Previous month',
     'common.nextMonth': 'Next month',
 
-    'lang.label': 'Language',
 
     'auth.welcome': 'Welcome to ThatWish',
     'auth.subtitle': 'Shared wishlists, zero duplicate gifts.',
@@ -274,8 +271,6 @@ export const translations = {
     'a11y.skip': 'Aller au contenu',
     'a11y.account': 'Menu du compte',
     'a11y.closeMenu': 'Fermer le menu',
-    'a11y.toDark': 'Passer en mode sombre',
-    'a11y.toLight': 'Passer en mode clair',
     'a11y.language': 'Langue',
     'a11y.month': 'Mois',
     'a11y.year': 'Année',
@@ -298,7 +293,6 @@ export const translations = {
     'common.prevMonth': 'Mois précédent',
     'common.nextMonth': 'Mois suivant',
 
-    'lang.label': 'Langue',
 
     'auth.welcome': 'Bienvenue sur ThatWish',
     'auth.subtitle': 'Des listes partagées, zéro cadeau en double.',

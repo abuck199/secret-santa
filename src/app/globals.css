@@ -1,36 +1,28 @@
 @import "tailwindcss";
 
-/* Dark mode follows the `.dark` class on <html> (set before paint by the
-   theme script in the root layout), not only the OS setting. */
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* ===== Design tokens (ported from the old app) ===== */
+/* ===== Design tokens =====
+   Light only (no dark mode, by choice). One brand colour (raspberry) for
+   everything about people, yellow ("sun") for "this is yours", near-black
+   for action buttons. */
 :root {
-  --paper: 246 244 239;   /* warm cream page */
-  --panel: 255 255 255;   /* card / surface */
-  --panel-2: 244 242 236; /* nested subtle surface */
-  --line: 230 226 219;    /* hairline borders */
-  --fg: 30 28 25;         /* near-black warm text */
-  --mute: 111 105 96;     /* muted text - AA (4.5:1) on cream */
-  --gold: 138 99 33;      /* refined accent - AA for small text on light */
-  --goldsoft: 242 235 222;/* accent wash */
-}
-
-.dark {
-  --paper: 23 22 20;
-  --panel: 31 29 27;
-  --panel-2: 38 36 33;
-  --line: 52 49 45;
-  --fg: 244 242 238;
-  --mute: 161 156 148;
-  --gold: 201 167 102;
-  --goldsoft: 46 40 30;
+  --paper: 247 242 232;      /* warm cream page */
+  --panel: 255 255 255;      /* card / surface */
+  --panel-2: 239 232 218;    /* nested subtle surface */
+  --line: 227 218 202;       /* hairline borders */
+  --fg: 26 26 26;            /* near-black text, action buttons */
+  --mute: 107 99 85;         /* muted text - 5.3:1 on cream */
+  --brand: 196 60 106;       /* raspberry fills - 4.9:1 with white text */
+  --brand-ink: 168 50 90;    /* raspberry for small text/links - 5.7:1 on cream */
+  --brand-soft: 248 220 229; /* raspberry wash */
+  --sun: 244 197 66;         /* "this is yours" highlight, with dark text */
+  --sun-soft: 252 240 200;
 }
 
 /* Replaces tailwind.config.js `theme.extend`. */
 @theme inline {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
   --color-paper: rgb(var(--paper));
   --color-panel: rgb(var(--panel));
@@ -38,8 +30,11 @@
   --color-line: rgb(var(--line));
   --color-fg: rgb(var(--fg));
   --color-mute: rgb(var(--mute));
-  --color-gold: rgb(var(--gold));
-  --color-goldsoft: rgb(var(--goldsoft));
+  --color-brand: rgb(var(--brand));
+  --color-brand-ink: rgb(var(--brand-ink));
+  --color-brand-soft: rgb(var(--brand-soft));
+  --color-sun: rgb(var(--sun));
+  --color-sun-soft: rgb(var(--sun-soft));
 
   --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.03), 0 6px 20px rgb(0 0 0 / 0.04);
   --shadow-card: 0 1px 3px rgb(0 0 0 / 0.05), 0 14px 40px rgb(0 0 0 / 0.06);
@@ -88,15 +83,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: rgb(var(--fg));
   background-color: rgb(var(--paper));
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .pb-safe {
   padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
-}
-
-.font-serif {
-  font-optical-sizing: auto;
 }
 
 @layer base {
@@ -110,7 +100,7 @@ body {
      trigger :focus-visible, so this stays out of the way for pointer users.
      Inputs keep their own focus ring (they set outline-none in utilities). */
   :focus-visible {
-    outline: 2px solid rgb(var(--gold));
+    outline: 2px solid rgb(var(--brand-ink));
     outline-offset: 2px;
   }
 }
@@ -124,7 +114,7 @@ body {
 @utility input {
   @apply w-full px-4 py-3 bg-panel border border-line rounded-xl outline-none transition
     text-fg placeholder:text-mute
-    focus:border-gold focus:ring-4 focus:ring-gold/15;
+    focus:border-brand focus:ring-4 focus:ring-brand/15;
 }
 
 @utility label {
@@ -163,7 +153,7 @@ body {
 }
 
 @utility link {
-  @apply text-fg font-medium underline decoration-gold/50 underline-offset-2 hover:decoration-gold;
+  @apply text-fg font-medium underline decoration-brand/50 underline-offset-2 hover:decoration-brand;
 }
 
 /* Shimmering skeleton placeholder */

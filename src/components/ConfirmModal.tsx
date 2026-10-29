@@ -91,12 +91,12 @@ export default function ConfirmModal({
         </button>
         <div
           className={`w-11 h-11 rounded-xl grid place-items-center mb-3 ${
-            danger ? 'bg-red-500/10 text-red-600' : 'bg-goldsoft text-gold'
+            danger ? 'bg-red-500/10 text-red-600' : 'bg-brand-soft text-brand-ink'
           }`}
         >
           <AlertTriangle className="w-6 h-6" aria-hidden="true" />
         </div>
-        <h3 id={titleId} className="font-serif text-xl font-semibold text-fg">{title}</h3>
+        <h3 id={titleId} className="font-display text-xl font-semibold text-fg">{title}</h3>
         {message && <p id={msgId} className="text-sm text-mute mt-1.5 leading-relaxed">{message}</p>}
         <div className="flex gap-2 mt-5">
           <button className="btn-secondary flex-1" onClick={onCancel} disabled={loading}>

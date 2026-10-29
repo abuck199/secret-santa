@@ -40,11 +40,11 @@ export default async function MatchPage() {
   return (
     <Page>
       {header}
-      <div className="card lift p-7 mb-6 text-center bg-goldsoft/40 animate-scale-in">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold mb-3">{t('assign.subtitle')}</p>
-        <p className="font-serif text-2xl sm:text-3xl font-medium text-fg tracking-tight">{assignment.receiverName}</p>
+      <div className="card lift p-7 mb-6 text-center bg-brand-soft/40 animate-scale-in">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-ink mb-3">{t('assign.subtitle')}</p>
+        <p className="font-display text-2xl sm:text-3xl font-medium text-fg tracking-tight">{assignment.receiverName}</p>
       </div>
-      <h2 className="font-serif text-lg font-medium text-fg mb-3">{t('assign.theirList')}</h2>
+      <h2 className="font-display text-lg font-medium text-fg mb-3">{t('assign.theirList')}</h2>
       <ReceiverList key={assignment.receiverId} initialItems={items} />
     </Page>
   );

@@ -26,7 +26,6 @@ import { switchHousehold } from '@/server/actions/households';
 import type { MyHousehold } from '@/server/queries/households';
 import Brand from './Brand';
 import LanguageToggle from './LanguageToggle';
-import ThemeToggle from './ThemeToggle';
 import { useSignOut } from './useSignOut';
 
 type Icon = ComponentType<{ className?: string; strokeWidth?: number; 'aria-hidden'?: boolean | 'true' }>;
@@ -132,7 +131,7 @@ export default function NavBar({
               className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm hover:bg-panel-2 text-left text-fg"
             >
               <span className="truncate">{h.name}</span>
-              {h.id === current.id && <Check className="w-4 h-4 text-gold shrink-0" />}
+              {h.id === current.id && <Check className="w-4 h-4 text-brand-ink shrink-0" />}
             </button>
           ))}
           <Link
@@ -140,7 +139,7 @@ export default function NavBar({
             onClick={closeAll}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-fg hover:bg-panel-2 font-medium mt-1 border-t border-line"
           >
-            <Plus className="w-4 h-4 text-gold" /> {t('nav.newHousehold')}
+            <Plus className="w-4 h-4 text-brand-ink" /> {t('nav.newHousehold')}
           </Link>
         </div>
       )}
@@ -175,7 +174,7 @@ export default function NavBar({
                   <Icon className="w-4 h-4" strokeWidth={1.9} aria-hidden="true" />
                   <span className="hidden lg:inline">{label}</span>
                   {active && (
-                    <span aria-hidden="true" className="absolute -bottom-[1.35rem] left-2 right-2 h-0.5 bg-gold rounded-full" />
+                    <span aria-hidden="true" className="absolute -bottom-[1.35rem] left-2 right-2 h-0.5 bg-brand rounded-full" />
                   )}
                 </Link>
               );
@@ -183,7 +182,6 @@ export default function NavBar({
           </div>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <LanguageToggle />
             <div className="relative" ref={profileRef}>
               <button
@@ -228,10 +226,7 @@ export default function NavBar({
           <Link href="/app" aria-label={t('nav.dashboard')}>
             <Brand size="sm" showMark={false} />
           </Link>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-mute truncate max-w-[32vw]">{current.name}</span>
-            <ThemeToggle />
-          </div>
+          <span className="text-sm font-medium text-mute truncate max-w-[32vw]">{current.name}</span>
         </div>
       </nav>
 
@@ -277,7 +272,7 @@ export default function NavBar({
             className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-panel rounded-t-3xl shadow-card max-h-[85vh] overflow-y-auto animate-slide-up pb-safe border-t border-line"
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-              <span className="font-serif text-lg font-medium text-fg">{t('nav.menu')}</span>
+              <span className="font-display text-lg font-medium text-fg">{t('nav.menu')}</span>
               <button onClick={() => setMenuOpen(false)} aria-label={t('a11y.closeMenu')} className="text-mute">
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>

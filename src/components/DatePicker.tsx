@@ -179,7 +179,7 @@ export default function DatePicker({
               value={view.m}
               onChange={(e) => setView((v) => ({ ...v, m: Number(e.target.value) }))}
               aria-label={t('a11y.month')}
-              className="flex-1 bg-panel border border-line rounded-lg px-2 py-1.5 text-sm font-medium text-fg outline-none focus:border-gold cursor-pointer"
+              className="flex-1 bg-panel border border-line rounded-lg px-2 py-1.5 text-sm font-medium text-fg outline-none focus:border-brand cursor-pointer"
             >
               {months.map((name, i) => (
                 <option key={name} value={i}>
@@ -192,7 +192,7 @@ export default function DatePicker({
               value={view.y}
               onChange={(e) => setView((v) => ({ ...v, y: Number(e.target.value) }))}
               aria-label={t('a11y.year')}
-              className="bg-panel border border-line rounded-lg px-2 py-1.5 text-sm font-medium text-fg outline-none focus:border-gold cursor-pointer"
+              className="bg-panel border border-line rounded-lg px-2 py-1.5 text-sm font-medium text-fg outline-none focus:border-brand cursor-pointer"
             >
               {years.map((y) => (
                 <option key={y} value={y}>
@@ -246,7 +246,7 @@ export default function DatePicker({
                       : disabled
                       ? 'text-mute/40 cursor-not-allowed'
                       : 'text-fg hover:bg-panel-2'
-                  } ${isToday && !isSelected ? 'ring-1 ring-gold/50' : ''}`}
+                  } ${isToday && !isSelected ? 'ring-1 ring-brand/50' : ''}`}
                 >
                   {d}
                 </button>

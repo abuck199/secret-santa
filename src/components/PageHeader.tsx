@@ -15,11 +15,11 @@ export default function PageHeader({
     <div className="flex items-end justify-between gap-4 mb-8">
       <div>
         {eyebrow && (
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold mb-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-ink mb-2">
             {eyebrow}
           </p>
         )}
-        <h1 className="font-serif text-[22px] sm:text-2xl font-medium tracking-tight text-fg leading-tight">
+        <h1 className="font-display text-[22px] sm:text-2xl font-medium tracking-tight text-fg leading-tight">
           {title}
         </h1>
         {subtitle && <p className="text-mute text-sm mt-2 max-w-xl leading-relaxed">{subtitle}</p>}

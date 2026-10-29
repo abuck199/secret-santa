@@ -23,8 +23,8 @@ export default function ErrorScreen({
         <Link href="/" className="inline-block mb-10">
           <Brand size="md" />
         </Link>
-        <p className="font-serif text-6xl font-medium text-gold tracking-tightest">{code}</p>
-        <h1 className="font-serif text-2xl font-medium text-fg mt-4">{title}</h1>
+        <p className="font-display text-6xl font-medium text-brand-ink tracking-tightest">{code}</p>
+        <h1 className="font-display text-2xl font-medium text-fg mt-4">{title}</h1>
         <p className="text-sm text-mute mt-2 leading-relaxed">{text}</p>
         <div className="flex flex-col sm:flex-row gap-2 justify-center mt-8">
           {children}

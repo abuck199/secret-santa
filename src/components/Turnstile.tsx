@@ -40,7 +40,7 @@ export default function Turnstile({ onToken, ref }: { onToken: (token: string | 
       appearance: 'interaction-only',
       size: 'flexible',
       language: lang,
-      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+      theme: 'light',
       callback: (token: string) => tokenCallback.current(token),
       'expired-callback': () => tokenCallback.current(null),
       'error-callback': () => tokenCallback.current(null),

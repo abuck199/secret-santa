@@ -89,7 +89,7 @@ export default function DeleteAccountDialog({ email, onClose }: { email: string;
         <div className="w-11 h-11 rounded-xl grid place-items-center mb-3 bg-red-500/10 text-red-600">
           <AlertTriangle className="w-6 h-6" aria-hidden="true" />
         </div>
-        <h3 id={titleId} className="font-serif text-xl font-semibold text-fg">{t('profile.deleteAccount')}</h3>
+        <h3 id={titleId} className="font-display text-xl font-semibold text-fg">{t('profile.deleteAccount')}</h3>
         <p className="text-sm text-mute mt-1.5 leading-relaxed">
           {t('profile.deleteAccountDesc')} {t('profile.deleteAccountConfirm')}
         </p>

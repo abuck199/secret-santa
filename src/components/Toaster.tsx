@@ -16,7 +16,7 @@ export default function Toaster() {
           fontWeight: 500,
           padding: '10px 14px',
         },
-        success: { iconTheme: { primary: 'rgb(var(--gold))', secondary: 'rgb(var(--paper))' } },
+        success: { iconTheme: { primary: 'rgb(var(--brand))', secondary: 'rgb(var(--paper))' } },
         error: { iconTheme: { primary: '#e5484d', secondary: 'rgb(var(--paper))' } },
       }}
     />

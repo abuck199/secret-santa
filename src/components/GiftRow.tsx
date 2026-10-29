@@ -74,7 +74,7 @@ export default function GiftRow({
             href={item.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-mute hover:text-gold transition mt-0.5"
+            className="inline-flex items-center gap-1 text-xs text-mute hover:text-brand-ink transition mt-0.5"
           >
             <ExternalLink className="w-3 h-3" /> {hostOf(item.link)}
           </a>
@@ -85,7 +85,7 @@ export default function GiftRow({
         <button
           onClick={onToggle}
           disabled={busy}
-          className="chip bg-goldsoft text-gold border border-gold/30 hover:opacity-80 transition"
+          className="chip bg-brand-soft text-brand-ink border border-brand/30 hover:opacity-80 transition"
           title={t('members.reservedByYou')}
         >
           {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}

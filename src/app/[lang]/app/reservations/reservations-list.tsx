@@ -65,7 +65,7 @@ export default function ReservationsList({ initialRows }: { initialRows: MyReser
               <div
                 key={row.id}
                 className={`card p-4 flex items-center gap-3 animate-slide-up ${
-                  row.purchased ? 'bg-goldsoft/50 border-gold/30' : ''
+                  row.purchased ? 'bg-brand-soft/50 border-brand/30' : ''
                 }`}
                 style={{ animationDelay: `${Math.min(i, 10) * 45}ms`, animationFillMode: 'backwards' }}
               >
@@ -77,7 +77,7 @@ export default function ReservationsList({ initialRows }: { initialRows: MyReser
                       href={row.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-mute hover:text-gold transition mt-0.5"
+                      className="inline-flex items-center gap-1 text-xs text-mute hover:text-brand-ink transition mt-0.5"
                     >
                       <ExternalLink className="w-3 h-3" /> {hostOf(row.link)}
                     </a>
@@ -89,7 +89,7 @@ export default function ReservationsList({ initialRows }: { initialRows: MyReser
                   disabled={isBusy}
                   className={`chip transition ${
                     row.purchased
-                      ? 'bg-goldsoft text-gold border border-gold/30'
+                      ? 'bg-brand-soft text-brand-ink border border-brand/30'
                       : 'bg-panel-2 text-mute border border-line hover:text-fg'
                   }`}
                 >

@@ -4,7 +4,6 @@ import { getT } from '@/i18n/server';
 import Brand from './Brand';
 import Footer from './Footer';
 import LanguageToggle from './LanguageToggle';
-import ThemeToggle from './ThemeToggle';
 
 export type LegalSection = { h: string; body: string[] };
 
@@ -27,10 +26,7 @@ export default async function LegalLayout({
           <Link href={home} aria-label={t('legal.home')}>
             <Brand size="sm" />
           </Link>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <LanguageToggle />
-          </div>
+          <LanguageToggle />
         </div>
       </header>
 
@@ -39,7 +35,7 @@ export default async function LegalLayout({
           <ArrowLeft className="w-4 h-4" aria-hidden="true" /> {t('legal.home')}
         </Link>
 
-        <h1 className="font-serif text-3xl font-medium tracking-tight text-fg">{title}</h1>
+        <h1 className="font-display text-3xl font-medium tracking-tight text-fg">{title}</h1>
         {updated && (
           <p className="text-xs text-mute mt-2">
             {t('legal.updated')}: {updated}
@@ -49,7 +45,7 @@ export default async function LegalLayout({
         <div className="mt-8 space-y-8">
           {sections.map((s) => (
             <section key={s.h}>
-              <h2 className="font-serif text-lg font-medium text-fg mb-2">{s.h}</h2>
+              <h2 className="font-display text-lg font-medium text-fg mb-2">{s.h}</h2>
               {s.body.map((p) => (
                 <p key={p} className="text-sm text-mute leading-relaxed mb-2">
                   {p}

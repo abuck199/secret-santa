@@ -182,7 +182,7 @@ export default function HouseholdSettings({
       <PageHeader eyebrow={t('nav.settings')} title={t('settings.title')} />
 
       {!isAdmin && (
-        <div className="card p-4 mb-4 bg-goldsoft/50 border-gold/20 text-sm text-fg">{t('settings.adminOnly')}</div>
+        <div className="card p-4 mb-4 bg-brand-soft/50 border-brand/20 text-sm text-fg">{t('settings.adminOnly')}</div>
       )}
 
       <Section title={t('settings.rename')}>
@@ -240,7 +240,7 @@ export default function HouseholdSettings({
                   {m.displayName} {m.isMe && <span className="text-mute font-normal">· {t('common.you')}</span>}
                 </p>
                 <span className="text-xs text-mute flex items-center gap-1">
-                  {m.isOwner && <Crown className="w-3 h-3 text-gold" aria-hidden="true" />}
+                  {m.isOwner && <Crown className="w-3 h-3 text-brand-ink" aria-hidden="true" />}
                   {m.role === 'admin' ? t('common.admin') : t('common.member')}
                 </span>
               </div>
@@ -308,7 +308,7 @@ export default function HouseholdSettings({
                       aria-label={copied === inv.id ? t('common.copied') : t('common.copy')}
                     >
                       {copied === inv.id ? (
-                        <Check className="w-4 h-4 text-gold" aria-hidden="true" />
+                        <Check className="w-4 h-4 text-brand-ink" aria-hidden="true" />
                       ) : (
                         <Copy className="w-4 h-4" aria-hidden="true" />
                       )}
@@ -335,7 +335,7 @@ export default function HouseholdSettings({
                     <>
                       <span className="text-mute">{t('settings.inviteJoinedLabel', { count: inv.joiners.length })}</span>
                       {inv.joiners.map((j) => (
-                        <span key={j.userId} className="chip bg-goldsoft text-gold border border-gold/30">
+                        <span key={j.userId} className="chip bg-brand-soft text-brand-ink border border-brand/30">
                           <Check className="w-3 h-3" aria-hidden="true" />
                           {j.name || t('common.member')}
                         </span>
@@ -377,7 +377,7 @@ export default function HouseholdSettings({
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="card p-5 mb-4">
-      <h2 className="font-serif text-lg font-medium text-fg mb-3">{title}</h2>
+      <h2 className="font-display text-lg font-medium text-fg mb-3">{title}</h2>
       {children}
     </div>
   );

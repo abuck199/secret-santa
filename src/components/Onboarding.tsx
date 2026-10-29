@@ -128,7 +128,7 @@ export default function Onboarding({ embedded = false }: { embedded?: boolean })
   if (embedded) {
     return (
       <div className="max-w-sm mx-auto px-4 py-10">
-        <h1 className="font-serif text-2xl font-medium tracking-tight text-fg mb-1">
+        <h1 className="font-display text-2xl font-medium tracking-tight text-fg mb-1">
           {t('nav.newHousehold')}
         </h1>
         <p className="text-mute text-sm mb-6">{t('onboard.subtitle')}</p>

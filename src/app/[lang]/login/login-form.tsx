@@ -131,10 +131,10 @@ export default function LoginForm() {
           </button>
 
           <div className="text-center mb-6">
-            <div className="mx-auto w-12 h-12 rounded-2xl bg-goldsoft text-gold grid place-items-center mb-4">
+            <div className="mx-auto w-12 h-12 rounded-2xl bg-brand-soft text-brand-ink grid place-items-center mb-4">
               <KeyRound className="w-6 h-6" strokeWidth={1.8} aria-hidden="true" />
             </div>
-            <h1 className="font-serif text-xl font-medium text-fg">{t('auth.codeLabel')}</h1>
+            <h1 className="font-display text-xl font-medium text-fg">{t('auth.codeLabel')}</h1>
             <p className="text-mute text-sm mt-1.5 leading-relaxed break-words">
               {t('auth.codeSent', { email })}
             </p>

@@ -5,7 +5,7 @@ import { ArrowUpRight, Cake } from 'lucide-react';
 import { useI18n } from '@/i18n/client';
 import { formatBirthday } from '@/lib/dates';
 
-// Featured "next birthday" card with a gold progress ring that fills as the
+// Featured "next birthday" card with a brand-coloured progress ring that fills as the
 // date approaches.
 export default function NextBirthdayCard({
   person,
@@ -43,7 +43,7 @@ export default function NextBirthdayCard({
               cy="46"
               r={r}
               fill="none"
-              stroke="rgb(var(--gold))"
+              stroke="rgb(var(--brand))"
               strokeWidth="5"
               strokeLinecap="round"
               strokeDasharray={circ}
@@ -53,10 +53,10 @@ export default function NextBirthdayCard({
           </svg>
           <div className="absolute inset-0 grid place-items-center text-center">
             {today ? (
-              <Cake className="w-8 h-8 text-gold" strokeWidth={1.7} />
+              <Cake className="w-8 h-8 text-brand-ink" strokeWidth={1.7} />
             ) : (
               <div>
-                <p className="font-serif text-2xl font-medium text-fg leading-none tabular-nums">{days}</p>
+                <p className="font-display text-2xl font-medium text-fg leading-none tabular-nums">{days}</p>
                 <p className="text-[10px] uppercase tracking-[0.12em] text-mute mt-1">
                   {days === 1 ? t('dash.dayUnit') : t('dash.daysUnit')}
                 </p>
@@ -67,10 +67,10 @@ export default function NextBirthdayCard({
 
         {/* Text */}
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold mb-1.5">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-1.5">
             {t('dash.nextBirthday')}
           </p>
-          <p className="font-serif text-xl sm:text-2xl font-medium text-fg leading-tight truncate">
+          <p className="font-display text-xl sm:text-2xl font-medium text-fg leading-tight truncate">
             {person.displayName}
             {isMe && <span className="text-mute font-sans font-normal text-base"> · {t('common.you')}</span>}
           </p>
@@ -78,7 +78,7 @@ export default function NextBirthdayCard({
             {formatBirthday(person.birthday, lang)}
             {person.age ? ` · ${t('dash.turning', { age: person.age })}` : ''}
             {' · '}
-            <span className={today ? 'text-gold font-medium' : ''}>{whenLabel}</span>
+            <span className={today ? 'text-brand-ink font-medium' : ''}>{whenLabel}</span>
           </p>
         </div>
 

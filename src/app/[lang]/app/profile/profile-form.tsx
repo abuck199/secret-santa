@@ -2,12 +2,11 @@
 
 import { useId, useLayoutEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Loader2, Save, Sun, Trash2 } from 'lucide-react';
+import { Globe, Loader2, Save, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import DatePicker from '@/components/DatePicker';
 import LanguageToggle from '@/components/LanguageToggle';
 import PageHeader, { Page } from '@/components/PageHeader';
-import ThemeToggle from '@/components/ThemeToggle';
 import { useI18n } from '@/i18n/client';
 import { actionErrorMessage } from '@/lib/action-error';
 import { updateProfile } from '@/server/actions/profile';
@@ -81,24 +80,16 @@ export default function ProfileForm({ profile }: { profile: MyProfile }) {
         </div>
       </form>
 
-      <div className="card p-5 mb-4">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="font-serif text-lg font-medium text-fg flex items-center gap-2">
-            <Sun className="w-[18px] h-[18px] text-gold" aria-hidden="true" /> {t('profile.language')}
-          </h2>
-          <ThemeToggle />
-        </div>
-        <div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t border-line">
-          <span className="text-sm text-mute flex items-center gap-2">
-            <Globe className="w-4 h-4" aria-hidden="true" /> {t('lang.label')}
-          </span>
-          <LanguageToggle />
-        </div>
+      <div className="card p-5 mb-4 flex items-center justify-between gap-4">
+        <h2 className="font-display text-lg font-medium text-fg flex items-center gap-2">
+          <Globe className="w-[18px] h-[18px] text-brand-ink" aria-hidden="true" /> {t('profile.language')}
+        </h2>
+        <LanguageToggle />
       </div>
 
       {/* Law 25: people can delete their account themselves. */}
       <div className="card p-5 border-red-500/30">
-        <h2 className="font-serif text-lg font-medium text-fg mb-2 flex items-center gap-2">
+        <h2 className="font-display text-lg font-medium text-fg mb-2 flex items-center gap-2">
           <Trash2 className="w-[18px] h-[18px] text-red-600" aria-hidden="true" /> {t('profile.dangerZone')}
         </h2>
         <p className="text-sm text-mute mb-4 leading-relaxed">{t('profile.deleteAccountDesc')}</p>

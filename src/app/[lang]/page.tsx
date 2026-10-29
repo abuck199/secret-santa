@@ -13,7 +13,6 @@ import {
 import Brand from '@/components/Brand';
 import Footer from '@/components/Footer';
 import LanguageToggle from '@/components/LanguageToggle';
-import ThemeToggle from '@/components/ThemeToggle';
 import { getLang, getT } from '@/i18n/server';
 import type { TFunction } from '@/i18n/translate';
 import { alternates } from '@/lib/seo';
@@ -62,10 +61,9 @@ export default async function LandingPage() {
             <Link href={login} className="btn-primary px-3.5 py-2 text-sm">
               {t('landing.getStarted')}
             </Link>
-            {/* Last, so they stay anchored to the right edge: the buttons'
-                width changes with the language and would push them around. */}
+            {/* Last, so it stays anchored to the right edge: the button's
+                width changes with the language and would push things around. */}
             <div className="hidden sm:flex items-center gap-2">
-              <ThemeToggle />
               <LanguageToggle />
             </div>
           </div>
@@ -77,10 +75,10 @@ export default async function LandingPage() {
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 sm:pt-20 pb-16">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
             <div className="min-w-0 animate-slide-up">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold mb-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-4">
                 {t('landing.hero.eyebrow')}
               </p>
-              <h1 className="font-serif text-4xl sm:text-5xl font-medium tracking-tight leading-[1.08]">
+              <h1 className="font-display text-4xl sm:text-5xl font-medium tracking-tight leading-[1.08]">
                 {t('landing.hero.title')}
               </h1>
               <p className="text-mute text-base sm:text-lg mt-5 leading-relaxed max-w-xl">
@@ -95,7 +93,7 @@ export default async function LandingPage() {
                 </Link>
               </div>
               <p className="text-xs text-mute mt-4 flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-gold" aria-hidden="true" /> {t('landing.hero.free')}
+                <Check className="w-3.5 h-3.5 text-brand-ink" aria-hidden="true" /> {t('landing.hero.free')}
               </p>
             </div>
 
@@ -109,17 +107,17 @@ export default async function LandingPage() {
         <section className="border-t border-line bg-panel/40">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
             <div className="max-w-2xl mb-12">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold mb-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-3">
                 {t('landing.features.eyebrow')}
               </p>
-              <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight">
+              <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight">
                 {t('landing.features.title')}
               </h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {features.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="card p-6">
-                  <div className="w-10 h-10 rounded-xl bg-goldsoft text-gold grid place-items-center mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-brand-soft text-brand-ink grid place-items-center mb-4">
                     <Icon className="w-5 h-5" strokeWidth={1.8} aria-hidden="true" />
                   </div>
                   <h3 className="font-medium text-fg mb-1.5">{title}</h3>
@@ -133,17 +131,17 @@ export default async function LandingPage() {
         {/* How it works */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           <div className="max-w-2xl mb-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold mb-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-3">
               {t('landing.how.eyebrow')}
             </p>
-            <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight">
+            <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight">
               {t('landing.how.title')}
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {steps.map((s) => (
               <div key={s.n} className="card p-6">
-                <span className="font-serif text-2xl font-medium text-gold">{s.n}</span>
+                <span className="font-display text-2xl font-medium text-brand-ink">{s.n}</span>
                 <h3 className="font-medium text-fg mt-3 mb-1.5">{s.title}</h3>
                 <p className="text-sm text-mute leading-relaxed">{s.desc}</p>
               </div>
@@ -153,8 +151,8 @@ export default async function LandingPage() {
 
         {/* CTA band */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
-          <div className="card p-10 sm:p-14 text-center bg-goldsoft/40">
-            <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight">
+          <div className="card p-10 sm:p-14 text-center bg-brand-soft/40">
+            <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight">
               {t('landing.cta.title')}
             </h2>
             <p className="text-mute mt-3 max-w-md mx-auto">{t('landing.cta.subtitle')}</p>
@@ -194,7 +192,7 @@ function MockPreview({ t, locale }: { t: TFunction; locale: string }) {
               cy="38"
               r={r}
               fill="none"
-              stroke="rgb(var(--gold))"
+              stroke="rgb(var(--brand))"
               strokeWidth="5"
               strokeLinecap="round"
               strokeDasharray={circ}
@@ -203,16 +201,16 @@ function MockPreview({ t, locale }: { t: TFunction; locale: string }) {
           </svg>
           <div className="absolute inset-0 grid place-items-center text-center">
             <div>
-              <p className="font-serif text-xl font-medium leading-none tabular-nums">3</p>
+              <p className="font-display text-xl font-medium leading-none tabular-nums">3</p>
               <p className="text-[9px] uppercase tracking-wide text-mute mt-0.5">{t('dash.daysUnit')}</p>
             </div>
           </div>
         </div>
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-ink">
             {t('landing.mock.next')}
           </p>
-          <p className="font-serif text-lg font-medium leading-tight">Camille</p>
+          <p className="font-display text-lg font-medium leading-tight">Camille</p>
           <p className="text-xs text-mute mt-0.5">{sampleDate} · {t('dash.turning', { age: 32 })}</p>
         </div>
       </div>
@@ -224,7 +222,7 @@ function MockPreview({ t, locale }: { t: TFunction; locale: string }) {
             <Gift className="w-4 h-4 text-mute shrink-0" />
             <span className="text-sm font-medium text-fg flex-1 truncate">{item.name}</span>
             {item.reserved ? (
-              <span className="chip bg-goldsoft text-gold border border-gold/30">
+              <span className="chip bg-brand-soft text-brand-ink border border-brand/30">
                 <Check className="w-3 h-3" /> {t('landing.mock.reserved')}
               </span>
             ) : (

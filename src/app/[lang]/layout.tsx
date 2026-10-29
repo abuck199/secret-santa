@@ -3,7 +3,6 @@ import { Analytics } from '@vercel/analytics/next';
 import { notFound } from 'next/navigation';
 import { lang as langParam } from 'next/root-params';
 import Toaster from '@/components/Toaster';
-import { themeInitScript } from '@/components/theme';
 import { LOCALES, isLocale } from '@/i18n/config';
 import { I18nProvider } from '@/i18n/client';
 import { getT } from '@/i18n/server';
@@ -46,26 +45,16 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f6f4ef' },
-    { media: '(prefers-color-scheme: dark)', color: '#171614' },
-  ],
+  themeColor: '#f7f2e8',
+  // Light only: keeps browsers from darkening form controls and scrollbars.
+  colorScheme: 'light',
 };
 
 export default async function RootLayout({ children }: LayoutProps<'/[lang]'>) {
   const lang = await langParam();
   if (!isLocale(lang)) notFound();
   return (
-    // The theme script changes <html>'s class before React hydrates.
-    <html lang={lang} className={fontVariables} suppressHydrationWarning>
-      <head>
-        {/* Runs while the HTML is parsed, so the right theme is on <html>
-            before the first paint. Plain <script> on purpose: next/script's
-            beforeInteractive waits for Next's JS and would flash. React only
-            warns if it client-renders this layout, which the language toggle
-            avoids by doing a full page load. */}
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-      </head>
+    <html lang={lang} className={fontVariables}>
       <body className="min-h-dvh">
         <I18nProvider lang={lang} dict={getDict(lang)}>
           {children}

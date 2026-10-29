@@ -84,7 +84,7 @@ export default function WishlistItem({
       ref={setNodeRef}
       style={style}
       className={`group card px-3 sm:px-4 py-3.5 flex items-center gap-3 transition ${
-        isDragging ? 'shadow-card ring-1 ring-gold/40' : 'hover:border-line'
+        isDragging ? 'shadow-card ring-1 ring-brand/40' : 'hover:border-line'
       }`}
     >
       <button
@@ -104,7 +104,7 @@ export default function WishlistItem({
             href={item.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-mute hover:text-gold transition mt-0.5"
+            className="inline-flex items-center gap-1 text-xs text-mute hover:text-brand-ink transition mt-0.5"
           >
             <ExternalLink className="w-3 h-3" /> {hostOf(item.link)}
           </a>

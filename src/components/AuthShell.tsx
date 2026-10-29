@@ -6,7 +6,6 @@ import { LogOut } from 'lucide-react';
 import { useI18n } from '@/i18n/client';
 import Brand from './Brand';
 import LanguageToggle from './LanguageToggle';
-import ThemeToggle from './ThemeToggle';
 import { useSignOut } from './useSignOut';
 
 // The narrow centered card shared by sign-in, "complete your profile" and
@@ -33,15 +32,12 @@ export default function AuthShell({
           <Link href="/" aria-label={t('legal.home')}>
             <Brand size="md" />
           </Link>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <LanguageToggle />
-          </div>
+          <LanguageToggle />
         </div>
         <div className="card p-6 sm:p-8 animate-scale-in">
           {title && (
             <div className="mb-6">
-              <h1 className="font-serif text-2xl font-medium tracking-tight text-fg">{title}</h1>
+              <h1 className="font-display text-2xl font-medium tracking-tight text-fg">{title}</h1>
               {subtitle && <p className="text-mute text-sm mt-1.5">{subtitle}</p>}
             </div>
           )}

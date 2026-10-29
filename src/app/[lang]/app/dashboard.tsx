@@ -49,8 +49,8 @@ export default function Dashboard({
   return (
     <Page>
       <div className="mb-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold mb-2">{householdName}</p>
-        <h1 className="font-serif text-[26px] sm:text-3xl font-medium tracking-tight text-fg leading-tight">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-2">{householdName}</p>
+        <h1 className="font-display text-[26px] sm:text-3xl font-medium tracking-tight text-fg leading-tight">
           {t('dash.greeting', { name: myName })}
         </h1>
       </div>
@@ -74,7 +74,7 @@ export default function Dashboard({
             className="group flex items-center gap-4 p-5 sm:p-6 text-left hover:bg-panel-2 transition animate-slide-up"
             style={{ animationDelay: `${i * 70}ms`, animationFillMode: 'backwards' }}
           >
-            <Icon className="w-5 h-5 text-gold shrink-0" strokeWidth={1.8} />
+            <Icon className="w-5 h-5 text-brand-ink shrink-0" strokeWidth={1.8} />
             <div className="min-w-0 flex-1">
               <StatNumber value={value} />
               <p className="text-xs text-mute mt-1.5 uppercase tracking-wide">{label}</p>
@@ -91,8 +91,8 @@ export default function Dashboard({
         </div>
       ) : rest.length > 0 ? (
         <>
-          <h2 className="font-serif text-lg font-medium text-fg flex items-center gap-2.5 mb-4">
-            <Cake className="w-[18px] h-[18px] text-gold" strokeWidth={1.8} />
+          <h2 className="font-display text-lg font-medium text-fg flex items-center gap-2.5 mb-4">
+            <Cake className="w-[18px] h-[18px] text-brand-ink" strokeWidth={1.8} />
             {t('dash.upcomingBirthdays')}
           </h2>
           <div className="card overflow-hidden">
@@ -107,8 +107,8 @@ export default function Dashboard({
                     style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'backwards' }}
                   >
                     <div
-                      className={`w-11 h-11 rounded-full grid place-items-center font-serif font-semibold shrink-0 border ${
-                        today ? 'bg-gold text-paper border-gold' : 'bg-panel-2 text-fg border-line'
+                      className={`w-11 h-11 rounded-full grid place-items-center font-display font-semibold shrink-0 border ${
+                        today ? 'bg-brand text-paper border-brand' : 'bg-panel-2 text-fg border-line'
                       }`}
                     >
                       {(m.displayName[0] || '?').toUpperCase()}
@@ -125,7 +125,7 @@ export default function Dashboard({
                     </div>
                     <span
                       className={`text-sm font-medium tabular-nums ${
-                        today ? 'text-gold' : soon ? 'text-fg' : 'text-mute'
+                        today ? 'text-brand-ink' : soon ? 'text-fg' : 'text-mute'
                       }`}
                     >
                       {whenLabel(m.days)}
@@ -143,5 +143,5 @@ export default function Dashboard({
 
 function StatNumber({ value }: { value: number }) {
   const animated = useCountUp(value);
-  return <p className="font-serif text-2xl font-medium text-fg leading-none tabular-nums">{animated}</p>;
+  return <p className="font-display text-2xl font-medium text-fg leading-none tabular-nums">{animated}</p>;
 }
