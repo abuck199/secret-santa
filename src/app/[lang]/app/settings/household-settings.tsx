@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '@/components/ConfirmModal';
+import DrawCeremony from '@/components/DrawCeremony';
 import InviteQr from '@/components/InviteQr';
 import PageHeader, { Page } from '@/components/PageHeader';
 import { useI18n } from '@/i18n/client';
@@ -79,6 +80,7 @@ export default function HouseholdSettings({
   const [copied, setCopied] = useState<string | null>(null);
   const [qrFor, setQrFor] = useState<string | null>(null); // invite whose QR code is open
   const [confirm, setConfirm] = useState<Confirm | null>(null);
+  const [ceremony, setCeremony] = useState(false); // the draw animation, after a successful draw
 
   const fail = (res: Parameters<typeof actionErrorMessage>[1]) => toast.error(actionErrorMessage(t, res));
   const inviteLink = (code: string) => `${origin}/join/${code}`;
@@ -111,7 +113,7 @@ export default function HouseholdSettings({
     const res = await shuffleAssignments(household.id);
     setDrawing(false);
     if (!res.ok) return fail(res);
-    toast.success(t('settings.drawDone'));
+    setCeremony(true); // its closing text replaces the old "draw done" toast
   }
 
   async function addInvite() {
@@ -414,6 +416,8 @@ export default function HouseholdSettings({
           </button>
         )}
       </Section>
+
+      {ceremony && <DrawCeremony names={members.map((m) => m.displayName)} onClose={() => setCeremony(false)} />}
 
       <ConfirmModal
         open={!!confirm}
