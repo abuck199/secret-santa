@@ -46,6 +46,12 @@ const nextConfig: NextConfig = {
     // Our root layout sits under [lang], so unmatched URLs need a standalone
     // 404 page (src/app/global-not-found.tsx); see Next's not-found docs.
     globalNotFound: true,
+    // Turbopack's on-disk cache (on by default since 16.3, and restored by
+    // Vercel between deployments) kept serving stale Tailwind output after
+    // globals.css changed: production shipped old tokens with new markup.
+    // Slower cold builds are the price of always-correct CSS.
+    turbopackFileSystemCacheForBuild: false,
+    turbopackFileSystemCacheForDev: false,
   },
   // Security headers on every response.
   async headers() {
