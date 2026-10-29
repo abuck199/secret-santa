@@ -8,6 +8,7 @@ import LanguageToggle from '@/components/LanguageToggle';
 import { getLang, getT } from '@/i18n/server';
 import type { TFunction } from '@/i18n/translate';
 import { appJsonLd, publicMetadata } from '@/lib/seo';
+import MockName from './mock-name';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -183,7 +184,9 @@ function MockPreview({ t, locale }: { t: TFunction; locale: string }) {
             </div>
           </div>
           <div className="min-w-0">
-            <p className="heading text-[26px]">Camille</p>
+            <p className="heading text-[26px]">
+              <MockName />
+            </p>
             <p className="text-[15px] mt-1">{sampleDate} · {t('dash.turning', { age: 32 })}</p>
           </div>
         </div>
