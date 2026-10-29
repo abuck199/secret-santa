@@ -7,8 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('err.notFoundTitle'), robots: { index: false } };
 }
 
-// Shown for notFound() and, through [...missing], for any unknown URL, in the
-// visitor's language and theme.
+// Shown for notFound() in pages, in the visitor's language (unknown URLs get
+// the global 404).
 export default async function NotFound() {
   const t = await getT();
   return <ErrorScreen code="404" title={t('err.notFoundTitle')} text={t('err.notFoundText')} homeLabel={t('err.home')} />;

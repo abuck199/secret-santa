@@ -26,14 +26,14 @@ export default function Footer() {
         <div className="sm:order-3">
           <LanguageToggle />
         </div>
-        <div className="sm:order-2 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs text-mute">
+        <div className="sm:order-2 flex flex-wrap items-center justify-center gap-x-2.5 text-sm text-mute">
           <span>© {year} ThatWish</span>
           <span aria-hidden="true">·</span>
-          <Link href="/privacy" className="hover:text-fg transition">
+          <Link href="/privacy" className="inline-flex items-center min-h-11 hover:text-fg transition">
             {t('legal.privacy')}
           </Link>
           <span aria-hidden="true">·</span>
-          <Link href="/terms" className="hover:text-fg transition">
+          <Link href="/terms" className="inline-flex items-center min-h-11 hover:text-fg transition">
             {t('legal.terms')}
           </Link>
         </div>

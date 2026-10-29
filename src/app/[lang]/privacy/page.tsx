@@ -37,7 +37,7 @@ const EN: LegalSection[] = [
     h: 'Cookies and similar technologies',
     body: [
       'Essential cookie: a secure session cookie keeps you signed in. It is required for the app to work and cannot be turned off.',
-      'Preferences: a cookie remembers the language you choose, and your browser’s local storage remembers your light or dark theme.',
+      'Preferences: a cookie remembers the language you choose.',
       'Analytics: a privacy-friendly, cookieless analytics tool that measures aggregate usage. It sets no tracking cookies and does not identify you.',
     ],
   },
@@ -111,7 +111,7 @@ const FR: LegalSection[] = [
     h: 'Témoins et technologies similaires',
     body: [
       'Témoin essentiel : un témoin de session sécurisé vous garde connecté. Nécessaire au fonctionnement de l’application, il ne peut être désactivé.',
-      'Préférences : un témoin retient la langue que vous choisissez, et le stockage local de votre navigateur retient votre thème clair ou sombre.',
+      'Préférences : un témoin retient la langue que vous choisissez.',
       'Analyses : un outil d’analyse sans témoin et respectueux de la vie privée qui mesure l’utilisation globale. Aucun témoin de suivi, aucune identification.',
     ],
   },

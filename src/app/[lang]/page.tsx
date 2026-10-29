@@ -1,16 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  Cake,
-  Check,
-  EyeOff,
-  Gift,
-  ListChecks,
-  Sparkles,
-  Users,
-} from 'lucide-react';
+import { ArrowRight, Cake, Check, EyeOff, ListChecks, Lock, Sparkles, Users } from 'lucide-react';
 import Brand from '@/components/Brand';
+import { WrappedGift } from '@/components/Celebration';
 import Footer from '@/components/Footer';
 import LanguageToggle from '@/components/LanguageToggle';
 import { getLang, getT } from '@/i18n/server';
@@ -49,16 +41,17 @@ export default async function LandingPage() {
         {t('a11y.skip')}
       </a>
       {/* Nav */}
-      <header className="sticky top-0 z-40 bg-paper/80 backdrop-blur-xl border-b border-line">
+      <header className="sticky top-0 z-40 bg-paper/90 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-          <Link href="/">
+          <Link href="/" className="shrink-0">
             <Brand size="sm" />
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link href={login} className="btn-ghost px-3 py-2 text-sm hidden min-[360px]:inline-flex">
+            {/* Phones have "I already have an account" right under the hero. */}
+            <Link href={login} className="btn-ghost px-3 hidden min-[420px]:inline-flex">
               {t('landing.signin')}
             </Link>
-            <Link href={login} className="btn-primary px-3.5 py-2 text-sm">
+            <Link href={login} className="btn-primary px-4">
               {t('landing.getStarted')}
             </Link>
             {/* Last, so it stays anchored to the right edge: the button's
@@ -72,56 +65,50 @@ export default async function LandingPage() {
 
       <main id="main-content" tabIndex={-1} className="outline-none">
         {/* Hero */}
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 sm:pt-20 pb-16">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
-            <div className="min-w-0 animate-slide-up">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-4">
-                {t('landing.hero.eyebrow')}
-              </p>
-              <h1 className="font-display text-4xl sm:text-5xl font-medium tracking-tight leading-[1.08]">
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-16 pb-14">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+            <div className="min-w-0">
+              <p className="eyebrow text-brand-ink mb-3 animate-rise">{t('landing.hero.eyebrow')}</p>
+              <h1 className="heading text-[32px] sm:text-[52px] leading-[0.98] animate-rise [animation-delay:80ms]">
                 {t('landing.hero.title')}
               </h1>
-              <p className="text-mute text-base sm:text-lg mt-5 leading-relaxed max-w-xl">
+              <p className="text-mute text-base sm:text-lg mt-5 leading-relaxed max-w-xl animate-rise [animation-delay:160ms]">
                 {t('landing.hero.subtitle')}
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 mt-8">
-                <Link href={login} className="btn-primary w-full sm:w-auto px-5 py-3 text-base">
-                  {t('landing.hero.cta')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              <div className="flex flex-col sm:flex-row gap-3 mt-7 animate-rise [animation-delay:240ms]">
+                <Link href={login} className="btn-primary w-full sm:w-auto px-6">
+                  {t('landing.hero.cta')} <ArrowRight className="w-[18px] h-[18px]" aria-hidden="true" />
                 </Link>
-                <Link href={login} className="btn-secondary w-full sm:w-auto px-5 py-3 text-base">
+                <Link href={login} className="btn-secondary w-full sm:w-auto px-6">
                   {t('landing.hero.secondary')}
                 </Link>
               </div>
-              <p className="text-xs text-mute mt-4 flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-brand-ink" aria-hidden="true" /> {t('landing.hero.free')}
+              <p className="text-sm text-mute mt-4 flex items-center gap-1.5 animate-rise [animation-delay:300ms]">
+                <Check className="w-4 h-4 text-brand-ink" strokeWidth={3} aria-hidden="true" /> {t('landing.hero.free')}
               </p>
             </div>
 
-            <div className="min-w-0 animate-scale-in" aria-hidden="true">
+            <div className="min-w-0 animate-rise [animation-delay:200ms]" aria-hidden="true">
               <MockPreview t={t} locale={lang === 'fr' ? 'fr-CA' : 'en-US'} />
             </div>
           </div>
         </section>
 
         {/* Features */}
-        <section className="border-t border-line bg-panel/40">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
-            <div className="max-w-2xl mb-12">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-3">
-                {t('landing.features.eyebrow')}
-              </p>
-              <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight">
-                {t('landing.features.title')}
-              </h2>
+        <section className="bg-panel/50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+            <div className="max-w-2xl mb-8">
+              <p className="eyebrow text-brand-ink mb-2">{t('landing.features.eyebrow')}</p>
+              <h2 className="heading text-[28px] sm:text-4xl">{t('landing.features.title')}</h2>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {features.map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="card p-6">
-                  <div className="w-10 h-10 rounded-xl bg-brand-soft text-brand-ink grid place-items-center mb-4">
-                    <Icon className="w-5 h-5" strokeWidth={1.8} aria-hidden="true" />
-                  </div>
-                  <h3 className="font-medium text-fg mb-1.5">{title}</h3>
-                  <p className="text-sm text-mute leading-relaxed">{desc}</p>
+                <div key={title} className="card p-5">
+                  <span className="w-12 h-12 rounded-2xl bg-brand-soft text-brand-ink grid place-items-center mb-4">
+                    <Icon className="w-6 h-6" strokeWidth={2} aria-hidden="true" />
+                  </span>
+                  <h3 className="text-base font-bold text-fg mb-1.5">{title}</h3>
+                  <p className="text-[15px] text-mute leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -129,35 +116,35 @@ export default async function LandingPage() {
         </section>
 
         {/* How it works */}
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
-          <div className="max-w-2xl mb-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-ink mb-3">
-              {t('landing.how.eyebrow')}
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight">
-              {t('landing.how.title')}
-            </h2>
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+          <div className="max-w-2xl mb-8">
+            <p className="eyebrow text-brand-ink mb-2">{t('landing.how.eyebrow')}</p>
+            <h2 className="heading text-[28px] sm:text-4xl">{t('landing.how.title')}</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-3 gap-3">
             {steps.map((s) => (
-              <div key={s.n} className="card p-6">
-                <span className="font-display text-2xl font-medium text-brand-ink">{s.n}</span>
-                <h3 className="font-medium text-fg mt-3 mb-1.5">{s.title}</h3>
-                <p className="text-sm text-mute leading-relaxed">{s.desc}</p>
+              <div key={s.n} className="card p-5">
+                <span className="heading text-4xl text-brand">{s.n}</span>
+                <h3 className="text-base font-bold text-fg mt-3 mb-1.5">{s.title}</h3>
+                <p className="text-[15px] text-mute leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* CTA band */}
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
-          <div className="card p-10 sm:p-14 text-center bg-brand-soft/40">
-            <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight">
-              {t('landing.cta.title')}
-            </h2>
-            <p className="text-mute mt-3 max-w-md mx-auto">{t('landing.cta.subtitle')}</p>
-            <Link href={login} className="btn-primary px-6 py-3 text-base mt-7">
-              {t('landing.getStarted')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
+          <div className="relative overflow-hidden rounded-[32px] bg-brand text-white px-6 py-12 sm:p-16 text-center">
+            <span aria-hidden="true" className="absolute left-8 top-8 w-8 h-8 rounded-full bg-sun animate-float" />
+            <span aria-hidden="true" className="absolute right-10 top-12 w-4 h-4 rounded-[4px] bg-white/80 rotate-12 animate-float [animation-delay:700ms]" />
+            <span aria-hidden="true" className="absolute right-16 bottom-10 w-6 h-6 rounded-full border-4 border-brand-soft animate-float [animation-delay:300ms]" />
+            <h2 className="heading text-[28px] sm:text-4xl relative">{t('landing.cta.title')}</h2>
+            <p className="mt-3 max-w-md mx-auto text-base relative">{t('landing.cta.subtitle')}</p>
+            <Link
+              href={login}
+              className="press relative inline-flex items-center gap-2 min-h-12 px-6 mt-7 rounded-full bg-white text-brand-ink text-base font-semibold"
+            >
+              {t('landing.getStarted')} <ArrowRight className="w-[18px] h-[18px]" aria-hidden="true" />
             </Link>
           </div>
         </section>
@@ -168,10 +155,9 @@ export default async function LandingPage() {
   );
 }
 
-// A static, stylized preview of the app for the hero (decorative only).
+// A static preview of the app for the hero (decorative only): the same
+// raspberry next-birthday card and gift cards as the real home and list.
 function MockPreview({ t, locale }: { t: TFunction; locale: string }) {
-  const r = 30;
-  const circ = 2 * Math.PI * r;
   const sampleDate = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' }).format(
     new Date(2000, 5, 30),
   );
@@ -181,60 +167,45 @@ function MockPreview({ t, locale }: { t: TFunction; locale: string }) {
     { name: t('landing.mock.item3'), reserved: false },
   ];
   return (
-    <div className="card p-5 sm:p-6 shadow-card max-w-md mx-auto">
-      {/* Faux next-birthday widget */}
-      <div className="rounded-2xl border border-line p-5 flex items-center gap-4 mb-4">
-        <div className="relative shrink-0 w-[76px] h-[76px]">
-          <svg width="76" height="76" viewBox="0 0 76 76" className="-rotate-90">
-            <circle cx="38" cy="38" r={r} fill="none" stroke="rgb(var(--line))" strokeWidth="5" />
-            <circle
-              cx="38"
-              cy="38"
-              r={r}
-              fill="none"
-              stroke="rgb(var(--brand))"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeDasharray={circ}
-              strokeDashoffset={circ * 0.18}
-            />
-          </svg>
-          <div className="absolute inset-0 grid place-items-center text-center">
+    <div className="max-w-md mx-auto space-y-3">
+      <div className="relative overflow-hidden rounded-3xl bg-brand text-white p-5">
+        <span className="absolute right-5 top-4 w-5 h-5 rounded-full bg-sun animate-float" />
+        <span className="absolute right-14 top-10 w-2.5 h-2.5 rounded-[3px] bg-white/80 rotate-12 animate-float [animation-delay:600ms]" />
+        <p className="eyebrow">{t('landing.mock.next')}</p>
+        <div className="flex items-center gap-4 mt-3">
+          <div className="w-[68px] h-[68px] shrink-0 rounded-2xl bg-white text-brand-ink grid place-items-center text-center">
             <div>
-              <p className="font-display text-xl font-medium leading-none tabular-nums">3</p>
-              <p className="text-[9px] uppercase tracking-wide text-mute mt-0.5">{t('dash.daysUnit')}</p>
+              <p className="heading text-[28px] tabular-nums">3</p>
+              <p className="font-mono text-[11px] font-semibold uppercase mt-0.5">{t('dash.daysUnit')}</p>
             </div>
           </div>
-        </div>
-        <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-ink">
-            {t('landing.mock.next')}
-          </p>
-          <p className="font-display text-lg font-medium leading-tight">Camille</p>
-          <p className="text-xs text-mute mt-0.5">{sampleDate} · {t('dash.turning', { age: 32 })}</p>
-        </div>
-      </div>
-
-      {/* Faux wishlist rows */}
-      <div className="space-y-2">
-        {items.map((item) => (
-          <div key={item.name} className="flex items-center gap-3 p-3 rounded-xl bg-panel-2 border border-line">
-            <Gift className="w-4 h-4 text-mute shrink-0" />
-            <span className="text-sm font-medium text-fg flex-1 truncate">{item.name}</span>
-            {item.reserved ? (
-              <span className="chip bg-brand-soft text-brand-ink border border-brand/30">
-                <Check className="w-3 h-3" /> {t('landing.mock.reserved')}
-              </span>
-            ) : (
-              <span className="chip bg-fg text-paper">{t('landing.mock.reserve')}</span>
-            )}
+          <div className="min-w-0">
+            <p className="heading text-[26px]">Camille</p>
+            <p className="text-[15px] mt-1">{sampleDate} · {t('dash.turning', { age: 32 })}</p>
           </div>
-        ))}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 mt-4 text-xs text-mute">
-        <Users className="w-3.5 h-3.5" /> {t('landing.mock.summary')}
-      </div>
+      {items.map((item) => (
+        <div key={item.name} className="flex items-center gap-3 p-3 rounded-[20px] bg-panel shadow-soft">
+          <span className="w-12 h-12 shrink-0 rounded-2xl bg-brand-soft text-brand-ink grid place-items-center">
+            <WrappedGift className="w-8 h-8" />
+          </span>
+          <span className="text-[15px] font-bold text-fg flex-1 truncate">{item.name}</span>
+          {item.reserved ? (
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-sun text-sm font-semibold">
+              <Check className="w-4 h-4" strokeWidth={3} /> {t('landing.mock.reserved')}
+            </span>
+          ) : (
+            <span className="px-3 py-1.5 rounded-full bg-fg text-white text-sm font-semibold">{t('landing.mock.reserve')}</span>
+          )}
+        </div>
+      ))}
+
+      <p className="flex items-center gap-2 px-1 text-sm text-mute">
+        <Users className="w-4 h-4" /> {t('landing.mock.summary')}
+        <Lock className="w-4 h-4 ml-auto" />
+      </p>
     </div>
   );
 }
