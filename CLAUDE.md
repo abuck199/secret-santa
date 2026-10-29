@@ -59,7 +59,9 @@ users, so no data was migrated.
   unbought reservations are released, bought ones stay taken (anonymously), your draw pairings
   are voided.
 - Invites: 16-hex codes, multi-use, 30 days, max 5 active per household (locked count). Unknown
-  and expired codes give the same error. A removed member can rejoin with a valid link.
+  and expired codes give the same error. Everyone who joins by link is a plain member; who
+  joined through which link is in `invite_redemptions`. A removed member can rejoin with a
+  valid link.
 - Wishlist: max 50 items per person per household (advisory lock), links re-validated
   server-side (`src/lib/url.ts`). Draw: crypto shuffle, cyclic pairing, ≥3 members; nobody
   (admins included) sees the full draw.
@@ -118,12 +120,21 @@ users, so no data was migrated.
 - **Schema changes:** edit `src/db/schema.ts` → `pnpm db:generate` → commit the SQL in
   `drizzle/` → `pnpm db:migrate` on `dev`, then on `production` at deploy time. Never use
   `drizzle-kit push` (both branches were baselined on 2026-10-28 and track migrations).
+  **Order matters:** for a migration that removes something, deploy the code that stops using
+  it first, then migrate production; for one that adds something, migrate first. Production is
+  migrated by the owner from their terminal (`DATABASE_URL='<prod direct URL>' pnpm db:migrate`,
+  with a leading space to keep it out of shell history), so the URL never passes through Claude.
+- Migrations: `0000` baseline; `0001` dropped the unused `invites` columns (`email`, `role`,
+  `accepted_by`, `accepted_at`).
 - `BETTER_AUTH_URL` is set for Production only; previews infer it from the request. A wrong value
   causes `INVALID_ORIGIN` on sign-in.
 - Secrets (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `RESEND_API_KEY`) stay out of git; one
   `BETTER_AUTH_SECRET` per environment.
 
-## Tests
+## Tests and CI
+
+`.github/workflows/ci.yml` runs `pnpm lint`, `pnpm typecheck` (`next typegen` first: `tsc` needs
+Next's generated route types) and `pnpm test` on every push; no secrets needed.
 
 `pnpm test`: Vitest + PGlite (in-memory Postgres built from `drizzle/`; never touches Neon).
 `tests/setup.ts` mocks `@/db`, `@/server/session` (`signInAs()`), `next/headers`,

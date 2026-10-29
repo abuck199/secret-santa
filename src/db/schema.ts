@@ -99,17 +99,15 @@ export const memberships = pgTable('memberships', {
   index('memberships_user_idx').on(t.userId),
 ]);
 
+// Multi-use links; who joined through each one is in invite_redemptions.
+// Everyone who joins by link becomes a plain member.
 export const invites = pgTable('invites', {
   id: uuid('id').primaryKey().defaultRandom(),
   householdId: uuid('household_id').notNull().references(() => households.id, { onDelete: 'cascade' }),
   code: text('code').notNull().unique(), // generated in app (crypto.randomBytes)
-  email: text('email'),
-  role: memberRole('role').notNull().default('member'),
   invitedBy: uuid('invited_by').references(() => users.id, { onDelete: 'set null' }),
-  acceptedBy: uuid('accepted_by').references(() => users.id, { onDelete: 'set null' }),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  acceptedAt: timestamp('accepted_at', { withTimezone: true }),
 }, (t) => [index('invites_code_idx').on(t.code)]);
 
 export const inviteRedemptions = pgTable('invite_redemptions', {

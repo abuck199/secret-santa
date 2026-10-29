@@ -55,6 +55,7 @@ pnpm dev                    # http://localhost:3000
 | `pnpm dev` | Dev server |
 | `pnpm build` / `pnpm start` | Production build / serve it |
 | `pnpm lint` | ESLint (also blocks database imports outside `src/server`) |
+| `pnpm typecheck` | Generate Next's route types, then `tsc` |
 | `pnpm test` | Server tests against an in-memory Postgres (never touches a real database) |
 | `pnpm db:generate` | Turn changes in `src/db/schema.ts` into a new SQL migration in `drizzle/` |
 | `pnpm db:migrate` | Apply pending migrations to `DATABASE_URL` |
@@ -62,7 +63,9 @@ pnpm dev                    # http://localhost:3000
 
 ## Deployment
 
-Vercel deploys `main` to production and every other branch as a preview.
+GitHub Actions runs lint, typecheck and tests on every push
+(`.github/workflows/ci.yml`; no secrets needed). Vercel deploys `main` to
+production and every other branch as a preview.
 Production uses the Neon `production` branch; previews and local development
 use the `dev` branch. Schema changes ship as migrations: run
 `pnpm db:migrate` against each branch.

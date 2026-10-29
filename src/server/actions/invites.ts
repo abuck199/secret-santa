@@ -4,7 +4,7 @@
 // derive the user from the session, check the role.
 
 import { randomBytes } from 'node:crypto';
-import { and, count, eq, gt, isNull, sql } from 'drizzle-orm';
+import { and, count, eq, gt, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/db';
 import { households, inviteRedemptions, invites, memberships } from '@/db/schema';
@@ -78,7 +78,6 @@ export async function acceptInvite(
       .select({
         id: invites.id,
         householdId: invites.householdId,
-        role: invites.role,
         householdName: households.name,
       })
       .from(invites)
@@ -92,7 +91,7 @@ export async function acceptInvite(
       // double submit; no row back means they were already in.
       const [joined] = await tx
         .insert(memberships)
-        .values({ householdId: invite.householdId, userId: user.id, role: invite.role })
+        .values({ householdId: invite.householdId, userId: user.id, role: 'member' })
         .onConflictDoNothing()
         .returning({ id: memberships.id });
       if (!joined) throw new ActionError('already_member', { name: invite.householdName });
@@ -100,10 +99,6 @@ export async function acceptInvite(
       await tx.insert(inviteRedemptions)
         .values({ inviteId: invite.id, userId: user.id })
         .onConflictDoNothing();
-      // `accepted_by` keeps the first person who used the link.
-      await tx.update(invites)
-        .set({ acceptedBy: user.id, acceptedAt: new Date() })
-        .where(and(eq(invites.id, invite.id), isNull(invites.acceptedBy)));
       return { householdId: invite.householdId, householdName: invite.householdName };
     });
     await rememberHousehold(joined.householdId);
