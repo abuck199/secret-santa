@@ -20,6 +20,13 @@ export function daysUntilBirthday(dateStr: string | null | undefined, from = new
   return Math.round((next.getTime() - today.getTime()) / 86400000);
 }
 
+// Christmas is an event for every group, shown among the birthdays.
+export const CHRISTMAS = '2000-12-25';
+
+export function daysUntilChristmas(from = new Date()): number {
+  return daysUntilBirthday(CHRISTMAS, from) ?? 0;
+}
+
 // Age the person will turn at their next birthday (null if year unknown/0).
 export function ageTurningNext(dateStr: string | null | undefined, from = new Date()): number | null {
   const parts = parseDateParts(dateStr);

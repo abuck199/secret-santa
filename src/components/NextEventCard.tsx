@@ -1,30 +1,37 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Cake } from 'lucide-react';
+import { ArrowRight, Cake, TreePine } from 'lucide-react';
 import { useI18n } from '@/i18n/client';
-import { formatBirthday } from '@/lib/dates';
 import { useCountUp } from './useCountUp';
 
-// Featured "next birthday" card: the brand-coloured hero of the home screen,
-// with a countdown that ticks down to the real number on arrival.
-export default function NextBirthdayCard({
-  person,
-  isMe,
+// Featured "next event" card (a birthday or Christmas): the brand-coloured hero
+// of the home screen, with a countdown that ticks down to the real number on arrival.
+export default function NextEventCard({
+  kind,
+  eyebrow,
+  title,
+  detail,
+  days,
   whenLabel,
   href,
+  linkLabel,
   className = '',
 }: {
-  person: { displayName: string; birthday: string | null; days: number; age: number | null };
-  isMe: boolean;
+  kind: 'birthday' | 'christmas';
+  eyebrow: string;
+  title: string;
+  detail: string;
+  days: number;
   whenLabel: string;
   href: string;
+  linkLabel: string;
   className?: string;
 }) {
-  const { t, lang } = useI18n();
-  const days = person.days;
+  const { t } = useI18n();
   const today = days === 0;
   const shown = useCountUp(days, 1000, Math.min(days + 18, 365));
+  const TodayIcon = kind === 'christmas' ? TreePine : Cake;
 
   return (
     <section className={`relative overflow-hidden rounded-3xl bg-brand text-white p-5 sm:p-6 ${className}`}>
@@ -39,7 +46,7 @@ export default function NextBirthdayCard({
         className="absolute right-6 top-14 w-3.5 h-3.5 rounded-full border-[3px] border-brand-soft animate-float [animation-delay:300ms]"
       />
 
-      <p className="eyebrow relative">{t('dash.nextBirthday')}</p>
+      <p className="eyebrow relative">{eyebrow}</p>
 
       <div className="relative flex items-center gap-4 mt-3">
         <div
@@ -47,7 +54,7 @@ export default function NextBirthdayCard({
           className="w-[72px] h-[72px] shrink-0 rounded-2xl bg-white text-brand-ink grid place-items-center text-center"
         >
           {today ? (
-            <Cake className="w-8 h-8" strokeWidth={2} aria-hidden="true" />
+            <TodayIcon className="w-8 h-8" strokeWidth={2} aria-hidden="true" />
           ) : (
             <div aria-hidden="true">
               <p className="heading text-[30px] tabular-nums">{shown}</p>
@@ -58,10 +65,9 @@ export default function NextBirthdayCard({
           )}
         </div>
         <div className="min-w-0">
-          <p className="heading text-[26px] sm:text-[30px] break-words">{person.displayName}</p>
+          <p className="heading text-[26px] sm:text-[30px] break-words">{title}</p>
           <p className="text-[15px] mt-1">
-            {isMe ? t('common.you') : formatBirthday(person.birthday, lang)}
-            {person.age ? ` · ${t('dash.turning', { age: person.age })}` : ''}
+            {detail}
             {today && ` · ${whenLabel}`}
           </p>
         </div>
@@ -71,7 +77,7 @@ export default function NextBirthdayCard({
         href={href}
         className="press relative mt-4 inline-flex items-center gap-2 min-h-11 px-5 rounded-full bg-white text-brand-ink text-[15px] font-semibold"
       >
-        {isMe ? t('nav.wishlist') : t('dash.viewList')}
+        {linkLabel}
         <ArrowRight className="w-[18px] h-[18px]" strokeWidth={2.4} aria-hidden="true" />
       </Link>
     </section>

@@ -62,7 +62,9 @@ users, so no data was migrated.
   gift wraps itself + `Confetti`, from `Celebration.tsx`), `useReservations`, `ConfirmModal`
   (bottom sheet on phones; `icon`/`eyebrow`/children for explanations). Each member has a page
   `/app/members/[userId]` (your own → `/app/list`); the home hero card and member cards share a
-  `<ViewTransition name="member-<id>" share="morph">` with its raspberry header. The "+ Add" tab
+  `<ViewTransition name="member-<id>" share="morph">` with its raspberry header. The home hero
+  (`NextEventCard`) shows the next event: a birthday, or Christmas (Dec 25, every group) when
+  it comes first; Christmas also sits in the "Coming up" list. The "+ Add" tab
   links to `/app/list#add` (`ADD_FIELD_ID`). Per-row actions are labelled pills, never
   hover-only icons.
 - **Wording:** users see **"group" / "groupe"** (a family, friends, colleagues), never
