@@ -65,10 +65,9 @@ users, so no data was migrated.
   `<ViewTransition name="member-<id>" share="morph">` with its raspberry header. The home hero
   (`NextEventCard`) shows the next event: a birthday, or Christmas (Dec 25, every group) when
   it comes first; Christmas also sits in the "Coming up" list. Its countdown is split-flap
-  digits (`FlapCounter`); the Christmas card adds a slow aurora and snow. The draw reveal
-  (`/app/match`) is a holographic card lit by the pointer or the phone's tilt (Android only,
-  no iOS motion prompt; otherwise a slow CSS drift of `@property --mx/--my`), and the name
-  decodes letter by letter. The "+ Add" tab
+  digits (`FlapCounter`); the Christmas card adds a slow aurora and snow. A holographic
+  draw-reveal card (tilt, iridescent foil, decoding name) was tried and rejected by the
+  owner (2026-10-29): keep `/app/match` a plain card flip. The "+ Add" tab
   links to `/app/list#add` (`ADD_FIELD_ID`). Per-row actions are labelled pills, never
   hover-only icons.
 - **Wording:** users see **"group" / "groupe"** (a family, friends, colleagues), never

@@ -199,65 +199,6 @@
   to { transform: translate(var(--drift), 320px); }
 }
 
-/* ===== Secret Santa reveal: a holographic card (see draw-reveal.tsx) =====
-   --mx/--my (0 to 1) say where the light comes from: the pointer or the
-   phone's tilt, else a slow drift. Registered so the drift can animate them. */
-@property --mx { syntax: '<number>'; inherits: true; initial-value: 0.5; }
-@property --my { syntax: '<number>'; inherits: true; initial-value: 0.5; }
-@keyframes holo-drift {
-  0% { --mx: 0.3; --my: 0.35; }
-  50% { --mx: 0.7; --my: 0.45; }
-  100% { --mx: 0.45; --my: 0.7; }
-}
-.holo {
-  transform-style: preserve-3d;
-  transform: rotateX(calc((0.5 - var(--my)) * 10deg)) rotateY(calc((var(--mx) - 0.5) * 14deg));
-  animation: holo-drift 7s ease-in-out infinite alternate;
-}
-/* Following the pointer or the tilt: registered properties transition smoothly. */
-.holo[data-live] { animation: none; transition: --mx 0.25s ease-out, --my 0.25s ease-out; }
-.holo-foil,
-.holo-glare {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-}
-.holo-foil {
-  background: linear-gradient(
-    115deg,
-    transparent 25%,
-    rgb(255 120 190 / 0.55) 37%,
-    rgb(120 210 255 / 0.5) 45%,
-    rgb(255 236 120 / 0.55) 53%,
-    rgb(175 140 255 / 0.45) 61%,
-    transparent 74%
-  );
-  background-size: 300% 300%;
-  background-position: calc(var(--mx) * 100%) calc(var(--my) * 100%);
-  mix-blend-mode: overlay;
-}
-.holo-glare {
-  background: radial-gradient(
-    circle at calc(var(--mx) * 100%) calc(var(--my) * 100%),
-    rgb(255 255 255 / 0.5),
-    transparent 55%
-  );
-  mix-blend-mode: soft-light;
-}
-/* One bright band sweeps down the card as it turns over. */
-.holo-scan {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -30%;
-  height: 30%;
-  pointer-events: none;
-  background: linear-gradient(transparent, rgb(255 255 255 / 0.6), transparent);
-  animation: holo-scan 0.9s 0.4s ease-in-out both;
-}
-@keyframes holo-scan { from { transform: translateY(0); opacity: 1; } to { transform: translateY(440%); opacity: 0; } }
-
 /* Shared-element morph (React <ViewTransition share="morph">): the home card
    turning into the member page header. */
 ::view-transition-group(.morph) {
@@ -423,8 +364,7 @@ body {
     animation: none;
   }
   .confetti,
-  .snowflake,
-  .holo-scan {
+  .snowflake {
     display: none;
   }
   ::view-transition-group(*),
